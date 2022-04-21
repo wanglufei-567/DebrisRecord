@@ -145,7 +145,6 @@ export default connect(
     },
     changeOrderName: () =>
       dispatch(async (dispatch, getState) => {
-        // 这里打印出来的值是更新之后的，待研究
         console.log("getState", JSON.stringify(getState()));
         const orderName = await Promise.resolve("眼镜");
         dispatch({

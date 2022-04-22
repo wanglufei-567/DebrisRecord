@@ -59,3 +59,21 @@ A在发送某个TCP报文前，发现此时自己这边的seq计数已经到了x
 B在收到这个报文后，拿到报文中的seq=x，又拿到了长度为100bit的数据，然后回包的时候ack=x+100。意思是告诉B你已经发了x+100位的数据了，下次发包的时候别忘了把seq改成x+100。
 
 A收到B回的数据包后，拿到报文中的ack=x+100，然后和自己这边的计数着的seq一比对，如果一样，说明A发的B都收到了没问题，如果不一样，假如A一看自己这边的seq已经等于y了，也就是自己计数着的已经发送y位的数据了，可是听B的意思它才收到x+100位数据，丢包了呗。然后就是重发什么的是TCP的另外一些机制。
+
+------
+
+### TCP四次挥手
+
+所谓四次挥手（Four-Way Wavehand）即终止TCP连接，就是指断开一个TCP连接时，需要客户端和服务端总共发送4个包以确认连接的断开。在socket编程中，这一过程由客户端或服务端任一方执行close来触发，整个流程如下图所示：
+
+![img](https://upload-images.jianshu.io/upload_images/2964446-2b9562b3a8b72fb2.png?imageMogr2/auto-orient/strip|imageView2/2/w/507/format/webp)
+
+由于TCP连接时全双工的，因此，每个方向都必须要单独进行关闭，这一原则是当一方完成数据发送任务后，发送一个FIN来终止这一方向的连接，收到一个FIN只是意味着这一方向上没有数据流动了，即不会再收到数据了，但是在这个TCP连接上仍然能够发送数据，直到这一方向也发送了FIN。首先进行关闭的一方将执行主动关闭，而另一方则执行被动关闭，上图描述的即是如此。
+
+（1）第一次挥手：Client发送一个FIN，用来关闭Client到Server的数据传送，Client进入FIN_WAIT_1状态。
+
+（2）第二次挥手：Server收到FIN后，发送一个ACK给Client，确认序号为收到序号+1（与SYN相同，一个FIN占用一个序号），Server进入CLOSE_WAIT状态。
+
+（3）第三次挥手：Server发送一个FIN，用来关闭Server到Client的数据传送，Server进入LAST_ACK状态。
+
+（4）第四次挥手：Client收到FIN后，Client进入TIME_WAIT状态，接着发送一个ACK给Server，确认序号为收到序号+1，Server进入CLOSED状态，完成四次挥手。

@@ -20,7 +20,7 @@ git config --global user.name “Your Name”
 ```
 
 
-commit信息需要加上如下type前缀：
+commit信息需要加上如下type前缀
 
 ```js
 feat：新功能（feature）

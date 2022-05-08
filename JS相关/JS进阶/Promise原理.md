@@ -296,10 +296,12 @@ if (result instanceof MyPromise) {
 #### 3.4 实现 catch()
 
 ```js
-  /* 链式调用时的异常穿透，由于then()中，给onRejected设置了默认值，所以可以一路throw(reason)到catch()中，最后返回一个rejected状态的promise */
+/* 链式调用时的异常穿透，由于then()中，给onRejected设置了默认值，所以可以一路throw(reason)到catch()中，最后返回一个rejected状态的promise */
   catch(onRejected) {
     return this.then(undefined, onRejected);
   }
+ /* 链式调用时的异常穿透，打开方式，then(onResolved).then(onResolved).catch(onRejected),中间的
+ then()没有传onRejected,因此使用的是onRejected的默认值，一路throw(reason) */
 ```
 
 #### 3.5 实现Promise.resolve()

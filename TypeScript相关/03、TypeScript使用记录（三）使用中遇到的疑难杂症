@@ -1,0 +1,155 @@
+## TypeScript使用记录(三) 使用中遇到的疑难杂症
+
+### 01、TypeScript中解构参数的使用
+
+在js中我们可以解构一个数组作为实参传递给一个指定参数数量的函数使用，如下例：
+
+```js
+// 实例
+function getObj(name, age) {
+  return {
+    name,
+    age,
+  };
+}
+console.log(getObj(...['James', 30]))
+// expected output: {name: 'James', age: 30}
+```
+
+但在TS中如何对结构的数组进行类型声明却是有点让人迷惑的
+
+首先，如果不对结构的数组进行类型声明，TS会提示以下错误：
+
+>  Error: 扩张参数必须具有元组类型或传递给 rest 参数。ts(2556)
+>
+> 错误原因：函数期望接受已经指定数量且指定声明类型的参数，但在调用函数时传入的却是扩张参数（解构表达式）
+
+如下例：
+
+```typescript
+function getObj(name: string, age: number) {
+  return {
+    name,
+    age,
+  };
+}
+
+// 下面这样使用会有错误提示
+// ⛔️ Error: 扩张参数必须具有元组类型或传递给 rest 参数。ts(2556)
+const result = getObj(...['James', 30]);
+
+// 这样是正常传参调用
+const result = getObj('James', 30);
+```
+
+如何进行类型声明？
+
+方案一
+
+直接将数组类型声明为元组类型，数组中每一项的类型对应于函数的形参的类型，如下例：
+
+```typescript
+function getObj(name: string, age: number) {
+  return {
+    name,
+    age,
+  };
+}
+
+const params:[string, number] = ['James', 30]
+const result = getObj(...params);
+```
+
+方案二
+
+通过 `as const` 语法将数组断言成   `tuple`，如下例子
+
+```typescript
+function getObj(name: string, age: number) {
+  return {
+    name,
+    age,
+  };
+}
+
+const result = getObj(...(['James', 30] as const));
+
+// 👇️ const tuple: readonly ["James", 30]
+const tuple = ['James', 30] as const;
+
+```
+
+方案三
+
+修改函数的形参为扩张参数并进行类型声明，和上面两种方案不同的解决思路，修改的是函数的声明，如下例
+
+```typescript
+function getArr(...args: string[]) {
+  return args;
+}
+
+const result0 = getArr(...['James', 'Alice', 'Bob', 'Carl']);
+```
+
+这个方案我们在js中也挺常见的
+
+在js中我们会经常使用[<u>剩余参数</u>](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters#example)将一个函数不定数量的<u>参数</u>表示为一个<u>数组</u>。
+
+```js
+// 示例
+function sum(...args) {
+  return args.reduce((previous, current) => {
+    return previous + current;
+  });
+}
+
+console.log(sum(1, 2, 3));
+// expected output: 6
+```
+
+关于元组的类型声明，有一种根据`interface`的`value`生成`tuple`的方式
+
+```typescript
+// interface类型
+interface OnGetDataParams {
+  page: number;
+  onSuccess: () => void;
+  onFail: () => void;
+}
+
+// 自定义类型工具
+type Lookup<T, K> = K extends keyof T ? T[K] : never;
+type TupleFromInterface<T, K extends Array<keyof T>> = { [I in keyof K]: Lookup<T, K[I]> }
+
+type OnGetDataParamsTuple = TupleFromInterface<OnGetDataParams, ['page', 'onSuccess', 'onFail']>
+// OnGetDataParamsTuple = [number, () => void, () => void]
+```
+
+首先`Lookup<T, K>`工具是提取对应`key`的`value`类型
+
+```typescript
+// interface类型
+interface OnGetDataParams {
+  page: number;
+  onSuccess: () => void;
+  onFail: () => void;
+}
+
+type Lookup<T, K> = K extends keyof T ? T[K] : never; 
+
+type Page = Lookup<OnGetDataParams, 'page'>
+// type Page = number
+```
+
+其次是遍历元组类型
+
+```typescript
+type Arr = ['page', 'onSuccess', 'onFail']
+
+type Traverse<K> = {[I in keyof K]: undefined}   
+
+type TraverseArr = Traverse<Arr>
+// type TraverseArr = [undefined, undefined, undefined]
+```
+
+以上就是解构参数在TS中声明为元组类型的方式，最后还拓展了下如何根据接口类型的`value`生成元组类型

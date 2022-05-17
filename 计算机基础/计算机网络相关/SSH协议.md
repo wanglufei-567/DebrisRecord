@@ -10,7 +10,7 @@
 
 对称加密就是加密或解密使用的是同一个秘钥。
 
-![ssh_symmetric.png](https://blog.haojunyu.com/imgs/ssh_symmetric.png)
+![](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/20220517084842.png)
 
 
 
@@ -20,7 +20,7 @@
 
 非对称加密需要一对秘钥来进行加密和解密，公开的秘钥叫公钥，私有的秘钥叫私钥。注意公钥加密的信息**只有**私钥才能解开（加密过程），私钥加密的信息**只有**公钥才能解开（验签过程）。
 
-![ssh_asymmetric.png](https://blog.haojunyu.com/imgs/ssh_asymmetric.png)
+![ssh_asymmetric](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/ssh_asymmetric.png)
 
 非对称加密的优点是安全性更高，秘钥管理比较方便，每个服务器只要维护一对公私钥即可。缺点是加解密耗时长，速度慢。
 

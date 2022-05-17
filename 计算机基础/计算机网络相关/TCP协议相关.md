@@ -12,7 +12,9 @@
 
 所谓**三次握手**（Three-Way Handshake）即建立TCP连接，就是指建立一个TCP连接时，需要客户端和服务端总共发送3个包以确认连接的建立。在`socket`编程中，这一过程由客户端执行`connect`来触发，整个流程如下图所示：
 
-![img](https://upload-images.jianshu.io/upload_images/2964446-aa923712d5218eeb.png?imageMogr2/auto-orient/strip|imageView2/2/w/517/format/webp)
+![img](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/webp)
+
+
 
 （1）第一次握手：Client将标志位SYN置为1，随机产生一个值seq=J，并将该数据包发送给Server，Client进入SYN_SENT状态，等待Server确认。
 
@@ -32,7 +34,7 @@
 
 ### TCP可靠性的体现：seq和ack机制
 
-<img src="https://upload-images.jianshu.io/upload_images/26124984-e76180b4b38df155.png?imageMogr2/auto-orient/strip|imageView2/2/w/958/format/webp" alt="img" style="zoom:50%;" />
+<img src="https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/webp-20220517085330776" alt="img" style="zoom:50%;" />
 
 **顺序号seq**：用来标识从TCP源端向TCP目的端发送的数据字节流，它表示在这个报文段中的第一个数据字节的顺序号。
 
@@ -50,7 +52,7 @@ TCP为应用层提供全双工服务，这意味数据能在两个方向上独�
 
 数据接收端收到TCP报文后，将这次报文中的seq取出来，和自己最后一次发送的ack对比，如果一致，则代表数据没有丢失，理解起来就是这次的顺序号和上次自己期望的顺序号一致嘛。如果不一致就说明有丢包发生。其实就是TCP用0~对每个字节进行计数
 
-![img](https://upload-images.jianshu.io/upload_images/26124984-42319b49c7e9517f.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![img](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/webp-20220517085411003)
 
 **三个过程：**
 
@@ -66,7 +68,7 @@ A收到B回的数据包后，拿到报文中的ack=x+100，然后和自己这边
 
 所谓四次挥手（Four-Way Wavehand）即终止TCP连接，就是指断开一个TCP连接时，需要客户端和服务端总共发送4个包以确认连接的断开。在socket编程中，这一过程由客户端或服务端任一方执行close来触发，整个流程如下图所示：
 
-![img](https://upload-images.jianshu.io/upload_images/2964446-2b9562b3a8b72fb2.png?imageMogr2/auto-orient/strip|imageView2/2/w/507/format/webp)
+![img](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/webp-20220517085419323)
 
 由于TCP连接时全双工的，因此，每个方向都必须要单独进行关闭，这一原则是当一方完成数据发送任务后，发送一个FIN来终止这一方向的连接，收到一个FIN只是意味着这一方向上没有数据流动了，即不会再收到数据了，但是在这个TCP连接上仍然能够发送数据，直到这一方向也发送了FIN。首先进行关闭的一方将执行主动关闭，而另一方则执行被动关闭，上图描述的即是如此。
 

@@ -4,10 +4,7 @@ WebView是ReactNative中的组件 , 它可以创建一个原生的WebView，可�
 
 下面👇这张页面效果图中红色部分就是WebView组件的部分，展示的便是一个html页面的内容
 
-<div align="left">
-<img src=https://dongger-typora.oss-cn-beijing.aliyuncs.com/typora/Screenshot_20220304_113627_com.xiaojukeji.vc.operator.debug.jpg  width=40% height=40%/>
-</div>
-
+<img src="https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/Screenshot_20220304_113627_com.xiaojukeji.vc.operator.debug.jpg" style="zoom:30%;" />
 
 
 ##### RN和Web页面的通信主要通过WebView组件提供的以下三个方法进行
@@ -129,10 +126,7 @@ WebView是ReactNative中的组件 , 它可以创建一个原生的WebView，可�
 
 可以看到RN侧传递的信息成功挂载到了web页面的windows.ReactNativeWebView.value属性上
 
-<div align="left">
-<img src=https://dongger-typora.oss-cn-beijing.aliyuncs.com/typora/Screenshot_20220304_133832_com.xiaojukeji.vc.operator.debug.jpg width=40% height=40%/>
-</div>
-
+<img src="https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/Screenshot_20220304_133832_com.xiaojukeji.vc.operator.debug.jpg" style="zoom:25%;" />
 
 
 #### Web -> React Native通信（`onMessage`）
@@ -194,10 +188,7 @@ onMessage = (e) => {
 
 可以看到web侧传递的信息成功被RN侧接收到
 
-<div align="left">
-<img src=https://dongger-typora.oss-cn-beijing.aliyuncs.com/typora/Screenshot_20220304_134845_com.xiaojukeji.vc.operator.debug.jpg width=40% height=40%/>
-</div>
-
+<img src="https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/Screenshot_20220304_134845_com.xiaojukeji.vc.operator.debug.jpg" style="zoom:25%;" />
 
 
 #### 完整代码

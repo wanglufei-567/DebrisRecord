@@ -32,7 +32,7 @@ console.log(QS.stringify(data)
 xhr.send(QS.stringify(data));
 ```
 
-![字符串提交场景](https://segmentfault.com/img/bVbqWfA)
+![字符串提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfA.png)
 
 对表单提交和文件上传时做特殊处理，需要使用 `new FormData()` 方法处理后传递给接口，`Content-type` 为 `multipart/form-data; boundary=----WebKitFormBoundarys9jOoKcA1Kwn9sYS` 格式。
 
@@ -77,7 +77,7 @@ let data = {
 xhr.send(JSON.stringify(data));
 ```
 
-![对象提交场景](https://segmentfault.com/img/bVbqWfB)
+![对象提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfB.png)
 
 ### 四、Content-Type的差异
 
@@ -91,7 +91,7 @@ xhr.send(JSON.stringify(data));
   xhr.send(obj);
   ```
 
-  ![传统ajax提交](https://segmentfault.com/img/bVbqWfp)
+  ![传统ajax提交](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfp.png)
 
 - 传统的form提交的时候，`Content-Type`默认为`application/x-www-form-urlencoded;charset=utf-8`类型
 
@@ -103,7 +103,7 @@ xhr.send(JSON.stringify(data));
   </form>
   ```
 
-  ![clipboard.png](https://segmentfault.com/img/bVbqWeV)
+  ![clipboard.png](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWeV.png)
 
 - axios传递`key=value&key=value`格式数据的时候，`Content-Type`默认为`application/x-www-form-urlencoded;charset=utf-8`类型
 
@@ -112,7 +112,7 @@ xhr.send(JSON.stringify(data));
   axios.post('/', sence1)
   ```
 
-  ![字符串提交场景](https://segmentfault.com/img/bVbqWfA)
+  ![字符串提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfA-20220517085949095.png)
 
 - axios传递`{key: value, key: value}`格式数据的时候，`Content-Type`默认为 `application/json;charset=utf-8`类型
 
@@ -121,7 +121,7 @@ xhr.send(JSON.stringify(data));
   axios.post('/', sence2)
   ```
 
-  ![对象提交场景](https://segmentfault.com/img/bVbqWfB)
+  ![对象提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfB-20220517085954238.png)
 
 ### 五、请求头字段 Content-Type
 

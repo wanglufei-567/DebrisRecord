@@ -34,7 +34,7 @@ xhr.send(QS.stringify(data));
 
 ![字符串提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfA.png)
 
-对表单提交和文件上传时做特殊处理，需要使用 `new FormData()` 方法处理后传递给接口，`Content-type` 为 `multipart/form-data; boundary=----WebKitFormBoundarys9jOoKcA1Kwn9sYS` 格式。
+对表单提交和文件上传时要做特殊处理，需要使用 `new FormData()` 方法处理后传递给接口，`Content-type` 为 `multipart/form-data; boundary=----WebKitFormBoundarys9jOoKcA1Kwn9sYS` 格式。
 
 ```js
 const formData = new FormData();
@@ -57,10 +57,20 @@ fetch('http://192.168.1.128:5022/tool/file/upload', {
 ```
 
 - 补充说明
-  1. `服务器为什么会对表单提交和文件上传做特殊处理，因为表单提交数据是名值对的方式，且Content-Type为application/x-www-form-urlencoded,而文件上传服务器需要特殊处理，普通的post请求（Content-Type不是application/x-www-form-urlencoded）数据格式不固定，不一定是名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。`
+  1. 服务器为什么会对表单提交和文件上传做特殊处理，因为表单提交数据是名值对的方式，且
+  
+     `Content-Type为application/x-www-form-urlencoded`,而文件上传服务器需要特殊处理，普通的
+  
+     `post`请求（`Content-Type`不是`application/x-www-form-urlencoded`）数据格式不固定，不一定是
+  
+     名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。
+  
   2. processData: false --> 因为 data 值是 `formdata` 对象，不需要对数据做处理。
+  
   3. cache: false --> 上传文件不需要缓存。
+  
   4. contentType: false --> 因为是由 `<form>` 表单构造的 `FormData` 对象，且已经声明了属性 `enctype="multipart/form-data"`，所以这里设置为 false。
+  
   5. xhrFields: { withCredentials: true }, 跨域请求设置
 
 ### 三、Request Payload
@@ -142,26 +152,26 @@ Content-Type: multipart/form-data; boundary=something
 
 <!--原生 ajax 请求默认 Content-Type: text/plain;charset=UTF-8-->
 
-可以看出来语法结构为：type/subtype(;parameter=value) 
+可以看出来语法结构为：`type/subtype(;parameter=value)` 
 
-- **type 主类型**，MIME中规定的任意标识符，如text，如果是*号代表所有
+- **type 主类型**，MIME中规定的任意标识符，如`text`，如果是*号代表所有
 
-  type包括两种类型：**独立类型**和**Multipart类型**
+  `type`包括两种类型：**独立类型**和**Multipart类型**
 
   - 独立类型从名字上可以看出来，只表示了一个单独的文件或者媒体的类型，表示组成内容的形式是独立存在的，比如一个HTML页面，一个视频文件，如下为常用的独立类型：
 
     - **Text**：用于标准化地表示的文本信息，文本消息可以是多种字符集和或者多种格式的
-    - **Application**：用于传输应用程序数据或者二进制数据，例如application/octet-stream,application/pdf,application/pkcs8,application/zip
-    - **Image**：图像或图形数据，包括位图和矢量图像以及动画图像，例如image/gif, image/png, image/jpeg, image/bmp, image/webp, image/x-icon
-    - **Audio**：用于传输音频或者音声数据，例如audio/mpeg, audio/vorbis
-    - **Video**：用于传输动态影像数据，可以是与音频编辑在一起的视频数据格式，例如video/mp4
+    - **Application**：用于传输应用程序数据或者二进制数据，例如`application/octet-stream`,`application/pdf`,`application/pkcs8`,`application/zip`
+    - **Image**：图像或图形数据，包括位图和矢量图像以及动画图像，例如`image/gif`, `image/png`, `image/jpeg`, `image/bmp`, `image/webp`, `image/x-icon`
+    - **Audio**：用于传输音频或者音声数据，例如`audio/mpeg`, `audio/vorbis`
+    - **Video**：用于传输动态影像数据，可以是与音频编辑在一起的视频数据格式，例如`video/mp4`
 
-  - Multipart类型表示此内容由多个部分组成的，且经常有不同的MIME类型（也就是由多个独立类型的内容组成的）
+  - `Multipart`类型表示此内容由多个部分组成的，且经常有不同的MIME类型（也就是由多个独立类型的内容组成的）
 
-    也可以用来表示属于相同事物的多个且独立的文件，这些独立的文件构成一个复杂的文档。在电子邮件场景中常见，如下为常用的Multipart类型:
+    也可以用来表示属于相同事物的多个且独立的文件，这些独立的文件构成一个复杂的文档。在电子邮件场景中常见，如下为常用的`Multipart`类型:
 
-    - **Multipart**：用于连接消息体的多个部分构成一个消息，这些部分可以是不同类型的数据，由多个不同MIME类型组件构成的数据，例如 multipart/form-data(由多种内容类型进行传输，可能既包括多媒体内容，又包括数据内容)
-    - **Message**：一个包括多种内容类型的消息，常用于下面的场景，例如指明一个邮件包含转发信息或者在多种信息的情况下，允许以chunk的形式发送数据量很大的信息。包括message/rfc822和message/partial，一般用于包装一个E-mail消息
+    - **Multipart**：用于连接消息体的多个部分构成一个消息，这些部分可以是不同类型的数据，由多个不同MIME类型组件构成的数据，例如 `multipart/form-data`(由多种内容类型进行传输，可能既包括多媒体内容，又包括数据内容)
+    - **Message**：一个包括多种内容类型的消息，常用于下面的场景，例如指明一个邮件包含转发信息或者在多种信息的情况下，允许以`chunk`的形式发送数据量很大的信息。包括`message/rfc822`和`message/partial`，一般用于包装一个E-mail消息
 
     
 
@@ -169,10 +179,10 @@ Content-Type: multipart/form-data; boundary=something
 
   - `subtype` 是 `type` 的详细信息。例如 `text/plain` 中 `text` 指文本，`plain` 对 `text` 进一步限制，指纯文本
 
-- parameter 可选，一些参数，如Accept请求头的q参数， Content-Type的 charset参数等
+- **parameter** (可选)，一些参数，如`Accept`请求头的参数， `Content-Type`的 `charse`t参数等
 
-  - charset：是指定字符编码的标准，常见的有"ISO-8859-1"、"UTF-8"、"GB2312“，”ASCII“等
-  - boundary：多用于上传文件时使用，用于分割数据
+  - `charse`t：是指定字符编码的标准，常见的有`ISO-8859-1`、`UTF-8`、`GB2312`、`ASCII`等
+  - `boundary`：多用于上传文件时使用，用于分割数据
 
 #### 4.3、常见的媒体格式
 
@@ -190,11 +200,11 @@ Content-Type: multipart/form-data; boundary=something
 </form>
 ```
 
-首先，Content-Type 被指定为 `application/x-www-form-urlencoded`；其次，提交的数据按照 key1=val1&key2=val2 的方式进行编码，key 和 val 都会进行 URL 转码。
+首先，`Content-Type` 被指定为 `application/x-www-form-urlencoded`；其次，提交的数据按照 `key1=val1&key2=val2` 的方式进行编码，`key` 和 `val` 都会进行 URL 转码。
 
 **multipart/form-data**
 
-常见的 POST 数据提交的方式。我们使用表单上传文件时（type=file），必须让 form 的 enctype 等于这个值。如果上传照片，文件等，由于很多情况下都会有批量上传，为了区分不同的数据，multipart/form-data的类型有boundary参数进行分割，
+常见的 POST 数据提交的方式。我们使用表单上传文件时（type=file），必须让 `form` 的 `enctype` 等于这个值。如果上传照片，文件等，由于很多情况下都会有批量上传，为了区分不同的数据，`multipart/form-data`的类型有`boundary`参数进行分割，
 
 ```html
 <form action="/" method="post" enctype="multipart/form-data">
@@ -218,7 +228,7 @@ this is file2;
 ------WebKitFormBoundary18bktajg65CSIx4j--
 ```
 
-上面请求是上传了两个文件，分别是 test1.txt 和test2.txt，文件内容分别是“this is file1;” 和 “this is file2;” 可以看到两个文件由于是文本，Content-Type 为 `text/plain`，`Content-Disposition` 中包含 `name` 和 `filename` 属性，name 是 form 表单提交内容里的 name 属性，文件之间有 `------WebKitFormBoundary18bktajg65CSIx4j` 这样一串字符隔开，这串字符就是 `boundary` 分割符，字符串随机生成不会与文本内容重复。
+上面请求是上传了两个文件，分别是 `test1.txt` 和`test2.txt`，文件内容分别是“this is file1;” 和 “this is file2;” 可以看到两个文件由于是文本，`Content-Type` 为 `text/plain`，`Content-Disposition` 中包含 `name` 和 `filename` 属性，`name` 是 `form` 表单提交内容里的 `name` 属性，文件之间有 `------WebKitFormBoundary18bktajg65CSIx4j` 这样一串字符隔开，这串字符就是 `boundary` 分割符，字符串随机生成不会与文本内容重复。
 
 **application/json**
 

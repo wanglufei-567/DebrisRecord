@@ -1,3 +1,30 @@
+### Form表单
+
+`html`中`form`表单可以直接将表单数据发送到服务端，`<form>`标签上有以下几个`attribute`需要记一下：
+
+- `action` - 规定当提交表单时向何处发送表单数据（也就是填写提交地址）
+- `method` - 规定用于发送 form-data 的 HTTP 方法（post、get）
+- `enctype` \- 规定在发送表单数据之前如何对其进行编码
+  - `application/x-www-form-urlencoded` \- 把数据组织成 urlencode的格式
+    - 表现形式为 key=value&key=value...
+    - 适用于普通字符内容提交，提交的数据为纯字符
+  - `multipart/form-data`- 二进制数据格式
+    - 适用于提交的数据为非纯字符，如图片，视频等
+  - `text/plain` -  纯文本提交
+- `<form>` 内的 `<input>` 使用 `name` 区分
+- 使用 `<input type="submit">` 提交
+
+```html
+<form method="POST" action="/post" enctype="multipart/form-data">
+    <p>名字: <input type="text" name="name" /></p>
+    <p>密码: <input type="password" name="password" /></p>
+    <input type="file" name="file">
+    <input type="submit" value="Submit" />
+</form>
+```
+
+
+
 ### FormData 对象
 
 表单数据以键值对的形式向服务器发送，这是由浏览器自动完成的。但是有时候，我们需要自己通过 js 来完成，构造一个表单并发送给服务器。这就需要用到 formData 对象

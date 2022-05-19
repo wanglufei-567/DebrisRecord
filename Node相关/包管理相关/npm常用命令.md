@@ -2,20 +2,20 @@
 
 **npm查看源：** 
 
-```
+```js
 npm config get registry
 ```
 
 **npm查看配置文件**
 
-```
+```js
 npm config get userconfig // 查看用户配置文件路径
 npm config get globalconfig // 查看全局配置文件路径 
 ```
 
 **npm修改源**
 
-```
+```js
 npm config set registry https://registry.npm.taobao.org/
 npm --registry http://registry.npm.xiaojukeji.com install [name]
 npm --registry https://registry.npm.taobao.org
@@ -24,7 +24,7 @@ npm --registry=http://npm.intra.xiaojukeji.com install
 
 **nrm使用**
 
-```
+```js
 nrm ls // 列出可选择的源
 nrm use npm // 切换使用的源
 nrm add <registry> <url> // 添加一个源
@@ -32,29 +32,31 @@ nrm add <registry> <url> // 添加一个源
 
 **npm查看已安装的包**
 
-```
+```js
 npm list [dependency] // 查看某个包的依赖关系树
 npm list [dependency] --depth=[depth] // 设置深度级别
 npm list --depth=0 // 查看全部的包
-npm list -g --depth 0
+npm list -g --depth 0  // 查看全局已安装的包
+npm root // 查看本地node_modules路径
+npm root -g // 查看全局node_modules路径
 ```
 
 **npm查看配置信息**
 
-```
+```js
 npm config ls
 ```
 
 **安装指定版本的npm包**
 
-```
+```js
 npm install [package]@[version]
 npm install [package]@latest
 ```
 
 **npm查看某个包的信息**
 
-```
+```js
 npm view [package] version
 npm view [package] versions
 npm info [package] 

@@ -290,15 +290,15 @@ let headers = xhr
 xhr.abort(); // 终止请求
 ```
 
-#### 1.4、 `XHR` 相关事件
+#### 1.4、 `XHR` 常用事件
 
-##### 1.3.1、常用的三个事件
+##### 1.4.1、常用的三个事件
 
 下面这三个`XHR`事件是最常用的：
 
 - `onload` —— 当请求完成（即使 HTTP 状态为 400 或 500 等），并且响应已完全下载时触发
 - `onerror` —— 当无法发出请求时触发，例如网络中断或者无效的 URL。
-- `progress` —— 在下载响应期间定期触发，报告已经下载了多少。
+- `onprogress` —— 在下载响应期间定期触发，报告已经下载了多少。
 
 ```js
 xhr.onload = function() {
@@ -317,7 +317,7 @@ xhr.onprogress = function(event) { // 定期触发
 };
 ```
 
-##### 1.3.2、`timeout`
+##### 1.4.2、`timeout`
 
 当请求超时时会触发**timeout** 事件
 
@@ -329,6 +329,80 @@ var client = new XMLHttpRequest()
   }
   client.send()
 ```
+
+#### 1.5、`XHR`事件分类及触发顺序
+
+##### 1.5.1、事件分类
+
+`XMLHttpRequest`的部分实现代码：
+
+```c#
+interface XMLHttpRequestEventTarget : EventTarget {
+  // event handlers
+  attribute EventHandler onloadstart;
+  attribute EventHandler onprogress;
+  attribute EventHandler onabort;
+  attribute EventHandler onerror;
+  attribute EventHandler onload;
+  attribute EventHandler ontimeout;
+  attribute EventHandler onloadend;
+};
+ 
+interface XMLHttpRequestUpload : XMLHttpRequestEventTarget {
+ 
+};
+ 
+interface XMLHttpRequest : XMLHttpRequestEventTarget {
+  // event handler
+  attribute EventHandler onreadystatechange;
+  readonly attribute XMLHttpRequestUpload upload;
+};
+```
+
+`xhr`一共有8个相关事件：7个`XMLHttpRequestEventTarget`事件+1个独有的`onreadystatechange`事件；而`xhr.upload`只有7个`XMLHttpRequestEventTarget`事件
+
+| 事件                 | 触发条件                                                     |
+| :------------------- | :----------------------------------------------------------- |
+| `onreadystatechange` | 每当`xhr.readyState`改变时触发；但`xhr.readyState`由非`0`值变为`0`时不触发。 |
+| `onloadstart`        | 调用`xhr.send()`方法后立即触发，若`xhr.send()`未被调用则不会触发此事件。 |
+| `onprogress`         | `xhr.upload.onprogress`在上传阶段(即`xhr.send()`之后，`xhr.readystate=2`之前)触发，每50ms触发一次；<br />`xhr.onprogress`在下载阶段（即`xhr.readystate=3`时）触发，每50ms触发一次。 |
+| `onload`             | 当请求成功完成时触发，此时`xhr.readystate=4`                 |
+| `onloadend`          | 当请求结束（包括请求成功和请求失败）时触发                   |
+| `onabort`            | 当调用`xhr.abort()`后触发                                    |
+| `ontimeout`          | `xhr.timeout`不等于0，由请求开始即`onloadstart`开始算起，当到达 `xhr.timeout`所设置时间请求还未结束即`onloadend`，则触发此事件。 |
+| `onerror`            | 在请求过程中，若发生`Network error`则会触发此事件（若发生`Network error`时，上传还没有结束，则会先触发`xhr.upload.onerror`，再触发`xhr.onerror`；若发生`Network error`时，上传已经结束，则只会触发`xhr.onerror`）。<br /><br />**注意**，只有发生了网络层级别的异常才会触发此事件，对于应用层级别的异常，如响应返回的`xhr.statusCode`是`4xx`时，并不属于`Network error`，所以不会触发`onerror`事件，而是会触发`onload`事件。 |
+
+##### 1.5.2、事件触发顺序
+
+当请求一切正常时，相关的事件触发顺序如下：
+
+1. 触发`xhr.onreadystatechange`(之后每次`readyState`变化时，都会触发一次)
+2. 触发`xhr.onloadstart`
+   //上传阶段开始：
+3. 触发`xhr.upload.onloadstart`
+4. 触发`xhr.upload.onprogress`
+5. 触发`xhr.upload.onload`
+6. 触发`xhr.upload.onloadend`
+   //上传结束，下载阶段开始：
+7. 触发`xhr.onprogress`
+8. 触发`xhr.onload`
+9. 触发`xhr.onloadend`
+
+#### 发生`abort`/`timeout`/`error`异常的处理
+
+在请求的过程中，有可能发生 `abort`/`timeout`/`error`这3种异常。相关的事件触发顺序如下：
+
+1. 一旦发生`abort`或`timeout`或`error`异常，先立即中止当前请求
+2. 将 `readystate` 置为`4`，并触发 `xhr.onreadystatechange`事件
+3. 如果上传阶段还没有结束，则依次触发以下事件：
+   - `xhr.upload.onprogress`
+   - `xhr.upload.[onabort或ontimeout或onerror]`
+   - `xhr.upload.onloadend`
+4. 触发 `xhr.onprogress`事件
+5. 触发 `xhr.[onabort或ontimeout或onerror]`事件
+6. 触发`xhr.onloadend` 事件
+
+
 
 ### 参考
 

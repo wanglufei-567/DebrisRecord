@@ -34,7 +34,7 @@ xhr.send(QS.stringify(data));
 
 ![字符串提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfA.png)
 
-对表单提交和文件上传时要做特殊处理，需要使用 `new FormData()` 方法处理后传递给接口，`Content-type` 为 `multipart/form-data; boundary=----WebKitFormBoundarys9jOoKcA1Kwn9sYS` 格式。
+对表单提交和文件上传时要做特殊处理，需要使用 `new FormData()` 方法处理后传递给接口，`Content-type` 为 `multipart/form-data; boundary=[xxx]` 格式。
 
 ```js
 const formData = new FormData();

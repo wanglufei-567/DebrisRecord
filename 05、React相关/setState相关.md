@@ -163,7 +163,7 @@ export default class BatchedUpdatesUsage extends Component {
 
 ### React合成事件和生命周期中的批量更新流程
 
-![image-20211217130015211](https://dongger-typora.oss-cn-beijing.aliyuncs.com/typora/image-20220410135754524.png)
+![image-20211217130015211](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220410135754524.png)
 
 setState并非异步，本质还是同步的，只不过它的表现形式是异步的，
 

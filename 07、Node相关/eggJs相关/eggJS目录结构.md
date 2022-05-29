@@ -1,3 +1,3 @@
 **工程目录**
 
-![image-20220410140523549](https://dongger-typora.oss-cn-beijing.aliyuncs.com/typora/image-20220410140523549.png)
+![](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220410140523549-20220529235823452-20220529235839321.png)

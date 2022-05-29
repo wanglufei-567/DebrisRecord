@@ -32,7 +32,7 @@ console.log(QS.stringify(data)
 xhr.send(QS.stringify(data));
 ```
 
-![字符串提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfA.png)
+![字符串提交场景](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWfA.png)
 
 对表单提交和文件上传时要做特殊处理，需要使用 `new FormData()` 方法处理后传递给接口，`Content-type` 为 `multipart/form-data; boundary=[xxx]` 格式。
 
@@ -87,7 +87,7 @@ let data = {
 xhr.send(JSON.stringify(data));
 ```
 
-![对象提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfB.png)
+![对象提交场景](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWfB.png)
 
 ### 四、Content-Type的差异
 
@@ -101,7 +101,7 @@ xhr.send(JSON.stringify(data));
   xhr.send(obj);
   ```
 
-  ![传统ajax提交](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfp.png)
+  ![传统ajax提交](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWfp.png)
 
 - 传统的form提交的时候，`Content-Type`默认为`application/x-www-form-urlencoded;charset=utf-8`类型
 
@@ -113,7 +113,7 @@ xhr.send(JSON.stringify(data));
   </form>
   ```
 
-  ![clipboard.png](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWeV.png)
+  ![clipboard.png](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWeV.png)
 
 - axios传递`key=value&key=value`格式数据的时候，`Content-Type`默认为`application/x-www-form-urlencoded;charset=utf-8`类型
 
@@ -122,7 +122,7 @@ xhr.send(JSON.stringify(data));
   axios.post('/', sence1)
   ```
 
-  ![字符串提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfA-20220517085949095.png)
+  ![字符串提交场景](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWfA-20220517085949095.png)
 
 - axios传递`{key: value, key: value}`格式数据的时候，`Content-Type`默认为 `application/json;charset=utf-8`类型
 
@@ -131,7 +131,7 @@ xhr.send(JSON.stringify(data));
   axios.post('/', sence2)
   ```
 
-  ![对象提交场景](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/bVbqWfB-20220517085954238.png)
+  ![对象提交场景](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWfB-20220517085954238.png)
 
 ### 五、请求头字段 Content-Type
 

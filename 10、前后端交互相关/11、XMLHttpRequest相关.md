@@ -2,7 +2,7 @@
 
 ### 前言
 
-`XMLHttpRequest`（XHR） 是一个内建的浏览器对象，它允许使用 JavaScript 发送 HTTP 请求。通过 XMLHttpRequest 可以在不刷新页面的情况下请求特定 URL，获取数据。这允许网页在不影响用户操作的情况下，更新页面的局部内容。
+`XMLHttpRequest`（XHR） 是一个浏览器内置对象，它允许使用 `JavaScript` 发送 `HTTP` 请求。通过 `XMLHttpRequest` 可以在不刷新页面的情况下请求特定 `URL`，获取数据。这允许网页在不影响用户操作的情况下，更新页面的局部内容。
 
 ### 一、XHR基础
 

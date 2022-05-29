@@ -1,6 +1,6 @@
 document是整个文档对象
 
-![image-20220410140143806](https://gitee.com/wang_lu_fei/picture_repo/raw/master/assets/image-20220410140143806.png)
+![image-20220410140143806](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220410140143806.png)
 
 html是文档对象的一个节点，有两个字节点<head/> 和<body/>
 

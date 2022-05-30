@@ -2,7 +2,7 @@
 
 ### 简介
 
-前后端交互中，http请求参数主要分为三种 `Query String Parameters`、`Form Data`、 `Request Payload` 。其中 `Query String Parameters`位于请求头中，拼接在`url?`后面，在`url`中可以直接看到入参；`Form Data`、 `Request Payload` 位于请求体中，数据格式与请求头字段 `Content-type`有关。
+前后端交互中，http请求参数主要分为三种 `Query String Parameters`、`Form Data`、 `Request Payload` 。其中 `Query String Parameters`位于请求头中，拼接在`url?`后面，在`url`中可以直接看到入参；`Form Data`、 `Request Payload` 位于==请求体==中，数据格式与请求头字段 `Content-type`有关。
 
 <!--Form Data、 Request Payload两种格式的数据都是在message-body中，只是chrome浏览器的开发者工具会根据ContentType区分显示方式-->
 
@@ -247,7 +247,7 @@ Content-Type: application/json;charset=utf-8
 | 媒体格式                          | 描述                                                         |
 | --------------------------------- | ------------------------------------------------------------ |
 | text/html                         | HTML格式                                                     |
-| text/plain                        | 纯文本格式，不包含任何控件或格式字符                         |
+| text/plain                        | 纯文本格式，不包含任何控件或格式字符（空格转换为 `"+"` 加号，但不对特殊字符编码） |
 | text/xml                          | XML格式                                                      |
 | image/gif                         | gif图片格式                                                  |
 | image/jpeg                        | jpg图片格式                                                  |
@@ -259,7 +259,7 @@ Content-Type: application/json;charset=utf-8
 | application/pdf                   | pdf格式                                                      |
 | application/msword                | Word文档格式                                                 |
 | application/octet-stream          | 二进制流数据（如常见的文件下载）                             |
-| application/x-www-form-urlencoded | 默认的encType，form 表单数据被编码为 key/value 格式发送到服务器（表单默认的提交数据的格式）。数据被编码为名称/值对。这是标准的编码格式。 |
+| application/x-www-form-urlencoded | 默认的`encType`，`form` 表单数据被==编码为 `key/value`== 格式发送到服务器（表单==默认==的提交数据的格式）数据被编码为名称/值对（一些特殊字符会被编码成转义字符，比如`+`会被转义成`%2B`）这是标准的编码格式 |
 | multipart/form-data               | 数据被编码为一条消息，页上的每个控件对应消息中的一个部分，用在上传文件: Content-Type: multipart/form-data; boundary=----WebKitFormBoundarys9jOoKcA1Kwn9sYS |
 
 ### 六、参考链接

@@ -4,7 +4,7 @@
 
 - `action` - 规定当提交表单时向何处发送表单数据（也就是填写提交地址）
 - `method` - 规定用于发送 form-data 的 HTTP 方法（post、get）
-- `enctype` \- 规定在发送表单数据之前如何对其进行编码
+- `enctype` \- 规定在发送表单数据之前如何对其进行编码（默认值是 `application/x-www-form-urlencoded` ）
   - `application/x-www-form-urlencoded` \- 把数据组织成 urlencode的格式
     - 表现形式为 key=value&key=value...
     - 适用于普通字符内容提交，提交的数据为纯字符

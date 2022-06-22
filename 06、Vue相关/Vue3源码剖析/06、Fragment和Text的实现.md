@@ -1,4 +1,4 @@
-## Vue3源码剖析（六）— Fragment和Text的实现
+## Vue3源码剖析（六）— `Fragment`和`Text`的实现
 
 除了元素虚拟节点之外，Vue3中还有很多其他类型的虚拟节点，这里先实现`Text`和`Fragment`
 

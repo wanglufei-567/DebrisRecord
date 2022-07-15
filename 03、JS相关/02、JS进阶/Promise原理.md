@@ -290,7 +290,8 @@ if (result instanceof MyPromise) {
   } 
 
   // then()返回的新promise2对象，传入构造函数中的executor里面的resolve和reject两个方法直接给到 
-  // promise1的.then()方法，那么promise1的.then()中执行resolve或者reject的时候，promise2的状态也会相应改变，从而实现promise2和promise1保持一致
+  // promise1的.then()方法，那么promise1的.then()中执行resolve或者reject的时候，
+  //promise2的状态也会相应改变，从而实现promise2和promise1保持一致
 ```
 
 #### 3.4 实现 catch()

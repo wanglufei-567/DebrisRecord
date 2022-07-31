@@ -131,9 +131,39 @@ Redis是一个开源的`key-value`存储系统，它支持存储的`value`类型
 
 Redis的安装与启动参考这几篇文章
 
-[Redis 的下载与安装（macOS系统](https://www.cnblogs.com/liyihua/p/14482412.html)
+[Redis 的下载与安装（macOS系统）](https://www.cnblogs.com/liyihua/p/14482412.html)
 
 [在Mac上安装redis](https://cloud.tencent.com/developer/article/1606701)
+
+- **启动redis服务**
+
+  ```shell
+  brew services start redis
+  ```
+
+- 关闭redis服务
+
+  ```shell
+  brew services stop redis
+  ```
+
+- 重启redis服务
+
+  ```shell
+  brew services restart redis
+  ```
+
+- 连接 Redis 客户端（Client）
+
+  ```shell
+  redis-cli -h 127.0.0.1 -p 6379
+  ```
+
+- 关闭 Redis 客户端
+
+  ```shell
+  redis-cli shutdown
+  ```
 
 ##### 3.1.3、Redis相关知识
 
@@ -337,4 +367,221 @@ Redis的安装与启动参考这几篇文章
 - `zincrby key increment value`：为元素的`score`加上增量
 - `zrem key value`：删除该集合下，指定值的元素
 - `zcount key min max`：统计该集合，分数区间内的元素个数 
-- `zrank key value`：返回该值在集合中的排名，从0开始。
+- `zrank key value`：返回该值在集合中的排名，从0开始
+
+### 3.3、Redis的配置文件
+
+**Redis**的配置文件默认位于`/usr/local/etc/redis.conf`
+
+**配置说明**
+
+##### 3.3.1、Units单位
+
+配置大小单位,开头定义了一些基本的度量单位，只支持bytes，不支持bit（大小写不敏感）
+
+```shell
+# Note on units: when memory size is needed, it is possible to specify
+# it in the usual form of 1k 5GB 4M and so forth:
+#
+# 1k => 1000 bytes
+# 1kb => 1024 bytes
+# 1m => 1000000 bytes
+# 1mb => 1024*1024 bytes
+# 1g => 1000000000 bytes
+# 1gb => 1024*1024*1024 bytes
+#
+# units are case insensitive so 1GB 1Gb 1gB are all the same.
+```
+
+##### 3.3.2、INCLUDES包含
+
+多实例的情况可以把公用的配置文件提取出来
+
+```shell
+# Include one or more other config files here.  This is useful if you
+# have a standard template that goes to all Redis servers but also need
+# to customize a few per-server settings.  Include files can include
+# other files, so use this wisely.
+#
+# Notice option "include" won't be rewritten by command "CONFIG REWRITE"
+# from admin or Redis Sentinel. Since Redis always uses the last processed
+# line as value of a configuration directive, you'd better put includes
+# at the beginning of this file to avoid overwriting config change at runtime.
+#
+# If instead you are interested in using includes to override configuration
+# options, it is better to use include as the last line.
+#
+# include /path/to/local.conf
+# include /path/to/other.conf
+```
+
+##### 3.3.3、NETWORK网络相关配置
+
+- **bind**
+  - 默认情况bind=127.0.0.1只能接受本机的访问请求
+  - 不写的情况下，无限制接受任何ip地址的访问
+  - 生产环境要写应用服务器的地址；服务器是需要远程访问的，所以需要将其注释掉
+- **port**
+  - 端口号，默认 6379
+- **timeout**
+  - 一个空闲的客户端维持多少秒会关闭，0表示关闭该功能。即永不关闭
+- **Tcp-keepalive**
+  - 对访问客户端的一种心跳检测，每个n秒检测一次
+  - 单位为秒，如果设置为0，则不会进行Keepalive检测，建议设置成60 
+
+<!--配置文件啥的，上网查吧，不记录了-->
+
+### 3.4、Redis的发布订阅
+
+Redis 发布订阅 (pub/sub) 是一种消息通信模式：发送者 (pub) 发送消息，订阅者 (sub) 接收消息
+
+Redis 客户端可以订阅任意数量的频道
+
+1、客户端可以订阅频道如下图
+
+![image-20220731163421582](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731163421582.png)
+
+2、当给这个频道发布消息后，消息就会发送给订阅的客户端
+
+ ![image-20220731163430919](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731163430919.png)
+
+ **发布订阅的命令：**
+
+1.  打开一个客户端A订阅`channel1`
+   - `SUBSCRIBE channel1`
+2. 打开另一个客户端B，给`channel1`发布消息"hello"
+   - `publish channel1 hello`
+   - 返回的数字是订阅者数量
+3. 客户端A中便可以收到信息"hello"
+
+<!--注：发布的消息没有持久化-->
+
+### 3.5、Redis事务操作
+
+#### 3.5.1、Redis事务的定义
+
+**Redis事务**是一个**单独**的**隔离操作**：事务中的所有命令都会**序列化**、**按顺序地**执行，事务在执行的过程中，**不会被其他客户端发送来的命令请求所打断**
+
+==**Redis事务**的主要作用就是**串联多个命令**防止别的**命令插队**==
+
+#### 3.5.2、Redis事务的三个命令Multi、Exec、discard
+
+从输入**Multi**命令开始，输入的命令都会依次进入命令队列中，但不会执行
+
+直到输入**Exec**后，**Redis**会将之前的命令队列中的命令依次执行
+
+组队的过程中可以通过**discard**来放弃组队
+
+![image-20220731181612797](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731181612797.png)
+
+**示例1：组队成功，提交成功**
+
+<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731181805304.png" alt="image-20220731181805304" />
+
+
+
+#### 3.5.3、事务的错误处理
+
+**错误1:**组队中某个命令出现了报告错误，执行时整个的所有队列都会被取消
+
+![image-20220731182123884](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731182123884.png)
+
+**示例2：组队阶段报错，提交失败**
+
+<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731181840078.png" alt="image-20220731181840078" style="zoom:80%;" />
+
+**错误2:**如果执行阶段某个命令报出了错误，则只有报错的命令不会被执行，而其他的命令都会执行，不会回滚
+
+![image-20220731182248389](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731182248389.png)
+
+**示例3：组队成功，提交有成功有失败情况**
+
+![image-20220731181914241](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731181914241.png)
+
+#### 3.5.4、事务冲突的问题
+
+假设这样一个场景：有很多人拥有同一个账户,然后同时去参加双十一抢购
+
+一个请求想给金额减8000
+
+一个请求想给金额减5000
+
+一个请求想给金额减1000
+
+![image-20220731183554239](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731183554239.png)
+
+这样势必会造成问题，账户中总共只有10000，不可能消费之后有负的余额
+
+解决这种问题，一般有两种方案：
+
+- **方案一：悲观锁**
+
+![image-20220731183803475](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731183803475.png)
+
+**悲观锁(Pessimistic Lock)**, 顾名思义，就是很悲观，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会**上锁**，这样别人想拿这个数据就会**block**直到它拿到锁
+
+**传统的关系型数据库里边就用到了很多这种锁机制**，比如**行锁**，**表锁**等，**读锁**，**写锁**等，都是在做操作之前先上锁
+
+这种方案的缺点很明显就是：**效率低**
+
+- **方案二：乐观锁**
+
+![image-20220731183925105](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731183925105.png)
+
+**乐观锁(Optimistic Lock),** 顾名思义，就是很乐观，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去**更新**这个数据，可以使用**版本号**等机制。
+
+**乐观锁适用于多读的应用类型，这样可以提高吞吐量**
+
+**Redis**就是利用这种**check-and-set**机制实现事务的
+
+#### 3.5.5、乐观锁在Redis中的使用
+
+两个命令
+
+-  `WATCH key [key ...]`
+  - 在执行`multi`之前，先执行`watch key1 [key2]`,可以监视一个(或多个) `key` 
+  - 如果在事务**执行之前这个(或这些) `key` 被其他命令所改动，那么事务将被打断**
+-  `UNWATCH key [key ...]`
+  - 取消 `WATCH` 命令对所有 `key` 的监视
+  - 如果在执行 `WATCH` 命令之后，`EXEC` 命令或`DISCARD` 命令先被执行了的话，那么就不需要再执行`UNWATCH` 了
+
+![image-20220731184640677](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220731184640677.png)
+
+#### 3.5.6、Redis事务三特性
+
+- **单独的隔离操作** 
+
+  事务中的所有命令都会**序列化**、按**顺序**地执行
+
+  事务在执行的过程中，**不会被其他客户端发送来的命令请求所打断**。
+
+- **没有隔离级别的概念** 
+
+  队列中的命令没有提交之前都不会实际被执行，因为事务提交前任何指令都**不会被实际执行**
+
+-  **不保证原子性** 
+
+  **事务中如果有一条命令执行失败，其后的命令仍然会被执行，==没有回滚==**
+
+### 3.6、Redis的持久化
+
+**Redis**是一个内存数据库，所有的数据将保存在内存中，所以与传统的MySQL、Oracle、SqlServer等关系型数据库直接把数据保存到硬盘相比，**Redis**的读写效率非常高
+
+但是保存在内存中也有一个很大的缺陷，一旦断电或者宕机，内存数据库中的内容将会全部**丢失**。为了弥补这一缺陷，**Redis**提供了**把内存数据持久化到硬盘文件**，以及**通过备份文件来恢复数据**的功能，即**==Redis持久化机制==**
+
+**Redis**支持两种方式的持久化
+
+- **RDB（Redis DataBase）快照**
+- **AOF（Append Of File）**
+
+
+
+
+
+
+
+### 引用
+
+[Redis专题：万字长文详解持久化原理](https://segmentfault.com/a/1190000039208726)
+
+

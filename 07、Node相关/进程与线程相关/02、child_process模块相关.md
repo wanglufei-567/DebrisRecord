@@ -664,7 +664,7 @@ Node.js 的 child_process 内置模块提供了几种创建子进程的四种方
 - `child_process.execFile()`：类似 `child_process.exec()`，区别是不能通过 shell 来执行，不支持像 I/O 重定向和文件查找这样的行为
 - `child_process.fork()`：衍生新的进程，进程之间是相互独立的，每个进程都有自己的 V8 实例、内存，系统资源是有限的，不建议衍生太多的子进程出来，通常根据系统 CPU 核心数设置
 
-### 四、参考文章
+### 参考文章
 
 [Node Guidebook 子进程](https://tsejx.github.io/node-guidebook/system/process/child-process/)
 

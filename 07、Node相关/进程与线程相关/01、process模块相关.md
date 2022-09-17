@@ -34,8 +34,6 @@
 - 三个标准流： `process.stdout` 标准输出、 `process.stdin` 标准输入、 `process.stderr` 标准错误输出
 - `process.title` 指定进程名称，有的时候需要给进程指定一个名称
 
-### 
-
 ### 参考文章
 
 [Node.js process 模块解读](https://juejin.cn/post/6844903614784225287)

@@ -55,7 +55,7 @@ console.log('Hello world!');                   // | |    都执行了
 
 可以把父进程执行的部分当做 `master.js`，子进程执行的部分当做 `worker.js`，可以把他们想象成是先执行了 `node master.js` 然后 `cluster.fork` 了几次，就执行了几次 `node worker.js`。
 
-而 cluster 模块则是二者之间的一个桥梁，可以通过 `cluster` 提供的方法，让其二者之间进行沟通交流。
+而 `cluster` 模块则是二者之间的一个桥梁，可以通过 `cluster` 提供的方法，让其二者之间进行沟通交流。
 
 ### 二、工作原理
 
@@ -130,7 +130,21 @@ const message = {
 process.send(message);
 ```
 
-### 三、参考文章
+### 三、总结
+
+`cluster`模块调用`cluster.fork()`方法来创建子进程，该方法与`child_process`中的`fork`是同一个方法。
+
+`cluster`模块采用的是经典的**==主从模型==**，`cluster`会创建一个`master`，然后**==根据指定的数量复制出多个子进程==**，可以使用 `cluster.isMaster`属性判断当前进程是`master`还是`worker`(工作进程)。由`master`进程来**==管理==**所有的子进程，==**主进程不负责具体的任务处理，主要工作是负责调度和管理**==。
+
+<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/640.png" alt="图片" style="" />
+
+`child_process` 模块与`cluster` 模块的区别
+
+无论是 `child_process` 模块还是 `cluster` 模块，为了解决 Node.js 实例单线程运行，无法利用多核 CPU 的问题而出现的。核心就是**父进程（即 `master` 进程）负责监听端口，接收到新的请求后将其分发给下面的 `worker` 进程**。
+
+`cluster`通过内部隐式地构建TCP服务器的方式实现了可以让**多个子进程监听同一个端口**，但`cluster`的**主进程只能管理一组==相同的==工作进程**，而自行通过`childprocess`来创建工作进程，可以做到**一个主进程可以控制==多组不同==进程**。
+
+### 参考文章
 
 [Node Guidebook 集群](https://tsejx.github.io/node-guidebook/system/process/cluster)
 

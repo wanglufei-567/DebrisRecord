@@ -103,13 +103,13 @@ new AsyncResource(type[, options])
 
 **`AsyncResource` 上的主要方法：**
 
-- `AsyncResource.bind`：`AsyncResource` 的静态方法，把指定的 `fn` 函数绑定在当前所属的异步资源上下文中（即在调用 `AsyncResource.bind` 时所在的异步资源上下文）；该方法的参数如下：
+- `AsyncResource.bind`：`AsyncResource` 的静态方法，把指定的 `fn` 函数**==绑定在当前所属的异步资源上下文中==**(**即在调用 `AsyncResource.bind` 时所在的异步资源上下文**）；该方法的参数如下：
 
   - `fn`：要绑定到当前所属的异步资源上下文中的执行函数；
   - `type`：异步资源类型，通过该属性与相关的 `AsyncResource` 进行关联，该参数为非必填参数；
   - `thisArg`：指定 `fn` 调用时 `this` 的值，该参数为非必填参数。
 
-- `bind`：把指定的 `fn` 函数绑定在当前 `AsyncResource` 实例所属的异步资源上下文中；该方法的参数如下：
+- `bind`：把指定的 `fn` 函数绑定在当前 `AsyncResource` **==实例所属的异步资源上下文中==**；该方法的参数如下：
 
   - `fn`：要绑定到当前 `AsyncResource` 实例所属的异步资源上下文中的执行函数；
   - `thisArg`：指定 `fn` 调用时 `this` 的值，该参数为非必填参数。
@@ -132,4 +132,231 @@ new AsyncResource(type[, options])
 
 ### 三、`AsyncHook`类
 
+`AsyncHook`类提供了一个用于跟踪异步操作的生命周期事件的接口
+
+```js
+const async_hooks = require('async_hooks');
+
+// 创建一个新的 AsyncHook 实例
+const asyncHook = async_hooks.createHook({ init, before, after, destroy, promiseResolve });
+```
+
+![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/1*gqgTMWCBGY_yk68Zi-vEqA.png)
+
+在一个异步资源的生命周期中，主要包含以下几个钩子：
+
+- `init`：对异步资源初始化时触发
+
+- `promiseResolve`：
+
+  - 对 `Promise` 对象执行 `resolve` 或 `reject` 操作时触发
+  - 调用 `Promise` 对象的 `then` 或 `catch` 方法时触发，此时在触发 `promiseResolve` 的前后，会分别触发 `before` 和 `after` 钩子
+
+  ```js
+  const fs = require('fs');
+  const { createHook } = require('async_hooks');
+  const hook = createHook({
+    promiseResolve (asyncId) {
+      fs.appendFileSync('log.out', `promiseResolve ${asyncId}\n`);
+    },
+    before(asyncId) {
+      fs.appendFileSync('log.out', `before ${asyncId}\n`);
+    },
+    after(asyncId) {
+      fs.appendFileSync('log.out', `after ${asyncId}\n`);
+    },
+  });
+  hook.enable();
+  
+  new Promise((resolve) => resolve(true)).then((a) => {});
+  ```
+
+  执行结果
+
+  ```log
+  promiseResolve 2
+  before 3
+  promiseResolve 3
+  after 3
+  ```
+
+  通过上面的输出可知，`promiseResolve` 在 `Promise` 对象构造函数中调用 `resolve` 时及调用了 `Promise` 对象的 `then` 时各触发了一次，并且第二次同时触发了 `before` 与 `after` 钩子
+
+- `before`：执行异步操作的回调函数之前触发
+
+- `after`：执行异步操作的回调函数之后触发
+
+- `destroy`：异步资源被销毁之后触发
+
+`async_hooks` 提供了 `init`、`promiseResolve`、`before`、`after` 及 `destroy` 几个钩子，并通过 `async_hooks.createHook` 来**==创建并启用==**相关钩子：
+
+```js
+const { createHook } = require('async_hooks');
+
+const hook = createHook({
+  init(asyncId, type, triggerAsyncId, resource) {
+  },
+  promiseResolve(asyncId) {
+  },
+  before(asyncId) {
+  },
+  after(asyncId) {
+  },
+  destroy(asyncId) {
+  }
+});
+hook.enable();
+```
+
+上述钩子的**参数**解释如下：
+
+- `asyncId`：异步资源的唯一编号
+- `type`：异步资源的类型（即名称）
+- `triggerAsyncId`：创建异步资源的异步资源上下文编号
+- `resource`：异步资源的引用
+
+在使用上述钩子时，需要注意以下几点：
+
+- 对于每个异步资源，除了 `init` 和 `destroy` 会被调用**一次**外，其余钩子被调用的次数大于等于一
+
+- 在钩子函数的实现体，尽量避免使用异步操作（包括 `console` 语句）
+
+  为什么不使用 `console.log` 呢？
+
+  - 因为 `console.log` 是一个异步操作，如果在 `async_hooks.createHook` 注册的回调函数中出现异步操作将会导致无限循环
+  - 可以使用 `fs.writeSync(1, msg)` 打印到标准输出，`writeSync` 的第 1 个参数接收文件描述符，`1` 表示标准输出
+
+- 在执行异步操作之前，要先调用 `hook.enable()` 方法来启用钩子，不然所执行的异步操作将不会触发相关钩子
+
+举个具体应用的🌰：
+
+在异步调用链中实现一个类似[线程局部存储](https://zh.m.wikipedia.org/zh-hans/%E7%BA%BF%E7%A8%8B%E5%B1%80%E9%83%A8%E5%AD%98%E5%82%A8)的机制<!--对象的存储是在线程开始时分配，线程结束时回收-->
+
+```js
+const http = require('http');
+const { AsyncResource, createHook, executionAsyncId } = require('async_hooks');
+
+const authProfiles = {};
+const hook = createHook({
+  init(asyncId, type, triggerAsyncId, resource) {
+    if (type === 'HTTP_PARSER') {
+      if (typeof authProfiles[asyncId] === 'undefined') {
+        authProfiles[asyncId] = {};
+      }
+    }
+  },
+  destroy(asyncId) {
+    authProfiles[asyncId] = null;
+  }
+})
+hook.enable();
+
+http.createServer((req, res) => {
+  const asyncResource = new AsyncResource('HTTP_PARSER');
+  asyncResource.runInAsyncScope((req, res) => {
+    const asyncId = executionAsyncId();
+    authProfiles[asyncId].key = Date.now();
+    // 其它异步操作....
+    res.end();
+  }, null, req, res);
+}).listen(3000);
+```
+
+- 通过 `init` 和 `destroy` 钩子实现了在异步资源初始化时对相关 `authProfiles` 信息进行初始化，并且在异步资源销毁时移除相关 `authProfiles` 信息
+- 在处理用户请求的整个异步调用链中（即 `asyncResource.runInAsyncScope` 回调内的异步调用链），均可通过变量 `asyncId` 的值操作相关 `authProfiles` 信息
+
+### 四、`AsyncLocalStorage`类
+
+虽然我们可以通过异步钩子实现类似[线程局部存储](https://link.juejin.cn/?target=https%3A%2F%2Fzh.m.wikipedia.org%2Fzh-hans%2F%E7%BA%BF%E7%A8%8B%E5%B1%80%E9%83%A8%E5%AD%98%E5%82%A8)的机制，不过Node.js提供了一种更加高效和安全的方式`AsyncLocalStorage`
+
+举个🌰
+
+```js
+import http from 'node:http';
+import { AsyncLocalStorage } from 'node:async_hooks';
+
+const asyncLocalStorage = new AsyncLocalStorage();
+
+function logWithId(msg) {
+  const id = asyncLocalStorage.getStore();
+  console.log(`${id !== undefined ? id : '-'}:`, msg);
+}
+
+let idSeq = 0;
+http.createServer((req, res) => {
+  asyncLocalStorage.run(idSeq++, () => {
+    logWithId('start');
+    // Imagine any chain of async operations here
+    setImmediate(() => {
+      logWithId('finish');
+      res.end();
+    });
+  });
+}).listen(8080);
+
+http.get('http://localhost:8080');
+http.get('http://localhost:8080');
+// Prints:
+//   0: start
+//   1: start
+//   0: finish
+//   1: finish
+```
+
+`AsyncLocalStorage` 的主要方法如下：
+
+- `run`：创建一个独立的上下文并运行指定的函数，在指定函数中的所有操作均可通过 `getStore` 获得共享数据，但函数外的操作无法获得共享数据；该方法的参数如下：
+
+  - `store`：共享数据，可以为任意类型；
+  - `callback`：要执行的回调函数；
+  - `...args`：传递给回调函数的参数列表。
+
+- `enterWith`：调用该方法后，之后所有操作均可通过 `getStore` 获得共享数据；该方法的参数如下：
+
+  - `store`：共享数据，可以为任意类型。
+  - 这里需要注意的是，如果在异步操作中调用了 `enterWith`，其影响范围仅限于该异步操作内部，比如下面的例子：
+
+  ```js
+  const { AsyncLocalStorage } = require('async_hooks');
+  
+  const asyncLocalStorage = new AsyncLocalStorage();
+  
+  asyncLocalStorage.enterWith(1);
+  console.log(asyncLocalStorage.getStore()); // 输出 1
+  
+  new Promise((resolve) => resolve(true)).then((value) => {
+    asyncLocalStorage.enterWith(value);
+    console.log(asyncLocalStorage.getStore()); // 输出 true
+    setTimeout(() => {
+      console.log(asyncLocalStorage.getStore()); // 输出 true
+    }, 1000);
+  });
+  
+  setTimeout(() => {
+    console.log(asyncLocalStorage.getStore()); // 输出 1
+  }, 1000);
+  ```
+
+- `exit`：在指定函数中的所有操作调用 `getStore` 无法获得外部上下文中设置的共享数据，比如下例：
+
+  ```js
+  const { AsyncLocalStorage } = require('async_hooks');
+  
+  const asyncLocalStorage = new AsyncLocalStorage();
+  
+  asyncLocalStorage.enterWith(1);
+  console.log(asyncLocalStorage.getStore()); // 输出 1
+  asyncLocalStorage.exit(() => {
+    console.log(asyncLocalStorage.getStore()); // 输出 undefined
+  });
+  ```
+
+  该方法的参数如下：
+
+  - `callback`：要执行的回调函数；
+  - `...args`：传递给回调函数的参数列表。
+
+- `disable`：调用该方法后，后续调用 `getStore` 将返回 `undefined`；
+
+- `getStore`：获取当前上下文中的共享数据；
 

@@ -2,7 +2,7 @@
 
 ## Node 进程与线程笔记（五）async_hooks模块
 
-### 一、async_hooks模块简介
+### 一、`async_hooks`模块简介
 
 `async_hooks`是 Node.js v8.x 版本新增加的一个核心模块，它提供了 API **==用来追踪 Node.js 中异步资源的生命周期==**，可帮助我们正确追踪异步调用的处理逻辑及关系；`async_hooks`属于内置模块，可以直接使用：
 
@@ -230,7 +230,7 @@ hook.enable();
 
 举个具体应用的🌰：
 
-在异步调用链中实现一个类似[线程局部存储](https://zh.m.wikipedia.org/zh-hans/%E7%BA%BF%E7%A8%8B%E5%B1%80%E9%83%A8%E5%AD%98%E5%82%A8)的机制<!--对象的存储是在线程开始时分配，线程结束时回收-->
+在异步调用链中实现一个类似[线程局部存储](https://zh.m.wikipedia.org/zh-hans/%E7%BA%BF%E7%A8%8B%E5%B1%80%E9%83%A8%E5%AD%98%E5%82%A8)的机制<!--对象的存储是在线程开始时分配，线程结束时回收，其实就是每个线程都有自己独立的存储对象-->
 
 ```js
 const http = require('http');
@@ -267,7 +267,9 @@ http.createServer((req, res) => {
 
 ### 四、`AsyncLocalStorage`类
 
-虽然我们可以通过异步钩子实现类似[线程局部存储](https://link.juejin.cn/?target=https%3A%2F%2Fzh.m.wikipedia.org%2Fzh-hans%2F%E7%BA%BF%E7%A8%8B%E5%B1%80%E9%83%A8%E5%AD%98%E5%82%A8)的机制，不过Node.js提供了一种更加高效和安全的方式`AsyncLocalStorage`
+虽然我们可以通过异步钩子实现类似[线程局部存储](https://zh.m.wikipedia.org/zh-hans/%E7%BA%BF%E7%A8%8B%E5%B1%80%E9%83%A8%E5%AD%98%E5%82%A8)的机制，不过Node.js提供了一种更加高效和安全的方式`AsyncLocalStorage`
+
+> **AsyncLocalStorage** 可以在 web 请求或其它任何异步处理流程中，将数据存储起来，以便在接下来的子流程中使用，实现类似本地存储的效果。
 
 举个🌰
 
@@ -302,6 +304,10 @@ http.get('http://localhost:8080');
 //   0: finish
 //   1: finish
 ```
+
+在上面上面这个例子中，可以看到哪怕**==同时有多个并发请求来临==**，并行触发了对请求进行处理的异步流程，但每一个流程中通过 `asyncLocalStorage.getStore()` 获取到的数据都是互相隔离的，和[线程局部存储](https://zh.m.wikipedia.org/zh-hans/%E7%BA%BF%E7%A8%8B%E5%B1%80%E9%83%A8%E5%AD%98%E5%82%A8)很像。
+
+<!--基于asyncLocalStorage这个Node内置的功能，可以在Node应用的全链路追踪中，做到全链路信息的存储，具体的一个例子就是，日志上报-->
 
 `AsyncLocalStorage` 的主要方法如下：
 
@@ -359,4 +365,26 @@ http.get('http://localhost:8080');
 - `disable`：调用该方法后，后续调用 `getStore` 将返回 `undefined`；
 
 - `getStore`：获取当前上下文中的共享数据；
+
+### 五、总结
+
+`async_hooks`模块简单理解就是异步钩子，也就是异步生命周期，`async_hooks`模块提供的 API可以帮助我们追踪异步调用的处理逻辑及关系。
+
+基于`async_hooks`模块提供的这些关于异步操作的功能`AsyncResource`、 `AsyncHooks`、`AsyncLocalStorage`，我们可以对应用中的整个调用链（比如一个 HTTP 请求从接收到响应的整个过程）做到一个全链路追踪，包括全链路信息获取和全链路信息存储，有了全链路追踪便可以减少应用故障定位所花费的时间与精力，全链路追踪的一个主要应用场景便是我们很熟悉的应用日志。
+
+<!--当然不用async_hooks模块也可以实现，但使用Node本身提供的功能必然在性能上有所优势---->
+
+当然除了应用到应用日志上面，`asyn_hooks`模块还有很多其他应用场景，比如，Node线程池的实现；也可以应用到我们的代码逻辑中，在异步生命周期中做一些特殊逻辑处理。
+
+### 参考文章
+
+[Node.js v16.17.0 documentation](https://nodejs.org/dist/latest-v16.x/docs/api/async_hooks.html)
+
+[Node.js async 高级编程](https://juejin.cn/post/7125632400440164383#heading-1)
+
+[Node.js使用async_hooks实现线程池(上)](https://juejin.cn/post/7063836300800950302#heading-3)
+
+[AsyncLocalStorage 的妙用](https://www.mdnice.com/writing/164ae721a68a445d966fccbd18e4056a)
+
+[Node.js 应用全链路追踪技术——全链路信息获取 ](https://www.cnblogs.com/cangqinglang/p/15622946.html)
 

@@ -44,7 +44,7 @@ brew uninstall [包名]
 brew uninstall git
 ```
 
-*清理旧版本**
+**清理旧版本**
 
 ```
 //清理所有包的旧版本
@@ -56,4 +56,6 @@ brew cleanup [包名]
 //查看可清理的旧版本包，不执行实际操作
 brew cleanup -n 
 ```
+
+
 

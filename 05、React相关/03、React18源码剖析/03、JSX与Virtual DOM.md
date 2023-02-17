@@ -26,7 +26,7 @@ const element = <h1>Hello, world!</h1>;
 
 > 在**编译**之后，JSX 表达式会被转为**普通 JavaScript 函数**调用，并且对其取值后得到 JavaScript 对象；
 
-JSX是一种JavaScript的语法扩展，所以其本质上还是JavaScript。JSX经过Babel的编译之后会被转换成一段JavaScript函数调用逻辑，执行之后会生成一个JavaScript对象<!--这个对象就是Virtual DOM-->
+==JSX是一种JavaScript的语法扩展，所以其本质上还是JavaScript。JSX经过Babel的编译之后会被转换成一段JavaScript函数调用逻辑，执行之后会生成一个JavaScript对象==<!--这个对象就是Virtual DOM-->
 
 **JSX的编译转换新旧对比**
 
@@ -93,7 +93,7 @@ _jsxs("h1", {
 
 可以看到转换结果中，会自动的引入相关依赖，也就是说不用我们手动的引入`React`了。
 
-可以发现两种转换方式不同，是因为Babel插件选择的模式不同导致的，两种模式`classic`、`automatic`。
+可以发现新旧两种转换方式不同，是因为Babel插件选择的模式不同导致的，两种模式`classic`、`automatic`。
 
 ### 二、实现JSX转换为Virtual DOM的方法
 
@@ -114,7 +114,7 @@ console.log('element', element)
 
 ![image-20221002162317710](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20221002162317710.png)
 
-很明显这段报错的原因是因为依赖模块导入的问题，`src/react/jsx-dev-runtime`这个文件路径并没有找到相对应的文件；报错原因很清楚，但是为什么会有这样一个报错却让人费解，最后查了下资料，发现是因为vite打包编译时，检测到JSX的语法，自动引入了这个文件
+很明显这段报错的原因是因为依赖模块导入的问题，`src/react/jsx-dev-runtime`这个文件路径并没有找到相对应的文件；报错原因很清楚，但是为什么会有这样一个报错却让人费解，最后查了下资料，发现是因为vite打包编译时，检测到JSX的语法，自动引入了`src/react/jsx-dev-runtime`这个文件
 
 ```js
 // vite.config.js
@@ -136,7 +136,7 @@ export default defineConfig({
 });
 ```
 
-完成自动引入`src/react/jsx-dev-runtime`的应该是这个react插件，`@vitejs/plugin-react`
+根据上面👆这个`vite.config.js`配置文件，可以发现完成自动引入`src/react/jsx-dev-runtime`的应该是这个`react`插件，`@vitejs/plugin-react`
 
 #### 2.1、实现jsxDEV方法
 
@@ -300,3 +300,16 @@ element的打印结果如下👇，也就是虚拟DOM
 }
 ```
 
+> **所谓的虚拟DOM就是一个描述真实DOM的纯JS对象**
+
+![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/virutaldom_1664073330011-20221003105707613.jpg)
+
+上图👆描述的是JSX如何转换为虚拟DOM，用户编写的JSX在**工程打包时**会由Babel进行一次转译，之后是由浏览器运行转译结果得到虚拟DOM，<!--浏览器运行得到虚拟DOM，到根据虚拟DOM生成真实DOM，这里的逻辑就是运行时，也就是runtime-->
+
+![image-20221003110306253](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20221003110306253.png)
+
+打开浏览器的Sources可以发现，浏览器运行的文件是已经经过Babel编译之后的了
+
+### 三、总结
+
+JSX是一种JavaScript的语法扩展，其本质上还是JavaScript；JSX在工程打包时会自动编译成一段JavaScript函数调用的代码，并在运行时执行调用生成虚拟DOM。

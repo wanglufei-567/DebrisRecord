@@ -2,7 +2,7 @@
 
 ### 一、前言
 
-事件是用户或浏览器自身执行的某种动作（比如：`click`、`mouseover`），而响应某个事件的函数叫做事件处理程序
+**==事件==**是用户或浏览器自身执行的某种动作（比如：`click`、`mouseover`），而响应某个事件的函数叫做事件处理程序
 
 #### 1.1、DOM事件流
 
@@ -217,7 +217,7 @@ React 采用合成事件的主要原因有以下几点：
 
   React中的合成事件与这个大致一样，只对**==根节点添加事件监听==**，当根节点内部的某个元素触发了相关事件，那么由于DOM事件流，在捕获和冒泡阶段，根节点的事件监听回调便会触发，然后再按照顺序收集事件流中的所有元素，最后再正向或者反向遍历从元素上拿到相关事件的监听回调进行执行，从而达到和DOM事件流相同的执行顺序；
 
-  由于真正注册事件监听的是根节点，所以如果内部元素通过`addEventListener`添加了监听回调，那么根节点上的回调和内部元素的原生监听事件回调，仍然按照DOM事件流来执行
+  由于真正注册事件监听的是**==根节点==**，所以如果内部元素通过`addEventListener`添加了监听回调，那么根节点上的回调和内部元素的原生监听事件回调，仍然按照DOM事件流来执行
 
   看下打印结果👇
 
@@ -416,6 +416,8 @@ export function registerDirectEvent(registrationName, dependencies) {
 到这里注册事件名就完成了，逻辑不复杂只是创建了很多文件，绕来绕去的，很晕，看下事件名注册的结果，遍历`allNativeEvents`并打印
 
 ![image-20230214231604388](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230214231604388.png)
+
+<!--注册事件名这里感觉有些问题，registerDirectEvent中的registrationName没有用到，也就是说原生事件名存储了一次，没有存储React事件名，而React事件名是区分捕获和冒泡阶段的，比如onClick和onClickCapture，不过源码里也是这样的，有点不理解-->
 
 #### 2.2、监听原生事件
 
@@ -876,6 +878,8 @@ export function createInstance(type, props, internalInstanceHandle) {
 }
 ```
 
+这样便可以通过事件目标获取到对应的fiber节点
+
 ------
 
 在DOM插件事件系统`src/react-dom-bindings/src/events/DOMPluginEventSystem.js`中实现并导出`dispatchEventForPluginEventSystem`
@@ -1065,7 +1069,7 @@ export { registerSimpleEvents as registerEvents, extractEvents };
 
 `SimpleEventPlugin中的extractEvents`主要完成以下内容：
 
-- 根据原生
+- 根据原生事件名获取React事件名
 
 - 遍历`fiber`链并提取事件监听方法（`accumulateSinglePhaseListeners`） 得到事件监听方法队列（`listeners`）
 - 利用原生的事件对象生成一个合成事件对象 `new SyntheticEventCtor` <!--为什么需要合成事件对象？1、原生事件对象event中有许多属性，React事件不是都需要；2、React事件需要事件对象中有一些自己的属性，比如React的阻止冒泡的方法stopPropagation、阻止默认行为的方法preventDefault-->
@@ -1171,10 +1175,12 @@ export default function getListener(inst, registrationName) {
 
 ```
 
+`getListener`就是从`fiber`节点的`props`上取到React事件监听方法
+
 最后注意下事件队列`listeners`的数据格式应当是这样的
 
 ```js
-listeners = [{ instance1, listener1, currentTarget1 }, { instance1, listener1, currentTarget1 }, ...]
+listeners = [{ fiber1, 监听方法1, 真实DOM1 }, { fiber2, 监听方法2, 真实DOM2 }, ...]
 ```
 
 ------
@@ -1507,3 +1513,4 @@ let element = <FunctionComponent />;
 - 给根节点注册事件，进行事件代理
 - 事件触发时，从事件目标对象向上回溯DOM节点完成事件收集
 - 根据是否在捕获阶段，进行正向或反向遍历派发队列，将事件取出来进行执行
+

@@ -6,7 +6,7 @@
 
 **==React Lane模型==**是 React 内部使用的一种**==调度器优化机制==**，用于在不同的优先级之间分配任务。
 
-<!--屁话，难以理解，简述就是React用Lane模型来表示任务的优先级，每个lane(车道)都对应一种优先级，一共有31条优先级，数字越小优先级越高-->
+<!--屁话，难以理解，简述就是React用Lane模型来表示任务的优先级，每个lane(车道)都对应一种优先级，一共有31条优先级，数字越小优先级越高，这样React便可以根据不同任务的优先级进行调度更新，优先响应用户操作等任务-->
 
 在 Lane 模型中，==每个 Lane 对应一种优先级，任务会被分配到不同的 Lane 中进行执行==。React 使用 Lane 模型来实现调度器的高效性和灵活性，从而**==提高应用程序的性能和响应能力==**。
 
@@ -113,7 +113,7 @@ const OffscreenLane = 0b1000000000000000000000000000000;
 
 在 React 应用中，任务的执行顺序和优先级是由 Scheduler调度器来控制的，而 Scheduler 调度器的任务优先级和任务的执行顺序都与 React Lane 模型中的 Lane 有关。
 
-==Scheduler 调度器会将任务加入到合适的 Lane 中，并根据 Lane 之间的优先级关系和任务的执行情况，动态地调整任务的执行顺序和时间，以确保每个 Lane 中的任务能够按照正确的优先级被执行。==
+==Scheduler 调度器会将任务加入到合适的 Lane 中，并根据 Lane 之间的优先级关系和任务的执行情况，动态地调整任务的执行顺序和时间，以确保每个 Lane 中的任务能够按照正确的优先级被执行。== <!--最小堆的技术，优先执行高优任务-->
 
 因此，React Lane 模型和 Scheduler 调度器都是为了提高 React 应用的==性能和响应速度==而设计的，它们的共同目标是==将任务按照正确的优先级和时间分配到合适的执行单元中==，并在执行过程中进行必要的==调整和切换==，以确保应用能够快速响应用户操作，提供良好的用户体验。
 
@@ -629,7 +629,7 @@ console.log('updateQueue', printUpdateQueue(fiber.updateQueue));
 
 ### 二、Lane模型下的初次渲染
 
-在实现Lane模型下的初次渲染之前，可以先看下完整的scheduleUpdateOnFiber流程，这个流程中包含了**同步渲染**和**并发渲染**，后面会多次出现这张流程图
+在实现Lane模型下的初次渲染之前，可以先看下完整的`scheduleUpdateOnFiber`流程，这个流程中包含了**同步渲染**和**并发渲染**，后面会多次出现这张流程图
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/scheduleUpdateOnFiber1_1667713205987.jpg)
 
@@ -684,7 +684,7 @@ root.render(element);
 
 ------
 
-实现请求一个更新车道的方法`requestUpdateLane`，==初次渲染时`requestUpdateLane`的返回值是`DefaultLane`(16)==
+**实现请求一个更新车道的方法`requestUpdateLane`**，==初次渲染时`requestUpdateLane`的返回值是`DefaultLane`(16)==
 
 ```diff
 +  //请求一个更新车道 初次渲染时是默认事件车道 DefaultLane 16
@@ -717,6 +717,8 @@ export function requestUpdateLane() {
 - 先获取当前更新优先级：`getCurrentUpdatePriority` <!--（默认值是NoLane 没有车道）-->
 - 若更新优先级为NoLane，则获取当前事件优先级：`getCurrentEventPriority` <!--（默认值是DefaultLane 16）-->
 - 若没有事件则返回默认事件车道 `DefaultLane` 16
+
+<!--所以初次渲染时，renderlane是`DefaultLane` 16-->
 
 ------
 
@@ -874,6 +876,8 @@ export const IdleEventPriority = IdleLane;
 ```
 
 这里就是给更新对象添加`lane`
+
+<!--更新对象的lane就表示了该更新的优先级，优先级高的更新要先处理-->
 
 ------
 
@@ -1035,9 +1039,7 @@ export function processUpdateQueue(
 }
 ```
 
-这里就是前面**1.4、 ReactUpdateQueue**中实现的逻辑，没啥看的
-
-<!--绕来绕去的 头皮发麻-->
+这里就是前面**1.4、 ReactUpdateQueue**中实现的逻辑，有了这套机制之后，React便可以做到优先处理高优任务
 
 ------
 
@@ -1158,7 +1160,7 @@ function ensureRootIsScheduled(root) {
 
 改造的内容有两点：
 
-1. 根据`root`上的`lane`判断是走同步更新还是调度更新
+1. **根据`root`上的`lane`判断是走同步更新还是调度更新**
 
    ```js
    //获取当前优先级最高的车道
@@ -1178,6 +1180,8 @@ function ensureRootIsScheduled(root) {
    <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302231930366.png" alt="image-20230302231930366" style="zoom:50%;" />
 
    初次渲染时`newCallbackPriority`为`DefaultLane`(16)不是`SyncLane`，所以走调度更新
+
+   <!--同步更新后面再实现-->
 
    ------
 
@@ -1209,17 +1213,17 @@ function ensureRootIsScheduled(root) {
    }
    ```
 
-2. 增加调度更新的逻辑
+2. **增加调度更新的逻辑**
 
    - 将`lane`转成事件优先级：`schedulerPriorityLevel`，供`Scheduler_scheduleCallback`使用
 
-   ```js
-   let schedulerPriorityLevel;
-   switch (lanesToEventPriority(nextLanes) //将lane转成事件优先级
-   ) {
-     //...
-   }
-   ```
+     ```js
+     let schedulerPriorityLevel;
+     switch (lanesToEventPriority(nextLanes) //将lane转成事件优先级
+     ) {
+       //...
+     }
+     ```
 
    - 使用正确的优先级`schedulerPriorityLevel`，执行`Scheduler_scheduleCallback`
 
@@ -1241,6 +1245,8 @@ function ensureRootIsScheduled(root) {
      > ```
 
      `scheduleCallback`的逻辑再**15、实现scheduler**中已经改造完成，接下来继续改造`scheduleCallback(priorityLevel, callback)`中的`callback`逻辑，也就是`performConcurrentWorkOnRoot`
+
+     <!--这里需要明确的一点‼️ scheduleCallback会创建一个宏任务来执行调度更新，后面将要实现的同步更新创建的则是一个微任务-->
 
 ------
 
@@ -1268,15 +1274,16 @@ function ensureRootIsScheduled(root) {
 }
 ```
 
-判断是否启用时间切片
+增加的内容：
 
-```js
-const shouldTimeSlice = !includesBlockingLane(root, lanes) && (!didTimeout);
-```
+- **判断是否启用时间切片（启用则采用并发渲染，不启用则采用同步渲染）**
 
-如果`root`上不包含阻塞的车道，并且任务没有超时，就可以并行渲染,就是启用时间分片
+  ```js
+  const shouldTimeSlice = !includesBlockingLane(root, lanes) && (!didTimeout);
+  ```
 
-- `includesBlockingLane`
+  ==如果`root`上**不包含阻塞的车道**，并且**任务没有超时**，就可以并行渲染,就是启用时间分片==
+  - **是否包含阻塞车道：`includesBlockingLane`**
 
   ```js
   export function includesBlockingLane(root, lanes) {
@@ -1287,20 +1294,44 @@ const shouldTimeSlice = !includesBlockingLane(root, lanes) && (!didTimeout);
 
   由于初次渲染时，`root`上的`lane`是`DefaultLane`，所以`includesBlockingLane`便为`true`
 
-- `didTimeout`
+  <!--所以初次渲染时，shouldTimeSlice为false，走同步渲染的逻辑-->
 
-  `didTimeout`是`scheduleCallback`内部执行`performConcurrentWorkOnRoot`时传入的
+  - **任务是否过期：`didTimeout`**
 
-  > ```js
-  > const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
-  > const continuationCallback = callback(didUserCallbackTimeout);
-  > ```
-  >
-  > `didUserCallbackTimeout`就是`didTimeout`，表示当前任务是否过期
+    `didTimeout`是`scheduleCallback`内部执行`performConcurrentWorkOnRoot`时传入的
 
-这里实现的是这部分逻辑
+    > ```js
+    > const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
+    > const continuationCallback = callback(didUserCallbackTimeout);
+    > ```
+    >
+    > `didUserCallbackTimeout`就是`didTimeout`，表示当前任务是否过期
+    >
+    > 若任务的过期时间小于当前时间，则说明当前任务已过期
 
-<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302234622023.png" alt="image-20230302234622023" style="zoom:50%;" />
+- 若`shouldTimeSlice`为`true`，则采用并发渲染：`renderRootConcurrent`
+
+  ```js
+  if (shouldTimeSlice) {
+   renderRootConcurrent(root, lanes)
+  }
+  ```
+
+  <!--并发渲染后面再实现-->
+
+- 若`shouldTimeSlice`为`false`，则采用同步渲染：`renderRootSync`
+
+  ```js
+  } else {
+  renderRootSync(root, lanes);
+  }
+  ```
+
+  同步渲染也就是流程图中这一部分内容👇
+
+  <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302234622023.png" alt="image-20230302234622023" style="zoom:50%;" />
+
+<!--performConcurrentWorkOnRoot是Concurrent Mode下的更新API，但不是每次更新都走并发渲染（切片）renderRootConcurrent，而是根据`shouldTimeSlice`判断走并发渲染renderRootConcurrent，还是同步渲染renderRootSync，这是因为一次任务虽然可以分割成若干小任务执行，但是当这个任务过期后，便应当尽快将任务执行完成，这个时候就不能继续切片执行了，而是将剩余部分一次性执行完成（走同步渲染renderRootSync）-->
 
 ------
 
@@ -1312,7 +1343,7 @@ const shouldTimeSlice = !includesBlockingLane(root, lanes) && (!didTimeout);
 
 ![image-20230302235350790](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302235350790.png)
 
-整个`Lane`模型下的初渲染，基本上和之前实现的初渲染一致，多了`SyncLane`和shouldTimeSlice的判断
+整个`Lane`模型下的初渲染，基本上和之前实现的初渲染一致，多了`SyncLane`和`shouldTimeSlice`的判断
 
 看下实现效果
 

@@ -133,7 +133,7 @@ function dispatchDiscreteEvent(
 
 这里增加的逻辑是：`onClick`事件被触发后，在执行监听函数之前将当前的更新优先级设置为离散事件优先级(`DiscreteEventPriority` 1) ，待监听函数执行完成后再将当前优先级重置为之前的优先级
 
-看下main.jsx中的监听函数👇
+看下`main.jsx`中的监听函数👇
 
 ```jsx
  <button onClick={() => {
@@ -349,7 +349,7 @@ function performSyncWorkOnRoot(root) {
 
 ### **三、Concurrent Mode**下的并发渲染
 
-接下来实现并发渲染，利用`scheduler`的时间切片将更新任务分解为多个小任务，并将这些小任务分配到多个帧中执行
+接下来实现并发渲染，利用`scheduler`的时间切片**==将更新任务分解为多个小任务，并将这些小任务分配到多个帧中执行==**
 
 ![image-20230305205537793](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230305205537793.png)
 
@@ -514,6 +514,8 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
 
   `allowConcurrentByDefault`，React18版本中这个值为true，表示==默认开启并发渲染==
 
+  所以==Concurrent Mode下**初次渲染**走的是并发渲染==
+
 - **渲染之后返回的任务状态：`exitStatus`**
 
   ```js
@@ -529,7 +531,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
           * 5ms内将`fiber`树构建完成，返回`RootCompleted`
           * 5ms没将`fiber`树构建完成就会退出，返回`RootInProgress`
 
-   - **判断渲染之后返回的任务状态`exitStatus**`
+   - **判断渲染之后返回的任务状态`exitStatus`**
 
         - 若`exitStatus`为`RootCompleted`，则**==直提交更新==**
 

@@ -1,4 +1,4 @@
-## webpack笔记（1）— webpack基本概念
+## webpack笔记（一）— webpack基本概念
 
 ### 一、前言
 
@@ -72,7 +72,7 @@ module.exports = {
 
 #### 3.1、 入口(entry)
 
-- 入口起点(entry point)指示 webpack 应该使用哪个模块，来作为构建其内部依赖图(dependency graph) 的开始。进入入口起点后，webpack 会找出有哪些模块和库是入口起点（直接和间接）依赖的
+- 入口起点(`entry point`)指示 **webpack** 应该使用哪个模块，来作为构建其内部依赖图(`dependency graph`) 的**开始**。进入入口起点后，**webpack**会找出有==哪些模块和库是入口起点（直接和间接）依赖的==
 - ==默认值是 `./src/index.js`==，但你可以通过在 `webpack configuration` 中配置 `entry` 属性，来指定一个（或多个）不同的入口起点
 
  `src\index.js`
@@ -93,7 +93,7 @@ module.exports = {
 
 #### 3.2、 输出(output)
 
-- `output` 属性告诉 webpack 在哪里输出它所创建的 bundle，以及如何命名这些文件
+- `output` 属性告诉**webpack**在哪里输出它所创建的 `bundle`，以及如何命名这些文件
 - 主要输出文件的默认值是 `./dist/main.js`，其他生成文件默认放置在 `./dist` 文件夹中。
 
 `webpack.config.js`
@@ -391,7 +391,7 @@ module.exports = {
 关于开发服务器**webpack-dev-server**需要知道的是：
 
 1. 使用`webpack`打包项目，得到输出的文件，==放到输出目录里==<!--output配置的目录-->
-2. 而使用`webpack-dev-server`（`webpack serve`）打包的话，==结果文件并不会写入硬盘，只会写到内存里== <!--所以使用开发服务器时，在工程里看不到打包后的文件-->
+2. ==使用`webpack-dev-server`（`webpack serve`）打包的话，**结果文件并不会写入硬盘，只会写到内存里**== <!--所以使用开发服务器时，在工程里看不到打包后的文件-->
 
 `webpack-dev-server`会启一个**http服务器**，用来返回打包后的文件
 

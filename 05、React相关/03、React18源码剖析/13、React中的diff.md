@@ -789,7 +789,7 @@ function reconcileChildFibers(
 新VDom和老VDom按照索引，==一一进行比较==
 
 - 如果 `key` 不同则==直接结束本轮循环==  
-- 如果`key` 相同而 `type` 不同，则直接==创建新`fibe`r节点==，标记老`fiber`为删除，==继续循环==
+- 如果`key` 相同而 `type` 不同，则直接==创建新`fiber`节点==，标记老`fiber`为删除，==继续循环==
 - 如果`key` 相同且 `type` 也相同，则直接==复用老节 `fiber` 节点==，==继续循环==
 - 如果`newChildren` 或 `oldFiber` 遍历完，==结束本轮循环==
 

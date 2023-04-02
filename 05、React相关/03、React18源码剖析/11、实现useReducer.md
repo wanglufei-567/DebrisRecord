@@ -15,7 +15,6 @@ React Hooks 是 React 16.8 引入的一项新特性，它可以让函数组件�
 下面是一个示例：
 
 ```jsx
-jsxCopy code
 import React, { useReducer } from 'react';
 
 function reducer(state, action) {
@@ -585,7 +584,7 @@ function prepareFreshStack(root) {
 
 接下来具体实现
 
-首先在2.2实现的`dispatch`中，最后会调用`scheduleUpdateOnFiber`，而`scheduleUpdateOnFibe`r中会执行**工作循环**计算一颗新的`fiber`树，所以接下来从`beginWork`这里开始完善
+首先在2.2实现的`dispatch`中，最后会调用`scheduleUpdateOnFiber`，而`scheduleUpdateOnFiber`中会执行**工作循环**计算一颗新的`fiber`树，所以接下来从`beginWork`这里开始完善
 
 ##### 2.3.1、beginWork
 
@@ -820,7 +819,7 @@ export function beginWork(current, workInProgress) {
   }
 ```
 
-<!--注意⚠️由于是更新，此时的函数组件对应的`fiber`的`tag`不再是IndeterminateComponent而是FunctionComponent-->
+<!--注意⚠️由于是更新，此时的函数组件对应的`fiber`的`tag`不再是IndeterminateComponent而是FunctionComponent，挂载时将IndeterminateComponent改成了FunctionComponent-->
 
 ------
 
@@ -1165,7 +1164,9 @@ function updateHostComponent(
 
   <!--这里其实就是diff的逻辑，比较新老节点的props，还有一部分的diff逻辑在beginWork实现了，就是复用老子fiber那里，当然这只是简单的diff，后面再统一实现其他diff-->
 
-- **将得到差异内容放到新`fiber`的更新队列上**：`workInProgress.updateQueue = updatePayload;`
+- **==将得到差异内容放到新`fiber`的更新队列上==**：`workInProgress.updateQueue = updatePayload;`
+
+  <!--这里将更新的内容放到新fiber的updateQueue上了-->
 
 - **给新`fiber`标记更新`tag`**: `markUpdate(workInProgress);`
 

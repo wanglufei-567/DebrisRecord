@@ -2,7 +2,7 @@
 
 ### 一、provide和inject的使用
 
-通常，当我们需要从父组件向子组件传递数据时，我们使用 `props`。想象一下这样的结构：有一些深度嵌套的组件，而深层的子组件只需要父组件的部分内容。在这种情况下，如果仍然将 `prop` 沿着组件链逐级传递下去，可能会很麻烦。
+通常，当我们需要从父组件向子组件传递数据时，我们使用 `props`。想象一下这样的结构：==有一些深度嵌套的组件，而深层的子组件只需要父组件的部分内容==。在这种情况下，如果仍然将 `prop` 沿着组件链逐级传递下去，可能会很麻烦。
 
 对于这种情况，我们可以使用一对 `provide` 和 `inject`。无论组件层次结构有多深，父组件都可以作为其所有子组件的依赖提供者。这个特性有两个部分：父组件有一个 `provide` 选项来提供数据，子组件有一个 `inject` 选项来开始使用这些数据。
 
@@ -58,7 +58,7 @@ export default {
 </script>
 ```
 
-实际上，你可以将依赖注入看作是“**长距离的 `prop**`”，除了：
+实际上，你可以将依赖注入看作是“==**长距离的 `prop**`==”，除了：
 
 - 父组件不需要知道哪些子组件使用了它 `provide` 的 `property`
 - 子组件不需要知道 `inject` 的 `property` 来自哪里
@@ -67,15 +67,27 @@ export default {
 
 其实 `provide` 和 `inject`的原理很简单
 
-首先关于`provide`，每个组件实例上都一个`provides`属性用于存储组件自己`provide`的`props`和父组件的provides，那为了避免组件自己的props和父组件的`props`出现同名冲突，会将父组件的`provides`属性作为组件自己`provides`的原型对象，这样就有了一个原型链，保证了在孙子组件中可以拿到曾父组件`provide`的`props`
+==**首先关于`provide`**==
 
-<!--若组件没有父组件则其provides的原型是null，另外，若组件自己本身并没有使用provide，那么其组件实例上的provides就是父组件的provides，只有当组件自己使用provide后，才会将其组件实例上的provides属性变成一个以父组件porvides为原型的对象-->
+每个==组件实例上==都一个`provides`属性用于存储==组件自己`provide`的`props`==和==父组件`provide`的`props`==
 
-其次关于`inject`，`inject`就是通过组件实例上的`parent`属性拿到父组件的`provides`（`parent.provides`），因为原型链的存在，组件通过`parent.provides`不仅可以拿到父组件的`provides`还可以拿到曾父组件的`provides`
+那为了避免组件自己的`props`和父组件的`props`出现同名冲突，==会将父组件的`provides`属性作为组件自己`provides`的原型对象==，这样就有了一个==**原型链**==，保证了在孙子组件中可以拿到曾父组件`provide`的`props`，若组件没有父组件则其`provides`的原型是`null`
+
+另外，若组件自己本身并没有使用`provide`，那么其组件实例上的`provides`就是父组件的`provides`，==只有当组件自己使用`provide`后，才会将其组件实例上的`provides`属性变成一个以父组件`porvides`为原型的对象==
+
+------
+
+**==其次关于`inject`==**
+
+==`inject`就是通过组件实例上的`parent`属性拿到父组件的`provides`（`parent.provides`）==
+
+==因为原型链的存在，组件通过`parent.provides`不仅可以拿到父组件的`provides`还可以拿到曾父组件的`provides`==
+
+------
 
 下面👇是具体实现
 
-**给组件实例添加`parent`和`provides`属性**
+==**给组件实例添加`parent`和`provides`属性**==
 
 ```typescript
 // packages/runtime-core/src/renderer.ts
@@ -84,6 +96,7 @@ function setupRenderEffect(instance, container, anchor) {
   const componentUpdate = () => {
       //...
 
+    // 将当前组件实例instance通过patch children传递给子组件
       patch(null, subTree, container, anchor, instance);
 
       //...
@@ -98,6 +111,7 @@ function setupRenderEffect(instance, container, anchor) {
 
 
 function mountComponent(vnode, container, anchor, parentComponent) {
+  // 创建组件实例时将父组件传递给子组件，parentComponent是父组件实例instance
   const instance = (vnode.component =
     createComponentInstance(vnode, parentComponent));
   
@@ -133,6 +147,10 @@ const patch = (
   };
 ```
 
+==在创建组件实例的方法`createComponentInstance`中添加`parent`和`provides`属性==
+
+==组件实例的`provides`属性默认值是`parent.provides`==
+
 ```typescript
 export function createComponentInstance(vnode, parent) {
   let instance = {
@@ -146,7 +164,11 @@ export function createComponentInstance(vnode, parent) {
 }
 ```
 
-上面👆这段实现中关于子组件的`parent`是怎么和父组件关联起来是有点隐蔽的，这个关联逻辑发生在
+父组件自己没有父组件的话，其`parent`属性就是`null`，其`provides`属性就是一个以`null`为原型的空对象
+
+------
+
+上面👆这段实现中关于子组件的`parent`是怎么和父组件关联起来是有点隐蔽的，这个关联逻辑发生在👇
 
 ```typescript
 function setupRenderEffect(instance, container, anchor) {
@@ -166,7 +188,7 @@ function setupRenderEffect(instance, container, anchor) {
 }
 ```
 
-父组件执行时将自己的组件实例传给子组件的`patch`，从而完成了子组件的`parent`是和父组件关联
+==父组件执行时将自己的组件实例`instance`传给子组件的`patch`，从而完成了子组件的`parent`是和父组件关联==
 
 > 注意：父组件的`setupRenderEffect`中的这段`patch`
 >
@@ -174,11 +196,11 @@ function setupRenderEffect(instance, container, anchor) {
 >  patch(null, subTree, container, anchor, instance);
 > ```
 >
-> 是在`patch`父组件的`render`生成的`VNode`，子组件就是在这个`VNode`中
+> `subTree`是在`patch`父组件的`render`生成的`VNode`，子组件就是这个`VNode`中，此时将父组件的实例`instance`传递给子组件
 
-父组件自己没有父组件的话，其`parent`属性就是`null`，其`provides`属性就是一个以`null`为原型的空对象
+------
 
-**provide的实现**
+==**provide的实现**==
 
 ```typescript
 // packages/runtime-core/src/apiInject.ts
@@ -231,7 +253,12 @@ if (currentProvides === parentProvides) {
 }
 ```
 
-这段逻辑的目的是，因为组件实例的`provides`属性默认值是`parent.provides`，那么若是组件要`provide` 自己的`props`时，便可能会覆盖掉父组件的`props`，因此需要隔离开来；此外通过利用原型链的原理，不管嵌套多少层，子组件都可以拿到最上层父组件`provide`的`props`，而且由于原型链的特性，子组件是从下至上逐层拿到原型链上的属性，所以即使存在同名属性，子组件也是取离自己最近的
+这段逻辑的目的是
+
+- ==因为组件实例的`provides`属性默认值是`parent.provides`==，那么若是组件要`provide` 自己的`props`时，便可能会覆盖掉父组件的`props`，因此需要隔离开来
+- 此外通过利用**==原型链==**的原理，不管嵌套多少层，子组件都可以拿到最上层父组件`provide`的`props`，而且由于原型链的特性，子组件是从下至上逐层拿到原型链上的属性，==所以即使存在同名属性，子组件也是取离自己最近的==
+
+------
 
 **inject的实现**
 
@@ -344,9 +371,9 @@ export * from './apiInject';
 
 **注意**
 
-从上面👆的使用中可以发现，通过`provide`和`inject`子组件不仅可以从父组件中拿到响应数据使用，而且当父组件去修改这个响应式数据，子组件也会有响应式更新
+从上面👆的使用中可以发现，通过`provide`和`inject`子组件不仅可以从父组件中拿到==响应式数据==使用，而且当父组件去修改这个响应式数据，子组件也会有响应式更新
 
-这其中的原理是，组件的`provides`是个原型链，父组件在这个原型链上放一个响应式数据，当子组件从原型链上拿到这个响应式数据并在自己的`render`中使用到这个响应式数据时，便会发生响应式依赖收集，当这个响应式数据发生变化便会触发子组件的更新，这样应该就能理解为啥父组件修改数据可以触发子组件更新了
+这其中的原理是，组件的`provides`是个原型链，父组件在这个原型链上放一个响应式数据，当子组件从原型链上拿到这个响应式数据并在自己的`render`中使用到这个响应式数据时，便会发生==响应式依赖收集==，当这个响应式数据发生变化==便会触发子组件的更新==，这样应该就能理解为啥父组件修改数据可以触发子组件更新了
 
 现在看官网上的这句话就有了更深入的理解了
 
@@ -357,6 +384,6 @@ export * from './apiInject';
 
 <!--上面这段话可以这么去理解，子组件inject一个响应式数据，相当于在子组件自己内部使用了一个外部的state，对吧，有点像vuex了，全局数据其实也就是这么个套路，pinia中就是用了provide和inject-->
 
-另外还有一个注意点，响应式数据是谁用，依赖收集就收集谁，看下图👇，父组件没有用这个响应式数据，就不会重新`render`
+另外还有一个注意点，==响应式数据是谁用，依赖收集就收集谁==，看下图👇，父组件没有用这个响应式数据，就不会重新`render`
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220622091202329.png" alt="image-20220622091202329" style="zoom:50%;" />

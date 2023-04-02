@@ -4,13 +4,13 @@
 
 #### 1.1、`setup`的使用
 
-组件的`render`函数每次更新时都会重新执行，但是`setup`函数只会在组件挂载时执行一次
+==组件的`render`函数每次更新时都会重新执行，但是`setup`函数只会在组件挂载时执行一次==
 
 - `setup`函数是`compositionAPI`的入口
 - 可以在函数内部编写逻辑，解决vue2中反复横跳问题
-- `setup`返回的返回值有两种形式：
-  - 函数：该函数就会覆盖掉组件原有的`render`函数，组件中原有`render`函数就不会执行了
-  - 对像：对象中的数据将暴露给模板使用
+- `setup`返回的返回值有**==两种形式：==**
+  - **函数**：==该函数就会覆盖掉组件原有的`render`函数，组件中原有`render`函数就不会执行了==
+  - **对像：**==对象中的数据将暴露给模板使用==
 - `setup`函数的参数为`props`、`context({slots,emit,attrs,expose})`
 
 **具体使用效果**
@@ -65,6 +65,10 @@
     const VueComponent = {
       setup() {
         const { state, handleClick } = useCount()
+      /**
+       * 若setup返回值是对象，则将该对象挂在组件实例上
+       * 并对该对象进行代理，若是ref则自动.value取值
+       */
         return {
           ...toRefs(state),
           handleClick
@@ -96,7 +100,7 @@
 
 #### 1.2、`setup`主要结构实现
 
-**初始化挂载方法`mountComponent`**
+==在**组件初始化挂载方法`mountComponent`**中处理`setup`==
 
 ```typescript
 // packages/runtime-core/src/renderer.ts
@@ -167,7 +171,16 @@ export function setupComponent(instance) {
 }
 ```
 
-**组件实例代理配置**
+从用户书写的组件，也就是`instance.type`上获取`setup`
+
+若有`setup`则处理`setup`
+
+- ==若`setup`返回值是函数，**则将该返回值置为组件的`render`**==
+- ==若`setup`返回值是对象，**则将该对象挂在组件实例上**，并对该对象进行代理，若是`ref`则自动`.value`取值==
+
+------
+
+**`setup`组件实例代理配置**
 
 ```typescript
 // packages/runtime-core/src/component.ts
@@ -193,10 +206,10 @@ const instanceProxy = {
 
 组件的`setup`的基本结构就是这样的👆，这里实现的核心在于:
 
-- `setup`的处理发生组件初始化挂载处理流程中，具体时间点是在组件渲染到真实节点之前 `mountComponent` :arrow_right: `setupComponent` :arrow_right:  `setup` 
-- 在`setup`的处理中根据`setup`的执行结果改变组件的`render`或`setupState`
-  - 若`setup`改变了组件的`render`，那么这个`setup`的`render`便成为了组件的`render`，优先级最高
-  - 若`setup`改变了组件的`setupState`，那么在组件的`render`中便可以通过`instance.proxy`拿到`setupState`中的数据
+- ==`setup`的处理，**发生组件初始化挂载处理流程中**，具体时间点是在组件渲染到真实节点之前== `mountComponent` :arrow_right: `setupComponent` :arrow_right:  `setup` 
+- ==在`setup`的处理中根据`setup`的执行结果改变组件的`render`或`setupState`==
+  - 若`setup`改变了组件的`render`，那么==这个`setup`的`render`便成为了组件的`render`，**优先级最高**==
+  - ==若`setup`改变了组件的`setupState`，那么在组件的`render`中便可以通过`instance.proxy`拿到`setupState`中的数据==
 
 #### 1.3、`setup`中的`emit`实现
 
@@ -247,7 +260,7 @@ export function setupComponent(instance) {
 }
 ```
 
-父组件给子组件传递的`props`中有`onChildUpdate`，那么子组件便可以通过`emit`触发`childUpdate`，完成对父组件方法的调用
+==父组件给子组件传递的`props`中有`onChildUpdate`，那么子组件便可以通过`emit`触发`childUpdate`，完成对父组件方法的调用==
 
 ```js
 setup(props, { attrs, emit }) {
@@ -429,6 +442,8 @@ export const setCurrentInstance = i => (instance = i);
 </html>
 ```
 
+<!--children是对象的话，可以直接判断为插槽（还有可能为其他类型）-->
+
 #### 2.2、组件的`slot`的具体实现
 
 `createVNode`中增加`slot`类型`children`
@@ -511,7 +526,9 @@ const publicProperties = {
 };
 ```
 
-组件的`slot`的实现很简单，就是将`slot`挂到组件实例上；其实组件的`slot`就是组件的`children`，这个`children`是对象形式的，所以核心的地方在于将`template`中的`slot`的转变成组件的`VNode`的`children`
+==组件的`slot`的实现很简单，就是将`slot`挂到组件实例上；==
+
+其实组件的`slot`就是组件的`children`，这个`children`是对象形式的，所以核心的地方在于将`template`中的`slot`的转变成组件的`VNode`的`children`
 
 ### 三、组件的`lifecycle`的实现
 
@@ -532,7 +549,7 @@ const publicProperties = {
   <div id="app"></div>
   <script src="../../../node_modules/@vue/runtime-dom/dist/runtime-dom.global.js"></script>
   <script>
-    const { render, h, getCurrentInstance } = VueRuntimeDOM;
+    const { render, h, getCurrentInstance, onMounted} = VueRuntimeDOM;
 
     const VueComponent = {
       setup() {
@@ -564,7 +581,7 @@ const publicProperties = {
 
 #### 3.2、`lifecycle`的具体实现
 
-钩子的定义
+**==钩子的定义==**
 
 ```typescript
 // packages/runtime-core/src/apiLifeCycle.ts
@@ -620,10 +637,29 @@ export const onBeforeMount = createInvoker(LifeCycle.BEFORE_MOUNT);
 export const onMounted = createInvoker(LifeCycle.MOUNTED);
 // lifecycle hook UPDATED
 export const onUpdated = createInvoker(LifeCycle.UPDATED);
-
 ```
 
-钩子的安装
+==需要注意的一点：钩子回调是如何存储在组件实例上的==
+
+```ts
+const lifeCycles = currentInstance[type] || (currentInstance[type] = []);
+
+const wrapHook = () => {
+    setCurrentInstance(currentInstance);
+    // 指定用户的钩子回调的this指向当前组件实例
+    hook.call(currentInstance);
+    setCurrentInstance(null);
+  };
+
+lifeCycles.push(wrapHook);
+```
+当用户在组件中使用了一个生命周期钩子函数，比如`onMounted`方法，那么组件实例`instance`上便会多一个`m`属性，==`instance.m`是一个**数组**用于存放用户传入的钩子回调==
+
+为何`instance.m`是一个数组？==这是因为用户可能多次使用同一个生命周期钩子函数==
+
+------
+
+**==钩子的安装==**
 
 ```typescript
  // packages/runtime-core/src/renderer.ts
@@ -681,9 +717,18 @@ export const onUpdated = createInvoker(LifeCycle.UPDATED);
   }
 ```
 
+```ts
+// packages/shared/src/index.ts
+export function invokerFns(fns) {
+  for (let i = 0; i < fns.length; i++) {
+    fns[i]();
+  }
+}
+```
+
 `lifecycle`的实现也很简单，核心的地方在
 
-- 要将使用到的钩子添加到组件实例上
+- ==首先，将**使用到的钩子**添加到组件实例上==
 
   ```typescript
   // 给当前组件实例上挂上钩子属性
@@ -700,8 +745,37 @@ export const onUpdated = createInvoker(LifeCycle.UPDATED);
     setCurrentInstance(null);
   };
   ```
+  
+- 然后，在组件的更新方法`componentUpdate`中，==**调用组件实例上的钩子**==
+
+  <!--用户使用到的钩子才会挂到组件实例上，没有用到就不会有，所以每个钩子函数在执行前都会判断是否有值-->
+
+  ```ts
+  /**
+  * lifeCycle hook BEFORE_MOUNT
+  * 生命周期钩子，挂载前
+  */
+  if (instance.bm) {
+  // ...
+  invokerFns(instance.bm);
+  }
+  
+  
+  /**
+   * lifeCycle kook MOUNTED
+   * 生命周期钩子，挂载完成
+   */
+  if (instance.m) {
+    // ...
+    invokerFns(instance.m);
+  }
+  ```
+
+  
 
 ### 四、总结
+
+==在组件 `mount` 阶段会调用 `setup` 方法，之后会判断 `render` 方法是否存在，如果不存在会调用 `compile` 方法将 `template` 转化为 `render`==
 
 组件的`setup`、`slot`、`lifecycle`的实现其实都不复杂，都是建立在组件的渲染原理上的
 

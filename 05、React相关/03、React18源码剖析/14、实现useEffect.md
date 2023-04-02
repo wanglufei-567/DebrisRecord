@@ -1,5 +1,3 @@
-
-
 ## React18源码解析（十四）实现useEffect
 
 ### 一、前言
@@ -62,7 +60,7 @@ function MyComponent() {
 
 #### 1.3、eventLoop
 
-下面👇这是一张事件循环的模型图，useEffect的副作用函数之所以会是在组件渲染完成后**==异步执行==**，这是因为`useEffect`的副作用函数被放进宏任务队列中了 <!--作为回调入的队-->，等一帧结束之后才能执行；而 `useLayoutEffect`的副作用函数之所以会是在组件渲染完成后同步执行，这是因为`useLayoutEffect`的副作用函数是在React commit阶段之后，立即执行的
+下面👇这是一张事件循环的模型图，`useEffect`的副作用函数之所以会是在组件渲染完成后**==异步执行==**，这是因为`useEffect`的副作用函数被放进宏任务队列中了 <!--作为回调入的队-->，等一帧结束之后才能执行；而 `useLayoutEffect`的副作用函数之所以会是在组件渲染完成后同步执行，这是因为`useLayoutEffect`的副作用函数是在React commit阶段之后，立即执行的
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/useLayoutEffect.jpg" alt="img" style="zoom:50%;" />
 
@@ -502,7 +500,7 @@ function commitHookEffectListMount(flags, finishedWork) {
 - **递归遍历子节点，先处理子节点上的`effect`副作用**：`recursivelyTraversePassiveMountEffects`
 - **处理完子节点再处理自己的`effect`副作用：**`commitHookEffectListMount`
   - **通过当前`fiber`节点找到`effect`链表：**`finishedWork.updateQueue.lastEffect`
-  - **依次执行`effect`对象上的`create`** <!--注意这里是从effect链表上依次取的create-->
+  - **依次执行`effect`对象上的`create`** <!--注意这里是从effect链表上依次取的create，create是用户传入的-->
   - **将`create`的返回值赋值给`effect`对象的`destroy`** <!--初次挂载时，effect上没有destroy，create执行之后effect上才有destroy，这也解释了为何只有更新之后才执行destroy-->
 
 ------

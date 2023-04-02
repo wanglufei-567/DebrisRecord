@@ -291,7 +291,7 @@ export function beginWork(current, workInProgress) {
 }
 ```
 
-`beginWork` 的目标是根据新虚拟DOM构建新的`fiber`==子链表==，但上面👆没有具体的实现逻辑，主要就是根据`fiber`的`tag`类型，调用对应的`fiber`更新方法，核心逻辑就在这些更新方法中<!-- DOM diff、根据VDom生成fiber等就是在这些更新方法中做的-->，另外需要注意⚠️的是，`beginWork`中构建并返回的是子`fiber`；
+==`beginWork` 的目标是根据新虚拟DOM构建新的`fiber`子链表==，但上面👆没有具体的实现逻辑，主要就是根据`fiber`的`tag`类型，调用对应的`fiber`更新方法，核心逻辑就在这些更新方法中<!-- DOM diff、根据VDom生成fiber等就是在这些更新方法中做的-->，另外需要注意⚠️的是，`beginWork`中构建并返回的是子`fiber`；
 
 工作循环的目的就是深度遍历整个`fiber`树，所以`beginWork`首先处理的便是`HostRootfiber`（`tag`为`3`），那么接下来首先实现**根`fiber`类型**的更新方法`updateHostRoot`👇
 
@@ -1263,7 +1263,7 @@ export function appendInitialChild(parent, child) {
 }
 ```
 
-上面👆这段实现的核心在于当前fiber只处理自己的子`fiber`（原生节点对应的`fiber`），将所有子`fiber`的真实Dom节点都追加到自己的真实Dom上，不会处理子`fiber`的子`fiber`；这是因为遍历`fiber`树时，是从下往上`competeUnitWork`的，也就是说，子`fiber`的子`fiber`对应的真实Dom节点，在子`fiber`完成时就已经挂到了子`fiber`的真实Dom上了
+上面👆这段实现的核心在于当前`fiber`只处理自己的子`fiber`（原生节点对应的`fiber`），将所有子`fiber`的真实Dom节点都追加到自己的真实Dom上，不会处理子`fiber`的子`fiber`；这是因为遍历`fiber`树时，是从下往上`competeUnitWork`的，也就是说，子`fiber`的子`fiber`对应的真实Dom节点，在子`fiber`完成时就已经挂到了子`fiber`的真实Dom上了
 
 ------
 

@@ -4,36 +4,36 @@
 
 本文内容虽然已经前后整理过三次，但都是代码的形式，没有整理成笔记。所以每次时间一长，有些知识点记不太清了就得去看代码，这样难免有些耽误事，所以特意写在笔记中，方便以后温故知新。
 
-### 1、理解Promise
+### 一、理解Promise
 
-什么是Promise?
+什么是**Promise**?
 
- Promise是JS中进行异步编程的新的解决方案。<!--别的地方看的，记不住-->
+ **Promise**是JS中进行异步编程的新的解决方案<!--别的地方看的，记不住-->
 
 具体点的说 <!--也是屁话-->
 
-- 从语法上来说: Promise是一个构造函数
-- 从功能上来说: promise对象用来封装一个异步操作并可以获取其结果
+- 从语法上来说: **Promise**是一个构造函数
+- 从功能上来说: **promise**对象用来封装一个异步操作并可以获取其结果
 
-为什么要用Promise？<!--其实就是解决回调地狱的问题，不过回调地狱的问题有争议，有人认为不是问题-->
+为什么要用**Promise**？<!--其实就是解决回调地狱的问题，不过回调地狱的问题有争议，有人认为不是问题-->
 
 - 指定回调函数的方式更加灵活: 可以在请求发出甚至结束后指定回调函数
-- 支持链式调用, 可以解决回调地狱问题
+- ==支持链式调用, 可以解决回调地狱问题==
 
-回调地狱的缺点
+**回调地狱的缺点**：
 
 - 不便于阅读
 - 不便于异常处理
 
-### 2、Promise的几个关键问题
+### 二、Promise的几个关键问题
 
  <!--真的很关键，这个是要记住的，虽然我总忘-->
 
 **1、如何改变promise的状态?**
 
-- resolve(value): 如果当前是pendding就会变为resolved
-- reject(reason): 如果当前是pendding就会变为rejected
-- 抛出异常: 如果当前是pendding就会变为rejected
+- `resolve(value)`: 如果当前是**pendding**就会变为**resolved**
+- `reject(reason)`: 如果当前是**pendding**就会变为**rejected**
+- 抛出异常: 如果当前是**pendding**就会变为**rejected**
 
 ```js
 const promise1 = new Promise((resolve, reject) => {
@@ -54,7 +54,7 @@ console.log(promise3) // Promise { <rejected> Error: 123 }
 
 **2、一个promise指定多个成功/失败回调函数, 都会调用吗?**
 
-当promise改变为对应状态时都会调用，并且入参是相同的
+当**promise**改变为对应状态时都会调用，并且入参是相同的
 
 ```js
 const promise = new Promise(res => {
@@ -72,29 +72,30 @@ promise.then(result => {
 
 **3、改变promise状态和指定回调函数谁先谁后?**
 
-- 都有可能, 正常情况下是先指定回调再改变状态, 但也可以先改状态再指定回调
-- 如何先改状态再指定回调?
-  - 在执行器中直接调用resolve()/reject()
-  - 延迟更长时间才调用then()
--  什么时候才能得到数据?
-  - 如果先指定的回调, 那当状态发生改变时, 回调函数就会调用, 得到数据
-  - 如果先改变的状态, 那当指定回调时, 回调函数就会调用, 得到数据
+都有可能, 正常情况下是先指定回调再改变状态, 但也可以先改状态再指定回调
 
-**4、promise.then()返回的新promise的结果状态由什么决定?**
+- **如何先改状态再指定回调?**
+  - 在执行器中直接调用`resolve()`/`reject()`
+  - 延迟更长时间才调用`then()`
+-  **什么时候才能得到数据?** ‼️<!--这个对于实现Promise很重要-->
+  - ==如果先指定的回调, 那当状态发生改变时, 回调函数就会调用, 得到数据==
+  - ==如果先改变的状态, 那当指定回调时, 回调函数就会调用, 得到数据==
 
-- 简单表达: 由then()指定的回调函数执行的结果决定 
+**4、promise.then()返回的新promise的结果状态由什么决定?** ‼️ <!--这个对于链式调用很重要-->
+
+- 简单表达: ==由`then()`指定的**回调函数执行的结果**决定== 
 
   <!--回调的返回值决定，和.then()前的promise无关-->
 
 - 详细表达:
-  - 如果抛出异常, 新promise变为rejected, reason为抛出的异常
+  - 如果抛出异常, 新**promise**变为**rejected**, **reason**为抛出的异常
 
-  - 如果返回的是非promise的任意值, 新promise变为resolved, value为返回的值
-  - 如果返回的是另一个新promise, 此promise的结果就会成为新promise的结果
+  - 如果返回的是非**promise**的任意值, 新**promise**变为**resolved**, **value**为返回的值
+  - 如果返回的是另一个新**promise**, 此**promise**的结果就会成为新**promise**的结果
 
 **5、promise异常传/穿透?**
 
--  当使用promise的then链式调用时, 可以在最后指定失败的回调
+-  当使用**promise**的**then**链式调用时, 可以在最后指定失败的回调
 -  前面任何操作出了异常, 都会传到最后失败的回调中处理
 
 ```js
@@ -120,20 +121,24 @@ promise.then(result => {
 
 **6、 如何中断promise链?**
 
-- 当使用promise的then链式调用时, 在中间中断, 不再调用后面的回调函数
-- 办法: 在回调函数中返回一个pendding状态的promise对象
+- 当使用**promise**的**then**链式调用时, 在中间中断, 不再调用后面的回调函数
+- 办法: 在回调函数中返回一个**pendding**状态的**promise**对象
 
 ### 3、实现Promise
 
-#### 3.1 创建一个Promise类 
+#### 3.1 、创建一个Promise类 
 
 <!--其实也是构造函数-->
 
-首先是promise的三个状态，`pending` `resolved` `rejected` 
+首先是**promise**的三个状态，`pending` `resolved` `rejected` 
 
-然后是Promise类构造函数中的三个属性，`status`表示promise实例的状态，`data`用来存储结果数据的（后面看代码就知道具体怎么用的），`callbacks`用来存放回调函数的
+然后是**Promise**类构造函数中的三个属性，
 
-每个promise的实例的初始状态都是`pending`，所以构造函数中`status`初始值置为 `pending`
+- `status`表示**promise**实例的状态
+- `data`用来存储结果数据的（后面看代码就知道具体怎么用的）
+- `callbacks`用来存放回调函数的
+
+每个**promise**的实例的初始状态都是`pending`，所以构造函数中`status`初始值置为 `pending`
 
 ```js
 const PENDING = 'pending';
@@ -149,13 +154,13 @@ class MyPromise {
 }
 ```
 
-#### 3.2 实现executor
+#### 3.2 、实现executor
 
 `executor`的形式是这样的 `(resolve, reject) => {}` 默认接受两个参数 `resolve` `reject`
 
 因此需要在构造函数中实现这两个参数
 
- `resolve` `reject`中使用的`setTimeout`模仿微任务，同时改变当前`promise`的状态 及 `data`数据存储
+ ==`resolve` `reject`中使用的`setTimeout`模仿微任务，**同时改变当前`promise`的状态 及 `data`数据存储**==
 
 ```js
   function resolve(value) {
@@ -200,11 +205,11 @@ class MyPromise {
     }
 ```
 
-#### 3.3 实现then()
+#### 3.3 、实现then()
 
-其实Promise的核心就是`then()`的实现
+==其实**Promise**的**核心**就是`then()`的实现==
 
-注意：`then()`方法最后返回的是个新的promise实例
+注意：`then()`方法最后返回的是个新的**promise**实例
 
 ```js
   /* Promise原型上的then()方法，用于指定成功和失败的回调，返回一个新的promise对象
@@ -228,6 +233,7 @@ class MyPromise {
 
       function handle(callback) {
         try {
+          // 这里从Promise实例上拿到resolve/rejected的data数据
           const result = callback(self.data);
 
           // 若回调的执行结果是promise对象，则用该执行结果的状态作为返回出去的promise的状态
@@ -277,7 +283,7 @@ if (result instanceof MyPromise) {
     } 
 ```
 
-这里的逻辑是，若是`then(result => {}, resson => {})`中的回调返回值是个promise实例（记做promise1）的话，那么`then(result => {}, resson => {})`本身返回的promise（记作promise2）实例的状态便和promise1保持一致；
+这里的逻辑是，若是`then(result => {}, resson => {})`中的回调返回值是个**promise**实例（记做**promise1**）的话，那么`then(result => {}, resson => {})`本身返回的**promise**（记作**promise2**）实例的状态便和**promise1**保持一致；
 
 这里的实现是这样的
 
@@ -294,7 +300,7 @@ if (result instanceof MyPromise) {
   //promise2的状态也会相应改变，从而实现promise2和promise1保持一致
 ```
 
-#### 3.4 实现 catch()
+#### 3.4 、实现 catch()
 
 ```js
 /* 链式调用时的异常穿透，由于then()中，给onRejected设置了默认值，所以可以一路throw(reason)到catch()中，最后返回一个rejected状态的promise */
@@ -305,7 +311,7 @@ if (result instanceof MyPromise) {
  then()没有传onRejected,因此使用的是onRejected的默认值，一路throw(reason) */
 ```
 
-#### 3.5 实现Promise.resolve()
+#### 3.5、 实现Promise.resolve()
 
 ```js
   /* Promise构造函数上的静态属性，用于返回一个resolved状态的promise */
@@ -320,7 +326,7 @@ if (result instanceof MyPromise) {
   }
 ```
 
-#### 3.6 实现Promise.reject()
+#### 3.6、 实现Promise.reject()
 
 ```js
   /* Promise构造函数上的静态属性，用于返回一个resolved状态的promise */
@@ -567,17 +573,19 @@ module.exports = MyPromise;
 
 ### 4、async 和await
 
-**async 函数**
+- **async 函数**
+  - ==**async**函数的返回值为**promise**对象，**promise**对象的结果由**async**函数执行的返回值决定==
 
-函数的返回值为promise对象，promise对象的结果由async函数执行的返回值决定
+- **await 表达式**
+  **await**右侧的表达式一般为**promise**对象, 但也可以是其它的值；
 
-**await 表达式**
-await右侧的表达式一般为promise对象, 但也可以是其它的值；如果表达式是promise对象, await返回的是promise成功的值；如果表达式是其它值, 直接将此值作为await的返回值
+  - 如果表达式是**promise**对象, **await**返回的是**promise**成功的值；
+  - 如果表达式是其它值, 直接将此值作为**await**的返回值
 
 **注意:**
-await必须写在async函数中, 但async函数中可以没有await，
+==**await**必须写在**async**函数中, 但**async**函数中可以没有**await**，==
 
-如果await的promise失败了, 就会抛出异常, 需要通过try...catch来捕获处理
+如果**await**的**promise**失败了, 就会抛出异常, 需要通过try...catch来捕获处理
 
 ### 5、JS异步之宏队列与微队列
 

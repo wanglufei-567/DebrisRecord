@@ -23,8 +23,31 @@
     <div id="app"></div>
    <script src="../../../node_modules/@vue/runtime-dom/dist/runtime-dom.global.js"></script>
     <script>
-        const { KeepAlive,render, h } = VueRuntimeDOM;
-       const Component1 = {
+       const { KeepAlive,render, h } = VueRuntimeDOM;
+       const ComponentA = {
+            n:"a",
+            render:()=>{
+                console.log('rendera')
+                return h('a','aa')
+            }
+        }
+        const ComponentB = {
+            n:"b",
+            render:()=>{
+                console.log('renderb')
+                return h('a','bb')
+            }
+        }
+        const ComponentC = {
+            n:"c",
+            render:()=>{
+                console.log('renderc')
+                return h('a','cc')
+            }
+        }
+        // 如何缓存的？  vnode， 为了性能考虑 。
+        // 我们弄一个盒子将渲染的结果临时的移动到内存中，如果后续切换回来，再从内存中直接拿出来就好了
+        const Component1 = {
             n:1,
             render:()=>{
                 console.log('render1')
@@ -53,14 +76,15 @@
             render(h(KeepAlive,{max:3, order:2},{
                 default:()=>h(ComponentB)
             }),app);
-        },1000)
+        },5000)
 
         setTimeout(()=>{
-            console.log('render3')
+          console.log('order3')
             render(h(KeepAlive,{max:3, order:3},{
                 default:()=>h(ComponentA)
             }),app);
-        },2000)
+        },10000)
+
      </script>
 </body>
 </html>
@@ -166,7 +190,7 @@ export const KeepAlive = {
   };
 ```
 
-keepAlive组件挂载时缓存插槽组件的`key`
+**keepAlive**组件挂载时缓存插槽组件的`key`
 
 ```typescript
 // packages/runtime-core/src/keepAlive.ts
@@ -313,7 +337,7 @@ export function createRenderer(options) {
 
 `ctx.render`上主要是一些DOM和组件的挂载、卸载、移动等方法，这些方法后面会在`keepAlive`组件中用到
 
-在`keepAlive`组件中给组件实例的上下文属性`ctx`配置上keepAlive组件的激活方法`active`和失活方法`deactivate`
+在`keepAlive`组件中给组件实例的上下文属性`ctx`配置上**keepAlive**组件的激活方法`active`和失活方法`deactivate`
 
 ```typescript
 
@@ -400,7 +424,7 @@ export function createRenderer(options) {
 
 这一段逻辑需要仔细思考一下
 
-首先`ShapeFlags.COMPONENT_SHOULD_KEEP_ALIVE`这个标识是在keepAlive组件实例上的subtree上的（也就是插槽组件的VNode）
+首先`ShapeFlags.COMPONENT_SHOULD_KEEP_ALIVE`这个标识是在**keepAlive**组件实例上的**subtree**上的（也就是插槽组件的**VNode**）
 
 ```js
 // packages/runtime-core/src/keepAlive.ts
@@ -430,7 +454,7 @@ rerurn () => {
 
 由于插槽组件不同，才会走到`unmount`逻辑中，
 
-这个时候，由于`subtree`上有`ShapeFlags.COMPONENT_SHOULD_KEEP_ALIVE`标识，所以会走`parentComponent.ctx.deactivate(n1)`这段逻辑，其实就是keepAlive组件中的这段逻辑
+这个时候，由于`subtree`上有`ShapeFlags.COMPONENT_SHOULD_KEEP_ALIVE`标识，所以会走`parentComponent.ctx.deactivate(n1)`这段逻辑，其实就是**keepAlive**组件中的这段逻辑
 
 ```js
 // packages/runtime-core/src/keepAlive.ts

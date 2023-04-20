@@ -4,7 +4,7 @@
 
 #### 1.1、调和更新
 
-react的调和更新采用了双缓冲的思想，维护了两棵fiber树，一棵fiber树用于渲染展示，另一棵fiber树用于计算更新；计算更新是以单个fiber节点为工作单元，完成更新队列中更新内容处理、生成新的VDom、根据VDom调和子fiber等工作。
+**React**的调和更新采用了**双缓冲**的思想，维护了两棵**fiber**树，一棵**fiber**树用于渲染展示，另一棵**fiber**树用于计算更新；计算更新是以单个**fiber**节点为工作单元，完成更新队列中更新内容处理、生成新的**VDom**、根据**VDom**调和子**fiber**等工作
 
 #### 1.2、实现一个日志工具
 
@@ -291,7 +291,9 @@ export function beginWork(current, workInProgress) {
 }
 ```
 
-==`beginWork` 的目标是根据新虚拟DOM构建新的`fiber`子链表==，但上面👆没有具体的实现逻辑，主要就是根据`fiber`的`tag`类型，调用对应的`fiber`更新方法，核心逻辑就在这些更新方法中<!-- DOM diff、根据VDom生成fiber等就是在这些更新方法中做的-->，另外需要注意⚠️的是，`beginWork`中构建并返回的是子`fiber`；
+==`beginWork` 的目标是根据新虚拟DOM构建新的`fiber`子链表==，但上面👆没有具体的实现逻辑，主要就是根据`fiber`的`tag`类型，调用对应的`fiber`更新方法，核心逻辑就在这些更新方法中<!-- DOM diff、根据VDom生成fiber等就是在这些更新方法中做的-->
+
+另外需要注意⚠️的是，`beginWork`中构建并返回的是子`fiber`；
 
 工作循环的目的就是深度遍历整个`fiber`树，所以`beginWork`首先处理的便是`HostRootfiber`（`tag`为`3`），那么接下来首先实现**根`fiber`类型**的更新方法`updateHostRoot`👇
 
@@ -971,7 +973,7 @@ export const mountChildFibers = createChildReconciler(false);
 - <!--设置副作用`placeChild(newFiber, newIdx)`暂时不用了解-->
 - 让第一个`child`对应的`fiber`作为返回值，其余`child`的`fiber`按照顺序挂到前一个`fiber`的`sibling`属性上，<!--这么做是为了后续通过第一个子fiber找到剩余的其他子fiber，也就是兄弟fiber-->
 
-注意⚠️这里的返回值是在前面的`reconcileChildren`中使用的，也就是将第一个`child`对应的`fiber`挂到父`fiber`的`child`属性上
+注意⚠️这里的返回值是在前面的`reconcileChildren`中使用的，也就是==将第一个`child`对应的`fiber`挂到父`fiber`的`child`属性上==
 
 ```jsx
 function reconcileChildren(current, workInProgress, nextChildren) {
@@ -1023,7 +1025,7 @@ function createChild(returnFiber, newChild) {
 
 上面这段实现中做的就是根据`child`的类型调用不同的创建`fiber`的方法
 
-需要注意⚠️的是每一个`child`的`fiber`都添加了`return`属性指向同一个父`fiber`
+需要注意⚠️的是==每一个`child`的`fiber`都添加了`return`属性指向同一个父`fiber`==
 
 ------
 
@@ -1189,18 +1191,18 @@ export function completeWork(current, workInProgress) {
 }
 ```
 
-上面👆这段实现的主要内容便是完成从`fiber`对应真实Dom的构建，最终将真实Dom添加到`fiber`的`stateNode`属性上
+上面👆这段实现的主要内容便是完成==从`fiber`对应**真实Dom**的构建，最终将**真实Dom**添加到`fiber`的`stateNode`属性上==
 
 其中比较复杂的是原生节点的`fiber`处理，有以下几个步骤
 
-- 创建真实Dom节点 `createInstance`
-- 将当前fiber的所有子节点对应的真实Dom都追加到当前fiber的真实Dom上 `appendAllChildren` <!--这个比较重要-->
+- 创建**真实Dom节点** `createInstance`
+- 将当前**fiber**的所有子节点对应的**真实Dom**都追加到当前**fiber**的**真实Dom**上 `appendAllChildren` <!--这个比较重要-->
 - 完成真实DOM的构建`finalizeInitialChildren`
-- 向上冒泡属性 `bubbleProperties` ，每个fiber节点上都有flags属性（用于记录自己的副作用）和`subtreeFlags`属性（用于记录所有子fiber的副作用）
+- 向上冒泡属性 `bubbleProperties` ，每个**fiber**节点上都有**flags**属性（用于记录自己的副作用）和`subtreeFlags`属性（用于记录所有子**fiber**的副作用）
 
 ------
 
-在`src/react-dom-bindings/src/client/ReactDOMHostConfig.js`中实现并导出创建真实Dom的方法
+在`src/react-dom-bindings/src/client/ReactDOMHostConfig.js`中实现并导出创建**真实Dom**的方法
 
 ```jsx
 export function createTextInstance(content) {
@@ -1263,7 +1265,9 @@ export function appendInitialChild(parent, child) {
 }
 ```
 
-上面👆这段实现的核心在于当前`fiber`只处理自己的子`fiber`（原生节点对应的`fiber`），将所有子`fiber`的真实Dom节点都追加到自己的真实Dom上，不会处理子`fiber`的子`fiber`；这是因为遍历`fiber`树时，是从下往上`competeUnitWork`的，也就是说，子`fiber`的子`fiber`对应的真实Dom节点，在子`fiber`完成时就已经挂到了子`fiber`的真实Dom上了
+上面👆这段实现的核心在于当前`fiber`只处理自己的子`fiber`（原生节点对应的`fiber`），将所有子`fiber`的**真实Dom节点**都追加到自己的**真实Dom**上，不会处理子`fiber`的子`fiber`；
+
+这是因为遍历`fiber`树时，是从下往上`competeUnitWork`的，也就是说，子`fiber`的子`fiber`对应的**真实Dom节点**，在子`fiber`完成时就已经挂到了子`fiber`的**真实Dom**上了
 
 ------
 

@@ -33,7 +33,7 @@ compiler.run((err, stats) => {
 
 ```
 
-`webpack`本身就是一个函数，将配置文件`webpack.config.js`传递给`webpack`方法可以得到一个`compiler`对象，通过调用`compiler.run`便可以开始进行编译并完成构建
+==**webpack**本身就是一个函数==，将配置文件`webpack.config.js`传递给**webpack**方法可以得到一个==**compiler**对象==，通过调用`compiler.run`便可以开始进行编译并完成构建
 
 看下打包的文件
 
@@ -47,14 +47,22 @@ compiler.run((err, stats) => {
 
 - **compiler**：==**webpack**的编译器，用于编译整个项目==
   - 在**webpack**启动时，会创建一个`compiler`对象，==该对象包含了整个webpack配置和所有插件的信息==，包括 `options`、`loaders`、`plugins` 这些信息，这个对象在 **webpack** 启动的时候被实例化，它是全局唯一的，可以简单地把它理解为 `webpack` 实例
-  - `compiler`对象提供了各种钩子函数（`Hooks`），用于==监听和控制**webpack**编译过程的不同阶段==，例如读取配置文件、解析入口文件、打包输出等。==用户可以通过编写插件并监听`compiler`的钩子函数，来实现对**webpack**编译过程的控制和扩展== <!--插件中可以拿到compiler对象-->
+  
+  - `compiler`对象提供了各种钩子函数（`Hooks`），用于==监听和控制**webpack**编译过程的不同阶段==，例如读取配置文件、解析入口文件、打包输出等。
+  
+    - 用户可以通过编写插件并监听`compiler`的钩子函数，来实现对**webpack**编译过程的控制和扩展
+  
+     <!--插件中可以拿到compiler对象-->
 - **compilation**：==**webpack**的编译上下文，用于表示一次编译过程中的所有资源和状态==
+  
   - ==在每次编译时，都会创建一个`compilation`对象==，该对象包含了编译过程中的==模块资源(`modules`)==、编译==生成资源(`asset files)`==、==变化的文件(`files`)==、以及==被跟踪依赖的状态信息(`fileDependencies`)==等信息
   - 当 **webpack** 以开发模式运行时，每当检测到一个变化，一次新的 `compilation` 将被创建。`compilation` 对象也提供了很多事件回调供插件做扩展。<!--通过 compilation 也可以读取到 compiler 对象-->
 - **tapable**：==**webpack**的事件处理器，用于实现事件的发布和订阅==
+  
   - **tapable**是**webpack**的一个核心工具，它暴露了 `tap`、`tapAsync`、`tapPromise` 方法，可以使用这些方法来触发 `compiler` 钩子，使得插件可以监听 **webpack** 在运行过程中广播的事件，然后通过 `compiler` 对象去操作**webpack**。我们也可以使用这些方法注入自定义的构建步骤，这些步骤将在整个编译过程中的不同时机触发。
 - **chunk**： ==**webpack**中的代码块，表示一组相关联的模块，例如一个入口文件及其所有依赖的模块==
 - **bundle**：==**webpack**中的打包文件，表示经过处理和打包后的最终输出文件==。
+  
   - **webpack**可以生成多个`bundle`，例如每个入口文件对应一个`bundle`，或者根据代码分割和动态导入生成多个`bundle`等
 
 ### 1.3、webpack工作流
@@ -124,6 +132,12 @@ module.exports = {
 }
 ```
 
+------
+
+**插件：**
+
+==每个插件都是一个类，而每个类都需要**定义一个apply方法**==
+
 `plugins\run-plugin.js`
 
 ```js
@@ -152,6 +166,12 @@ class DonePlugin {
 module.exports = DonePlugin;
 ```
 
+------
+
+**loader：**
+
+==每个**loader**其实就是一个**函数**，函数**入参是源代码**==
+
 `loaders\logger1-loader.js`
 
 ```js
@@ -170,6 +190,8 @@ function loader(source) {
 }
 module.exports = loader;
 ```
+
+------
 
 `src\entry1.js`
 

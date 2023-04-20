@@ -8,7 +8,7 @@
 const element = <h1>Hello, world!</h1>;
 ```
 
-上面这段代码便是一段JSX，JSX是一种JavaScript的语法扩展，它可以很好地描述 UI 应该呈现出它应有交互的本质形式。
+上面这段代码便是一段**JSX**，**JSX**是一种**JavaScript**的语法扩展，它可以很好地描述 **UI** 应该呈现出它应有交互的本质形式。
 
 <!--屁话，难以理解，其实就是jsx写起来就像写js一样，没有引入新的概念-->
 
@@ -26,11 +26,11 @@ const element = <h1>Hello, world!</h1>;
 
 > 在**编译**之后，JSX 表达式会被转为**普通 JavaScript 函数**调用，并且对其取值后得到 JavaScript 对象；
 
-==JSX是一种JavaScript的语法扩展，所以其本质上还是JavaScript。JSX经过Babel的编译之后会被转换成一段JavaScript函数调用逻辑，执行之后会生成一个JavaScript对象==<!--这个对象就是Virtual DOM-->
+==**JSX**是一种**JavaScript**的语法扩展，所以其本质上还是**JavaScript**。**JSX**经过**Babel**的编译之后会被转换成一段**JavaScript**函数调用逻辑，执行之后会生成一个**JavaScript**对象==<!--这个对象就是Virtual DOM-->
 
 **JSX的编译转换新旧对比**
 
-在React17之前的JSX的转换是下面👇这样的：
+在React17之前的**JSX**的转换是下面👇这样的：
 
 ```js
 const babel = require('@babel/core');
@@ -58,7 +58,7 @@ React.createElement("h1", null, "hello", React.createElement("span", {
 }, "world"));
 ```
 
-可以看到，JSX被转换成`React.createElement()`函数的调用，所以这也能解释了为什么要在有JSX的文件中引入`React`，即使在文件中并没有显式的使用到React。
+可以看到，**JSX**被转换成`React.createElement()`函数的调用，所以这也能解释了为什么要在有**JSX**的文件中引入`React`，即使在文件中并没有显式的使用到React。
 
 在React17之后的JSX的转换是下面👇这样的：
 
@@ -259,7 +259,7 @@ export default hasOwnProperty;
 export const REACT_ELEMENT_TYPE = Symbol.for('react.element');
 ```
 
-以上👆就是jsxDEV方法的实现，很简单，没有什么难度
+以上👆就是**jsxDEV**方法的实现，很简单，没有什么难度
 
 看下`main.jsx`中的打印结果
 
@@ -274,7 +274,7 @@ let element = (
 console.log('element', element)
 ```
 
-element的打印结果如下👇，也就是虚拟DOM
+`element`的打印结果如下👇，也就是**虚拟DOM**
 
 ```
 {
@@ -304,12 +304,13 @@ element的打印结果如下👇，也就是虚拟DOM
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/virutaldom_1664073330011-20221003105707613.jpg)
 
-上图👆描述的是JSX如何转换为虚拟DOM，用户编写的JSX在**工程打包时**会由Babel进行一次转译，之后是由浏览器运行转译结果得到虚拟DOM，<!--浏览器运行得到虚拟DOM，到根据虚拟DOM生成真实DOM，这里的逻辑就是运行时，也就是runtime-->
+上图👆描述的是**JSX**如何转换为**虚拟DOM**，用户编写的**JSX**在**工程打包时**会由**Babel**进行一次转译，之后是由浏览器运行转译结果得到**虚拟DOM**，<!--浏览器运行得到虚拟DOM，到根据虚拟DOM生成真实DOM，这里的逻辑就是运行时，也就是runtime-->
 
 ![image-20221003110306253](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20221003110306253.png)
 
-打开浏览器的Sources可以发现，浏览器运行的文件是已经经过Babel编译之后的了
+打开浏览器的**Sources**可以发现，浏览器运行的文件是已经经过**Babel**编译之后的了
 
 ### 三、总结
 
-JSX是一种JavaScript的语法扩展，其本质上还是JavaScript；JSX在工程打包时会自动编译成一段JavaScript函数调用的代码，并在运行时执行调用生成虚拟DOM。
+**JSX**是一种**JavaScript**的语法扩展，其本质上还是**JavaScript**；**JSX**在工程打包时会自动编译成一段==**JavaScript**函数调用==的代码，并在==**运行时**执行调用==生成虚拟DOM。
+

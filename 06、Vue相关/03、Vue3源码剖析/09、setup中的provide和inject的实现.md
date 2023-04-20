@@ -69,7 +69,7 @@ export default {
 
 ==**首先关于`provide`**==
 
-每个==组件实例上==都一个`provides`属性用于存储==组件自己`provide`的`props`==和==父组件`provide`的`props`==
+每个==组件实例上==都一个**==provides==**属性用于存储==组件自己`provide`的`props`==和==父组件`provide`的`props`==
 
 那为了避免组件自己的`props`和父组件的`props`出现同名冲突，==会将父组件的`provides`属性作为组件自己`provides`的原型对象==，这样就有了一个==**原型链**==，保证了在孙子组件中可以拿到曾父组件`provide`的`props`，若组件没有父组件则其`provides`的原型是`null`
 
@@ -369,11 +369,11 @@ export * from './apiInject';
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220622090728651.png" alt="image-20220622090728651" style="zoom:50%;" />
 
-**注意**
+⚠️**注意**
 
 从上面👆的使用中可以发现，通过`provide`和`inject`子组件不仅可以从父组件中拿到==响应式数据==使用，而且当父组件去修改这个响应式数据，子组件也会有响应式更新
 
-这其中的原理是，组件的`provides`是个原型链，父组件在这个原型链上放一个响应式数据，当子组件从原型链上拿到这个响应式数据并在自己的`render`中使用到这个响应式数据时，便会发生==响应式依赖收集==，当这个响应式数据发生变化==便会触发子组件的更新==，这样应该就能理解为啥父组件修改数据可以触发子组件更新了
+这其中的原理是，组件的**provides**是个原型链，父组件在这个原型链上放一个==响应式数据==，当子组件从原型链上拿到这个响应式数据并在自己的`render`中使用到这个响应式数据时，便会发生==响应式依赖收集==，当这个响应式数据发生变化==便会触发子组件的更新==，这样应该就能理解为啥父组件修改数据可以触发子组件更新了
 
 现在看官网上的这句话就有了更深入的理解了
 
@@ -387,3 +387,13 @@ export * from './apiInject';
 另外还有一个注意点，==响应式数据是谁用，依赖收集就收集谁==，看下图👇，父组件没有用这个响应式数据，就不会重新`render`
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220622091202329.png" alt="image-20220622091202329" style="zoom:50%;" />
+
+### 四、总结
+
+ **provide** 和 **inject**的实现原理很简单
+
+采用了原型链的原理，每个组件实例上都有一个**==provides==**属性，
+
+- **==provides==**的原型链上有祖先组件们的**provide**的数据
+- **inject**就是从原型链上取值，按照就近原则
+

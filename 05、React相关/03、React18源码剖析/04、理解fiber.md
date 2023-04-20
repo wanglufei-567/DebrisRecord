@@ -23,7 +23,7 @@
 
   ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/xun_huan_lian_biao_1644749414532.jpg)
 
-<!--react的更新队列就是一个循环列表-->
+<!--react的更新队列就是一个循环列表，链表动态插入、删除节点高效，随机访问效率低；数组随机访问效率高，插入、删除操作效率低-->
 
 #### 1.1、循环链表示例
 
@@ -377,8 +377,8 @@ bfs(root);
 
 不过React并没有使用浏览器提供`requestIdleCallback` API，而是自己实现了一个类似的机制；React之所以没有使用`requestIdleCallback`，是因为下面👇这两个问题：
 
-- **兼容性问题** <!--不同浏览器对requestIdleCallback的实现不一致-->
-- **执行时间不可控**<!--从上面的requestIdleCallback示例也可以发现，每次空闲时间不固定-->
+- ==**兼容性问题**== <!--不同浏览器对requestIdleCallback的实现不一致-->
+- ==**执行时间不可控**==<!--从上面的requestIdleCallback示例也可以发现，每次空闲时间不固定-->
 
 所以React自己实现了一个类似`requestIdleCallback`的机制，里面把每帧执行时间固定为**==5ms==**；
 
@@ -654,7 +654,7 @@ function performUnitOfWork(fiber) {
 
 ### 四、总结
 
-==由于 `runtime`的存在，React的Virtual DOM计算可能会占用大量的运算时间，挤占浏览器的渲染流程时间，导致页面卡顿、用户事件不能及时响应==；所以React采用切片的思想，引入`fiber`架构，==将Virtual DOM计算任务拆分一个个原子化的任务单元，使得Virtual DOM计算任务变得可中断==，然后在浏览器的每一帧的空闲时间进行任务单元的执行，从而避免了上述的问题。
+==由于 `runtime`的存在，React的Virtual DOM计算可能会占用大量的运算时间，挤占浏览器的渲染流程时间，导致页面卡顿、用户事件不能及时响应==；所以React采用切片的思想，引入`fiber`架构，**==将Virtual DOM计算任务拆分一个个原子化的任务单元，使得Virtual DOM计算任务变得可中断==**，然后在浏览器的每一帧的空闲时间进行任务单元的执行，从而避免了上述的问题。
 
 `fiber`的核心思想就是==**时间切片**==，类比理解就是相当于**断点续传**。
 

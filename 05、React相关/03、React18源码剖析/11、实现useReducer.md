@@ -4,7 +4,7 @@
 
 #### 1.1、React Hooks
 
-React Hooks 是 React 16.8 引入的一项新特性，它可以让函数组件具有类组件的一些特性，例如状态管理、生命周期函数等。通过使用 Hooks，可以将状态管理逻辑从组件中提取出来，使组件更加简洁、易于理解和维护。**==每个 Hook 都是一个函数，接收一些参数，返回一个数组或对象，用于在组件中进行状态管理和操作==**。
+React Hooks 是 React 16.8 引入的一项新特性，它可以==让函数组件具有类组件的一些特性==，例如状态管理、生命周期函数等。通过使用 Hooks，可以将状态管理逻辑从组件中提取出来，使组件更加简洁、易于理解和维护。**==每个 Hook 都是一个函数，接收一些参数，返回一个数组或对象，用于在组件中进行状态管理和操作==**。
 
 #### 1.2、useReducer
 
@@ -304,9 +304,11 @@ function mountReducer(reducer, initialArg) {
     hook.queue = queue;
   ```
 
-  `fiber`节点上的`memoizedState`是用来存储==自己的状态==，每一种`fiber`的状态存的类型是不一样的<!-- HostRootFiber上存的就是要渲染的元素-->，而函数组件`fiber`上的`memoizedState`属性上存储的就是它自己的Hooks
+  `fiber`节点上的**==memoizedState==**是用来存储==自己的状态==，每一种`fiber`的状态存的类型是不一样的
 
-  函数组件`fiber`上的`memoizedState`属性上存储的Hooks，采用了单向链表结构，形成了一个 `hooks`链<!--可以参考下面的结构示意图帮助理解-->
+  - **HostRootFiber**上存的就是要渲染的元素
+  - 而函数组件`fiber`上的`memoizedState`属性上存储的就是它自己的**Hooks**
+    - 函数组件`fiber`上的`memoizedState`属性上存储的Hooks，采用了单向链表结构，形成了一个 `hooks`链<!--可以参考下面的结构示意图帮助理解-->
 
   <!--为何有hooks链，这是因为一个函数组件上可能不止用了一个useReducer方法，后面其他Hooks方法也会调用这个方法，同样会挂到fiber的memoizedState上-->
 
@@ -320,7 +322,7 @@ function mountReducer(reducer, initialArg) {
 
   - `queue`：`hook`对象上的更新队列，这个`queue`是每个`ReducerHook`对象**==独有的==**，不能混淆 <!--存在一个组件中，多个useReducer的情况-->，也是为了后面`dispatch`时可以正确取到更新内
 
-    同一个`ReducerHook`不管`dispatch`多少次，用的都是同一个`queue` <!--这里的更新队列queue，和之前fiber上的更新队列是一样的-->
+    ==同一个`ReducerHook`不管`dispatch`多少次，用的都是同一个`queue`== <!--这里的更新队列queue，和之前fiber上的更新队列是一样的-->
 
 - **返回`[state, dispatch]`** : `[hook.memoizedState, dispatch]` <!--最后用户拿到的就是这个-->
 

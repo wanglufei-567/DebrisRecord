@@ -4,7 +4,7 @@
 
 #### 1.1、`setup`的使用
 
-==组件的`render`函数每次更新时都会重新执行，但是`setup`函数只会在组件挂载时执行一次==
+==组件的`render`函数**每次更新时都会重新执行**，但是`setup`函数**只会在组件挂载时执行一次**==
 
 - `setup`函数是`compositionAPI`的入口
 - 可以在函数内部编写逻辑，解决vue2中反复横跳问题
@@ -176,7 +176,9 @@ export function setupComponent(instance) {
 若有`setup`则处理`setup`
 
 - ==若`setup`返回值是函数，**则将该返回值置为组件的`render`**==
-- ==若`setup`返回值是对象，**则将该对象挂在组件实例上**，并对该对象进行代理，若是`ref`则自动`.value`取值==
+- ==若`setup`返回值是对象，**则将该对象挂在组件实例上的setupState属性上**，并对该对象进行代理，若是`ref`则自动`.value`取值==
+  - 组件的`render`方法的`this`指向一个**Proxy**对象（`instanceProxy`），在这个对象中会对`setupState`、`data`、`props`进行取值处理
+  - ⚠️需要注意一点的是，**OptionsAPI**中的==`data`会自动被转换成响应式数据==，但是`setup`返回的对象==`setupState`并没有被转换成响应式数据==，所以在使用`setup`时需要通过`reactivity`模块的`reactive`方法创建响应式数据提供给最后的返回值对象使用
 
 ------
 

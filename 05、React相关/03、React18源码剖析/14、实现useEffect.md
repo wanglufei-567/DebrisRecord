@@ -2,13 +2,26 @@
 
 ### 一、前言
 
-`useEffect` 和 `useLayoutEffect` 都是 React 提供的用于处理副作用（Side Effect）的 Hook
+`useEffect` 和 `useLayoutEffect` 都是 **React** 提供的用于**==处理副作用==**（Side Effect）的 Hook
 
 **==副作用指的是那些与组件渲染无关的操作==**，比如网络请求、DOM 操作、定时器设置等。在类式组件中，通常会将这些操作放在生命周期方法中进行处理，比如 `componentDidMount`、`componentDidUpdate` 和 `componentWillUnmount` 等
 
 而在函数式组件中，可以使用 `useEffect` 和 `useLayoutEffect` 来处理副作用。它们的用法类似，都接受两个参数：一个副作用函数和一个依赖数组
 
-其中，`useEffect` 会在组件**==渲染完成后异步执行==**副作用函数，而 `useLayoutEffect` 会在组件**==渲染完成后同步执行==**副作用函数。因此，在大多数情况下，应该优先使用 `useEffect`。
+虽然`useEffect`和`useLayoutEffect`都是**React**中用于**==处理副作用==**的钩子函数，它们的**==执行时机==**和**==执行顺序==**有所不同
+
+- `useEffect`的执行时机是在组件渲染完成之后，即**==DOM更新==**之后且**==浏览器渲染完成之后==**异步执行
+  - 在`useEffect`中执行的副作用操作==不会阻塞组件的渲染==，也不会影响用户的交互体验，
+  - `useEffect`常用于数据获取、订阅事件、添加定时器等操作
+  - `useEffect`可以通过第二个参数来指定依赖项数组，当依赖项发生变化时才会执行副作用操作，否则会跳过
+- `useLayoutEffect`的执行时机是在组件渲染之后，即**==DOM更新==**之后但在**==浏览器布局和绘制之前==**同步执行
+  - 因此，在`useLayoutEffect`中执行的副作用操作==会阻塞组件的渲染==，可能会导致页面出现短暂的卡顿
+  - `useLayoutEffect`常用于进行DOM操作（例如测量元素尺寸、修改样式等）以及实现一些需要同步更新UI的功能
+  - `useLayoutEffect`也可以通过第二个参数来指定依赖项数组，当依赖项发生变化时才会执行副作用操作，否则会跳过
+
+由于`useLayoutEffect`会在组件渲染完成之后同步执行，因此应该尽量避免在其中进行耗时的操作，以免影响用户体验
+
+另外，由于`useLayoutEffect`可能会阻塞组件的渲染，因此在大多数情况下，应该优先考虑使用`useEffect`来处理副作用。只有当==必须在浏览器布局和绘制之前执行一些操作时==，才应该使用`useLayoutEffect`。
 
 下面分别对 `useEffect` 和 `useLayoutEffect` 进行详细介绍：
 

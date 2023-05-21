@@ -1,16 +1,24 @@
+## npm相关
 
+### 一、npm常用命令
+
+**npm查看配置信息**
+
+```js
+npm config ls
+```
+
+**npm查看配置文件路径**
+
+```js
+npm config get userconfig // 查看用户配置文件路径
+npm config get globalconfig // 查看全局配置文件路径 
+```
 
 **npm查看源：** 
 
 ```js
 npm config get registry
-```
-
-**npm查看配置文件**
-
-```js
-npm config get userconfig // 查看用户配置文件路径
-npm config get globalconfig // 查看全局配置文件路径 
 ```
 
 **npm修改源**
@@ -22,7 +30,7 @@ npm --registry https://registry.npm.taobao.org
 npm --registry=http://npm.intra.xiaojukeji.com install
 ```
 
-**nrm使用**
+**nrm切换不同源**
 
 ```js
 nrm ls // 列出可选择的源
@@ -39,12 +47,6 @@ npm list --depth=0 // 查看全部的包
 npm list -g --depth 0  // 查看全局已安装的包
 npm root // 查看本地node_modules路径
 npm root -g // 查看全局node_modules路径
-```
-
-**npm查看配置信息**
-
-```js
-npm config ls
 ```
 
 **安装指定版本的npm包**
@@ -68,7 +70,7 @@ npm info [package]
 dnpm add <user> <package>
 ```
 
-
+### 二、包版本管理
 
 **npm 管理包版本**
 
@@ -81,3 +83,4 @@ dnpm add <user> <package>
 - `=`: 接受确切的版本。
 - `-`: 接受一定范围的版本。例如：`2.1.0 - 2.6.2`。
 - `||`: 组合集合。例如 `< 2.1 || > 2.6`。
+

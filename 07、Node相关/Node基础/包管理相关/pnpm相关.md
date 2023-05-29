@@ -92,11 +92,3 @@ pnpm why react -r // 显示依赖于指定 package的所有 package
 
 `--recursive` `-r` 参数表示执行该命令于子目录所有`package` 中，或者如果执行在一个工作空间时，在工作空间的所有`package`执行
 
-**在所有包中运行命令**
-
-```shell
-pnpm command --parallel
-```
-
-`--parallel`表示在所有匹配的包中立即运行给定的脚本 并输出前缀流
-

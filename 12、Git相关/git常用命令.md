@@ -31,3 +31,11 @@ refactor：重构（即不是新增功能，也不是修改bug的代码变动）
 test：增加测试
 chore：构建过程或辅助工具的变动
 ```
+
+根据commitId查找某次提交内容，通过git show 或者 git log -p -1 等（也可以用前八位进行搜索）
+
+```shell
+git show 124a9a0ee1d8f1e15e833aff432fbb3b02632105
+git log -p -1 124a9a0ee1d8f1e15e833aff432fbb3b02632105
+```
+

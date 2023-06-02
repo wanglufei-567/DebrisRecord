@@ -79,9 +79,9 @@ pnpm remove axios --filter  @monorepo/http // 单个package
 **查看依赖树**
 
 ```shell
-pnpm list // 查看全局公共依赖
-pnpm list -r // 查看每个package的依赖
-pnpm list -r --filter pkg1 // 查看pkg1的依赖
+pnpm list [package]// 查看全局公共依赖
+pnpm list [package] -r // 查看每个package的依赖
+pnpm list [package] -r --filter pkg1 // 查看pkg1的依赖
 ```
 
 **查看某个包的依赖树**

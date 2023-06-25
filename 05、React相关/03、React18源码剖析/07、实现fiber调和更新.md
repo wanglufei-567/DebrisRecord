@@ -601,7 +601,7 @@ function createFiberFromTypeAndProps(type, key, pendingProps) {
 
 👆这里的逻辑也不复杂就是根据VDom这个js对象创建`fiber`这个js对象
 
-⚠️这里需要注意的是，VDom的`props`属性是赋值给了对应`fiber`的`pendingProps`属性，表示等待处理或者生效的属性<!--VDom的props属性中包含了children等属性，也就是当前VDom节点的子VDom节点，是个数组-->
+⚠️这里需要注意的是，==VDom的`props`属性是赋值给了对应`fiber`的`pendingProps`属性==，表示等待处理或者生效的属性<!--VDom的props属性中包含了children等属性，也就是当前VDom节点的子VDom节点，是个数组-->
 
 ------
 

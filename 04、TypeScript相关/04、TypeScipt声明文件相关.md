@@ -2,15 +2,17 @@
 
 ### 一、 TypeScript 查找第三方依赖包类型声明文件时的顺序
 
-1. 查找项目中的 `node_modules/@types` 目录下是否存在与依赖包名称相对应的类型声明文件
-   - 例如，如果你的项目依赖了 `lodash`，TypeScript 会在 `node_modules/@types` 目录下查找是否存在 `lodash` 的类型声明文件，如 `lodash.d.ts`
-2. 如果在项目的 `node_modules/@types` 目录下找不到与依赖包名称相对应的类型声明文件，TypeScript 会继续查找全局安装的类型声明文件，全局安装的类型声明文件通常位于全局的 `typings` 或 `types` 目录下
-3. 如果以上步骤都没有找到类型声明文件，TypeScript 会查找项目中的 `typeRoots` 或 `types` 选项所配置的目录，这些目录通常用于存放项目内部的类型声明文件
-4. 如果 TypeScript 仍然无法找到类型声明文件，它会假设该依赖包不包含类型声明，将其视为一个纯 JavaScript 库，无法提供类型检查和推断。
+1. **==依赖包内查找==**
+   1. 先查找 ==npm 包的 `package.json` 中的根属性 `types` 或 `typings` 字段指定的声明文件==，有则使用，否则继续查找
+   2. 查找 npm 包的**==根目录==**是否有一个 `index.d.ts` 声明文件，有则使用，否则继续查找
+   3. 查看 npm 包的 `package.json` 中的根属性 `main` 字段（入口文件），==查找和入口文件同级目录下==是否有同名的 `.d.ts` 文件，有则使用，否则认为此 npm 包完全没有声明文件
+2. **==依赖包外查找==**
+   1. 查找项目中的 `node_modules/@types` 目录下是否存在==与依赖包名称相对应==的类型声明文件
+      - 例如，如果你的项目依赖了 `lodash`，TypeScript 会在 `node_modules/@types` 目录下查找是否存在 `lodash` 的类型声明文件，如 `lodash.d.ts`
+   2. 如果在项目的 `node_modules/@types` 目录下找不到与依赖包名称相对应的类型声明文件，TypeScript 会继续查找全局安装的类型声明文件，全局安装的类型声明文件通常位于全局的 `typings` 或 `types` 目录下
+   3. 如果以上步骤都没有找到类型声明文件，TypeScript 会查找项目中的 `typeRoots` 或 `types` 选项所配置的目录，这些目录通常用于存放项目内部的类型声明文件
 
-为了使 TypeScript 能够找到和使用第三方依赖包的类型声明文件，需要确保安装了相应的类型声明文件
-
-大多数常见的第三方库都提供了官方的类型声明文件，可以通过 `@types` 包发布，例如 `@types/lodash`
+如果 TypeScript 仍然无法找到类型声明文件，它会假设该依赖包不包含类型声明，将其视为一个纯 JavaScript 库，无法提供类型检查和推断
 
 ### 二、TypeScript 的配置文件（`tsconfig.json`）在项目中的生效顺序
 

@@ -415,4 +415,99 @@ export default connect(
 
 ```
 
+### 四、其他工具方法
+
+#### 4.1、createSelector方法
+
+`createSelector` 是**reselect**库中的一个方法，它用于创建==可记忆的选择器==，选择器是一个函数，它==接收 Redux store 的状态作为输入==，并根据需要计算和返回==派生的数据==
+
+使用 `createSelector` 可以==避免在每次状态更新时都重新计算派生数据==，从而提高性能。它使用了一种称为记忆化（memoization）的技术，它会缓存上一次计算的结果，并在下次调用时检查输入是否发生变化。如果输入没有变化，`createSelector` 将返回缓存的结果，而不会重新计算
+
+`createSelector` 的基本用法如下：
+
+```js
+import { createSelector } from 'redux';
+
+const mySelector = createSelector(
+  [inputSelector1, inputSelector2, ...],
+  (input1, input2, ...) => {
+    // 根据输入计算派生数据的逻辑
+    return derivedData;
+  }
+);
+```
+
+`createSelector` 接收两个参数：
+
+- 输入选择器数组
+  - 输入选择器数组包含了用于选择计算所需的输入数据的函数，当状态发生变化时，`createSelector` 会调用输入选择器函数来获取最新的输入数据，并将其传递给计算函数
+- 计算派生数据的函数
+  - 计算函数负责根据输入数据进行逻辑计算，并==返回派生数据==
+  - 这个函数的输出将被缓存起来，以便在下次调用时进行比较。如果输入没有变化，`createSelector` 将直接返回缓存的结果，而不会再次调用计算函数
+
+##### 4.1.1、createSelector方法在react中的具体使用
+
+`createSelector` 可以与 **React** 和 **Redux** 一起使用，以优化组件的渲染性能和数据获取逻辑。下面是一个示例，展示了如何在 **React** 组件中使用 `createSelector`：
+
+首先，确保你的应用已经设置了 **Redux** 并拥有一个 **Redux store**
+
+1. 安装 `reselect` 包（包含了 `createSelector`）：
+
+   ```shell
+   npm install reselect
+   ```
+
+2. 在你的 Redux 文件中导入 `createSelector`：
+
+   ```js
+   import { createSelector } from 'reselect';
+   ```
+
+3. 创建一个或多个输入选择器，它们负责从 **Redux store** 中选择所需的状态数据。例如：
+
+   ```js
+   const getUsers = (state) => state.users;
+   const getFilter = (state) => state.filter;
+   ```
+
+4. 使用 `createSelector` 创建一个派生数据选择器，该选择器将接收输入选择器的输出并返回派生数据。例如：
+
+   ```js
+   const getFilteredUsers = createSelector(
+     [getUsers, getFilter],
+     (users, filter) => {
+       // 根据输入选择器的输出计算派生数据
+       return users.filter(user => user.name.includes(filter));
+     }
+   );
+   ```
+
+   在上面的示例中，`getFilteredUsers` 是一个==派生数据==选择器，它接收 `getUsers` 和 `getFilter` 的输出，并根据它们的值对用户数据进行过滤
+
+   每当 `getUsers` 或 `getFilter` 的输出发生变化时，`getFilteredUsers` 将重新计算
+
+5. 在你的 **React** 组件中使用派生数据选择器：
+
+   ```jsx
+   import { useSelector } from 'react-redux';
+   
+   const MyComponent = () => {
+     const filteredUsers = useSelector(getFilteredUsers);
+   
+     // 使用 filteredUsers 渲染组件的内容
+     return (
+       <div>
+         {filteredUsers.map(user => (
+           <div key={user.id}>{user.name}</div>
+         ))}
+       </div>
+     );
+   };
+   ```
+
+   在上面的示例中，通过 `useSelector` hook，我们订阅了 `getFilteredUsers` 的派生数据选择器，并将派生数据 `filteredUsers` 注入到组件中
+
+   当 **Redux store** 中与 `getFilteredUsers` 相关的状态发生变化时，React 组件将自动重新渲染
+
+使用 `createSelector` 结合 **React** 和 **Redux**，可以根据需要计算派生数据，并在输入数据变化时进行优化。这可以提高组件的性能，避免不必要的渲染和计算
 

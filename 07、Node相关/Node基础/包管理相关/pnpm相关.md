@@ -37,6 +37,12 @@ packages:
 pnpm install
 ```
 
+**仅为`workpace package`安装依赖**
+
+```shell
+pnpm install -w
+```
+
 **安装全局的公共依赖包**
 
 `pnpm` 提供了 `-w`, `--workspace-root` 参数，可以将依赖包安装到工程的根目录下，作为==所有 `package` 的公共依赖==

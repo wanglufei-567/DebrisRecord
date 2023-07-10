@@ -1,4 +1,8 @@
-### 同步下的this.setState({newstate})
+## 类式组件中的setState
+
+### 一、不同状态下的setState
+
+#### 1.1、同步下的this.setState({newstate})
 
 ```js
 import React, { Component } from "react";
@@ -44,9 +48,7 @@ export default class BatchedUpdatesUsage extends Component {
    */
 ```
 
-
-
-### 同步下的this.setState(updater)
+#### 1.2、同步下的this.setState(updater)
 
 ```js
 import React, { Component } from "react";
@@ -111,7 +113,7 @@ export default class BatchedUpdatesUsage extends Component {
      */
 ```
 
-### 异步下下的this.setState({newstate})
+#### 1.3、异步下的this.setState({newstate})
 
 ```js
 import React, { Component } from "react";
@@ -159,27 +161,21 @@ export default class BatchedUpdatesUsage extends Component {
      */
 ```
 
-### 
-
-### React合成事件和生命周期中的批量更新流程
+### 二、React合成事件和生命周期中的批量更新流程
 
 ![image-20211217130015211](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220410135754524.png)
 
 setState并非异步，本质还是同步的，只不过它的表现形式是异步的，
 
-
-
-### React中的事务流程图
+#### 2.1、React中的事务流程图
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a65dbe50540f4a33ac6ef8ce5221f96c~tplv-k3u1fbpfcp-watermark.awebp)
 
-#### React批量更新策略事务(ReactDefaultBatchingStrategyTransaction)
+#### 2.2、React批量更新策略事务(ReactDefaultBatchingStrategyTransaction)
 
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e7e4a3118f394c1b89c4f6fdb93ff4bf~tplv-k3u1fbpfcp-watermark.awebp)
 
-
-
-### state更新
+#### 2.3、state更新
 
 ```js
 // _processPendingState：将setState的partialState与原state合并

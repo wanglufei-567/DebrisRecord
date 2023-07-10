@@ -1,6 +1,8 @@
+## React Ref相关
+
 `React.createRef()`方式创建
 
-```
+```jsx
 class MyComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -14,13 +16,13 @@ class MyComponent extends React.Component {
 
 当 ref 被传递给 `render` 中的元素时，对该节点的引用可以在 ref 的 `current` 属性中被访问
 
-```
+```jsx
 const node = this.myRef.current;
 ```
 
 函数式组件创建Ref
 
-```
+```jsx
  function CustomTextInput(props) {
   // 这里必须声明 textInput，这样 ref 才可以引用它
   const textInput = useRef(null);
@@ -44,11 +46,9 @@ const node = this.myRef.current;
 }
 ```
 
-
-
 回调函数形式的Ref
 
-```
+```jsx
 class CustomTextInput extends React.Component {
   constructor(props) {
     super(props);

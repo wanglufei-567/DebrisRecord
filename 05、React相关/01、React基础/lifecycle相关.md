@@ -1,3 +1,5 @@
+## 生命周期相关
+
 ### 挂载阶段
 
 - #### **Parent constructor(props)**
@@ -75,22 +77,17 @@
 
     而componentDidUpdate(prevProps, prevState, snapshot)在 DOM 更新后立即调用，所以这里可以依据props或state的改变对DOM进行改变
 
-    
 
-    
+#### PureComponent
 
-    #### PureComponent
+PureComponent实际上自动加载shouldComponentUpdate函数，当组件更新时，shouldComponentUpdate对props和state进行了一层浅比较
 
-    PureComponent实际上自动加载shouldComponentUpdate函数，当组件更新时，shouldComponentUpdate对props和state进行了一层浅比较
 
-    
-    
-    
-    
-    // React设计理念是 跨平台渲染=>virtualDom 快速响应=>异步可中断+增量更新
-    
-    // 因为是异步可中断的了，所以可能导致componentWillMount()多次执行，所以这些生命周期要废弃
-    
-    
+
+// React设计理念是 跨平台渲染=>virtualDom 快速响应=>异步可中断+增量更新
+
+// 因为是异步可中断的了，所以可能导致componentWillMount()多次执行，所以这些生命周期要废弃
+
+
 
 

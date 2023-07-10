@@ -1,4 +1,6 @@
-### useRef
+## useRef相关
+
+#### 一、概述
 
 ```js
 const myRef = useRef(initialValue);
@@ -8,9 +10,11 @@ react官方是这样描述`useRef`的
 
 > `useRef` 返回一个可变的 ref 对象，其 `.current` 属性被初始化为传入的参数（`initialValue`）。返回的 ref 对象在组件的整个生命周期内持续存在。
 
-其实简单理解就是useRef这个hooks给我们提供了一个贯穿组件生命周期的一个对象，我们可以在里面存任何数据，类比于<u>***类式组件***</u>，这个对象就相当于this对象，在类式组件中我们有时会在实例对像上存放数据，***<u>函数式组件</u>***由于没有实例所以就有了**<u>*useRef*</u>**这个hooks;
+其实简单理解就是useRef这个hooks给我们提供了一个贯穿组件生命周期的一个对象，我们可以在里面存任何数据
 
-### 基础使用
+类比于**类式组件**，这个对象就相当于this对象，在类式组件中我们有时会在实例对像上存放数据，**函数式组件**由于没有实例所以就有了**useRef**这个hooks
+
+### 二、基础使用
 
 ```js
 import React, {useRef} from 'react'
@@ -38,13 +42,13 @@ export default BasicUsage
 
 就像类式组件中，改变实例对象上的数据不会引起rerender一样，改变ref对象上的数据也不会引起rerender;
 
-### 利用useRef实现componentDidUpdate
+### 三、利用useRef实现componentDidUpdate
 
-```
+```jsx
 useEffect(fn,[dep])
 ```
 
-`useEffect`在初次渲染或者state更新时，都会执行fn，可以利用`useRef`实现初次渲染不执行fn，只在更新时执行fn
+`useEffect`在初次渲染或者state更新时都会执行fn，可以利用`useRef`实现初次渲染不执行fn，只在更新时执行fn
 
 ```js
   const useDidUpdateEffect = (fn:()=>void, dep?: any[]) => {
@@ -58,13 +62,13 @@ useEffect(fn,[dep])
   }
 ```
 
-其实useEffect还是在初次渲染时有调用回调，只不过包了一层匿名函数让fn在初次渲染时没执行而已，第一次render之后，ref.current的值已经变成true,当state更新时，useEffect的回调再次执行时就会调用fn
+其实`useEffect`还是在初次渲染时有调用回调，只不过包了一层匿名函数让fn在初次渲染时没执行而已，第一次render之后，`ref.current`的值已经变成true,当state更新时，`useEffect`的回调再次执行时就会调用fn
 
+### 四、ForwardRefUsage的使用
 
+要在函数式组件上使用`ref={myRef}`就必须使用**ForwardRefUsage**传递`ref`(不然会报错)
 
-### ForwardRefUsage的使用
-
-要在函数式组件上使用`ref={myRef}`就必须使用ForwardRefUsage传递ref(不然会报错)，React.forwardRef字面意思理解为转发Ref，它会创建一个React组件，这个组件能够将其接受的 `ref` props转发到其组件树下的另一个组件中,另外还可以通过`useImperativeHandle(ref,fn,[dep])`将子组件中的数据传回给父组件，也是一种组件间的通信方式
+**React.forwardRef**字面意思理解为转发Ref，它会创建一个**React**组件，这个组件能够将其接受的 `ref` `props`转发到其组件树下的另一个组件中，另外还可以通过`useImperativeHandle(ref,fn,[dep])`将子组件中的数据传回给父组件，也是一种组件间的通信方式
 
 ```js
 import React, { useRef, useState, useImperativeHandle, useEffect, Ref } from 'react';

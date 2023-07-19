@@ -98,3 +98,14 @@ pnpm why react -r // 显示依赖于指定 package的所有 package
 
 `--recursive` `-r` 参数表示执行该命令于子目录所有`package` 中，或者如果执行在一个工作空间时，在工作空间的所有`package`执行
 
+**在项目的上下文中执行指定的命令**
+
+```shell
+pnpm exec <command>
+
+// 例如 pnpm exec npm test
+```
+
+`<command>` 是要在项目上下文中执行的任何命令
+
+通过这个命令，可以在项目依赖项中执行特定的命令，而无需在全局范围安装这些命令或将它们作为项目的开发依赖项安装

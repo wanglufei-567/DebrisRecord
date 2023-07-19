@@ -23,7 +23,7 @@ const MovingComponent = () => {
 
 由于**React**的组件更新机制，父组件状态更新时会引起其子组件的**re-render**，在这个例子中，每次鼠标移动引起的父组件**MovingComponent**的状态更新，都会导致子组件**ChildComponent** **re-render**，若**ChildComponent** 中存在重逻辑，那么频繁的**re-render**将会引起性能问题
 
-一般我们可以通过**React.memo**包裹子组件来解决其频繁**re-render**的问题，但通过将子组件作为`children`传递给父组件也可以解决这个问题，看下面👇
+一般我们可以通过**React.memo**包裹子组件来解决其频繁**re-render**的问题，同时通过将子组件作为`children`传递给父组件也可以解决这个问题，看下面👇
 
 在上层组件中（**MovingComponent**的父组件）将**ChildComponent**作为`children`，通过`props`传递给**MovingComponent**
 

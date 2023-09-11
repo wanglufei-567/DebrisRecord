@@ -164,9 +164,20 @@
 以下是一些常用的**Docker**命令，用于管理容器和镜像：
 
 1. **创建和运行容器**：
-   - `docker run <image_name>`：基于指定的镜像创建并启动一个容器
+   - ==`docker run <image_name>`：基于指定的镜像创建并启动一个容器==
+     - `docker run -d -p 8080:80 --name my_container my_image:my_tag`：创建一个带有标签（tag）的容器
+       - `-d`：表示以后台模式运行容器
+       - `-p 8080:80`：将主机的8080端口映射到容器的80端口
+       - `--name my_container`：为容器指定一个名称为`my_container`
+       - `my_image`：指定要使用的镜像
+       - `my_tag`: 标签名称
    - `docker run -d <image_name>`：在后台模式下运行容器
-   - `docker run -it <image_name> /bin/bash`：以交互模式启动容器，并进入容器的Shell
+   - ==`docker run -it <image_name> /bin/bash`：以交互模式启动容器，并进入容器的Shell== <!--像ssh连接访问远端服务器-->
+     - `-it`：这两个选项结合在一起，表示以交互模式运行容器
+       -  `-i` 表示交互式（允许用户输入）
+       - `-t` 表示分配一个伪终端
+     - `/bin/bash`：这是在容器内执行的命令，表示要进入容器的**Bash Shell**
+     - 要退出容器的**Shell**并停止容器，可以输入 `exit` 命令，然后容器将终止
    - `docker exec -it <container_id> /bin/bash`：进入正在运行的容器的Shell
    - `docker attach <container_id>`：附加到正在运行的容器的标准输入、输出和错误流
    - `docker start <container_id>`：启动已经创建的容器

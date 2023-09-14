@@ -122,13 +122,13 @@
 - **容器编排 (Container Orchestration)**：
 
   - **容器编排**是一种**自动化和管理**容器的方法，通常用于大规模部署和维护容器化应用程序。它包括自动化容器的部署、伸缩、负载均衡、服务发现、故障恢复等操作
-  - 最流行的容器编排工具之一是**Kubernetes**，它提供了丰富的功能和强大的生态系统，用于管理容器集群。通过**Kubernetes**，开发人员可以轻松地定义应用程序的架构，部署多个容器，确保高可用性和可伸缩性。
+  - 最流行的容器编排工具之一是**Kubernetes**，它提供了丰富的功能和强大的生态系统，用于管理容器集群。通过**Kubernetes**，开发人员可以轻松地定义应用程序的架构，部署多个容器，确保高可用性和可伸缩性
 
 - **Docker Compose**:
 
   - **Docker Compose**是用于定义和运行多个容器的工具，通常用于本地开发和测试环境，它通过一个YAML文件来描述应用程序的各个组件，包括容器映像、环境变量、网络设置等
 
-  - 使用`docker-compose up`命令，您可以轻松地启动整个应用程序堆栈。这使得开发人员可以在本地模拟多容器应用程序的部署，以便更轻松地开发和测试。、
+  - 使用`docker-compose up`命令，您可以轻松地启动整个应用程序堆栈。这使得开发人员可以在本地模拟多容器应用程序的部署，以便更轻松地开发和测试
 
     以下是一个简单的Docker Compose示例：
 
@@ -153,60 +153,117 @@
   例如，要将一个卷挂载到容器的`/data`目录，可以使用以下方式：
 
   ```bash
-  bashCopy code
   docker run -v my_volume:/data my_image
   ```
+  
+这将创建名为`my_volume`的卷，并将其挂载到容器的`/data`目录，使数据持久化
+  
+- **Docker镜像的存储位置**
 
-  这将创建名为`my_volume`的卷，并将其挂载到容器的`/data`目录，使数据持久化
+  - **Docker** 镜像默认存储在 **Docker** ==守护程序的数据目录==中，具体位置取决于使用的操作系统
+
+  - **macOS** 和 **Windows**系统下**Docker** 镜像存储在**==虚拟机内部==**，而不是直接存储在操作系统的文件系统中，因为 **Docker** 在这些操作系统上运行时使用了虚拟化技术
+
+  - ==**导出 Docker 镜像：**==
+
+    - 可以使用 `docker save` 命令将一个或多个镜像==打包成一个 `tar` 归档文件==，然后可以将这个 `tar` 文件复制到其他地方，例如另一台机器上，以便导入镜像
+
+    ```bash
+    docker save -o <output_file_name>.tar <image_name>
+    ```
+
+    - `-o`：表示`output`（输出）
+    - `<output_file_name>.tar`：指定导出的 `tar` 文件的文件名和路径
+    - `<image_name>`：要导出的 **Docker** 镜像的名称
+
+  - **==导入Docker镜像：==**
+
+    - 使用 `docker load` 命令在另一台机器上导入镜像
+
+    ```bash
+    docker load -i <input_file_name>.tar
+    ```
+
+    - `-i`: 表示`input`（输入）
+    - `<input_file_name>.tar`：要导入的 tar 文件的文件名和路径
 
 ### 三、Docker中常用的命令
 
 以下是一些常用的**Docker**命令，用于管理容器和镜像：
 
-1. **创建和运行容器**：
+1. **管理镜像**：
+
+   - ==`docker build -t <image_name> <Dockerfile_path>`：根据**Dockerfile**构建一个新的镜像==
+     - `-t` 选项用于指定镜像的名称和标签（tag）
+     - `image-name` 为镜像指定的名称
+     - `tag` 为镜像指定的标签，通常用于版本控制
+     - `Dockerfile_path` 表示 **Dockerfile** 所在的当前目录
+   - ==`docker images`：列出所有本地镜像==
+   - `docker pull <image_name>`：从**Docker Hub**或其他仓库中拉取镜像
+   - `docker push <image_name>`：将镜像推送到Docker Hub或其他仓库
+   - `docker rmi <image_id>`：删除本地镜像
+
+2. **创建和运行容器**：
+
    - ==`docker run <image_name>`：基于指定的镜像创建并启动一个容器==
-     - `docker run -d -p 8080:80 --name my_container my_image:my_tag`：创建一个带有标签（tag）的容器
-       - `-d`：表示以后台模式运行容器
-       - `-p 8080:80`：将主机的8080端口映射到容器的80端口
-       - `--name my_container`：为容器指定一个名称为`my_container`
-       - `my_image`：指定要使用的镜像
-       - `my_tag`: 标签名称
+
    - `docker run -d <image_name>`：在后台模式下运行容器
+
+     - ==`-d`：表示以后台模式运行容器==
+
+       <!--`-d` 或 `--detach`: 这个选项告诉Docker在后台以守护进程方式运行容器，而不会将容器的标准输入（stdin）、标准输出（stdout）和标准错误（stderr）连接到终端-->
+
+   - `docker run -d -p 8080:80 --name my_container <image_name>:<tag>`：创建并运行一个带有标签（tag）的容器
+
+     - `-p 8080:80`：将主机的8080端口映射到容器的80端口
+     - `--name my_container`：为容器指定一个名称为`my_container`
+     - `image_name`：指定要使用的镜像
+     - `tag`: 标签名称
+
    - ==`docker run -it <image_name> /bin/bash`：以交互模式启动容器，并进入容器的Shell== <!--像ssh连接访问远端服务器-->
+
      - `-it`：这两个选项结合在一起，表示以交互模式运行容器
        -  `-i` 表示交互式（允许用户输入）
        - `-t` 表示分配一个伪终端
      - `/bin/bash`：这是在容器内执行的命令，表示要进入容器的**Bash Shell**
      - 要退出容器的**Shell**并停止容器，可以输入 `exit` 命令，然后容器将终止
+
    - `docker exec -it <container_id> /bin/bash`：进入正在运行的容器的Shell
+
    - `docker attach <container_id>`：附加到正在运行的容器的标准输入、输出和错误流
+
    - `docker start <container_id>`：启动已经创建的容器
+
    - `docker stop <container_id>`：停止运行的容器
+
    - `docker restart <container_id>`：重启容器
+
    - `docker pause <container_id>`：暂停容器的所有进程
+
    - `docker unpause <container_id>`：恢复暂停的容器
+
    - `docker rm <container_id>`：删除一个或多个容器
+
    - `docker ps`：列出运行中的容器
+
    - `docker ps -a`：列出所有容器，包括停止的容器
-2. **管理镜像**：
-   - `docker build -t <image_name> <Dockerfile_path>`：根据Dockerfile构建一个新的镜像
-   - `docker images`：列出所有本地镜像
-   - `docker pull <image_name>`：从**Docker Hub**或其他仓库中拉取镜像
-   - `docker push <image_name>`：将镜像推送到Docker Hub或其他仓库
-   - `docker rmi <image_id>`：删除本地镜像
+
 3. **容器日志和信息**：
    - `docker logs <container_id>`：查看容器的日志
    - `docker inspect <container_id>`：查看容器的详细信息，包括配置和网络设置
+
 4. **容器数据卷**：
    - `docker volume create <volume_name>`：创建一个数据卷
    - `docker volume ls`：列出所有数据卷
    - `docker volume rm <volume_name>`：删除一个数据卷
    - `docker run -v <volume_name>:<container_path>`：将数据卷挂载到容器中，用于持久化数据
+
 5. **容器网络**：
    - `docker network create <network_name>`：创建一个自定义网络
    - `docker network ls`：列出所有网络
    - `docker network rm <network_name>`：删除一个自定义网络
    - `docker network inspect <network_name>`：查看网络的详细信息
+
 6. **其他常用命令**：
    - `docker version`：查看Docker客户端和服务器的版本信息
    - `docker info`：查看Docker系统的详细信息

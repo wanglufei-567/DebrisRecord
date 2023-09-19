@@ -14,6 +14,8 @@
 
 ### 二、TypeScript声明文件的分类
 
+#### 2.1、全局声明文件与模块声明文件
+
 **TypeScript**声明文件可以分为**全局声明文件**和**模块声明文件**：
 
 1. **==全局声明文件==**：用于描述全局范围的变量、函数、类、命名空间等
@@ -22,10 +24,94 @@
    - 也就是说，这些全局变量或全局类型都是可以在全局任何地方直接使用的，而不需要导入后再使用
 
 2. **==模块声明文件==**：模块声明文件用于描述模块、库或第三方依赖的类型信息，它们提供了对模块导出的变量、函数、类和命名空间的类型定义
+- 模块声明文件的命名通常与模块名称相匹配，并以`.d.ts`结尾。例如，`lodash.d.ts`、`react.d.ts`等
+   
+- ==只要声明文件中出现顶层的 `import` 或 `export`，那么这个声明文件就会被当做模块==，模块中所有的声明都是==局部变量==或==局部类型==，必须 `export` 导出后，才能在其他文件中通过`import`或`/// <reference>`指令引入使用
 
-   - 模块声明文件的命名通常与模块名称相匹配，并以`.d.ts`结尾。例如，`lodash.d.ts`、`react.d.ts`等
+#### 2.2、全局声明文件书写技巧
 
-   - ==只要声明文件中出现顶层的 `import` 或 `export`，那么这个声明文件就会被当做模块==，模块中所有的声明都是==局部变量==或==局部类型==，必须 `export` 导出后，才能在其他文件中通过`import`或`/// <reference>`指令引入使用
+- **声明类型**
+
+  声明类型主要使用 `interface` 和 `type`
+
+  ```ts
+  interface IPeople {
+    name: string
+    age?: number
+  }
+  
+  type NumAndString = number | string
+  ```
+
+  一个项目中，通常需要定义非常多的 `interface` 和 `type` ，如果像上面这样，所有的 `interface` 和 `type` 都暴露在最外层作为全局类型，很有可能会出现命名冲突
+
+- **使用命名空间避免命名冲突**
+
+  全局声明文件中可能会存在类型命名冲突，使用命名空间时，只有命名空间暴露在全局
+
+  ```ts
+  // 声明一个命名空间
+  declare namespace mySpace {
+    type name = 'myObj'
+    interface IPeople {
+      name: string
+      age?: number
+    }
+  }
+  ```
+
+  在TS文件中使用
+
+  ```ts
+  const name:mySpace.name = 'myObj'
+  
+  const people:mySpace.IPeople = {
+    name: 'zhangsan',
+    age: '22'
+  }
+  ```
+
+- **声明模块**
+
+  `declare module` 可以用来为一个没有类型声明的模块声明类型，也可以用来扩展一个模块的类型声明
+
+  假设，现在有一个模块叫做 `foo` ，直接使用时会报错：
+
+  ```ts
+  // TS 报错
+  // Cannot find module 'foo' or its corresponding type declarations.
+  import sayHi, { name, sayHello } from 'foo'
+  ```
+
+  由于上例报错，所以需要我们来写声明文件告诉 TS 这个模块的信息：
+
+  ```ts
+  declare module 'foo' {
+    const name: string
+    function sayHello (name: string): string
+    export default function sayHi(): string
+  }
+  ```
+
+  使用模块 `foo`：
+
+  ```ts
+  import sayHi, { name, sayHello } from 'foo'
+  
+  sayHi()
+  sayHello(name)
+  ```
+
+- **`/// <reference />` 三斜线指令引用声明文件**
+
+  当我们在编写一个全局声明文件但又依赖其他声明文件时，文件内不能出现 `import` 去导入其他声明文件的声明，此时就需要通过三斜线指令来引用其他的声明文件
+
+  `<reference />` 可以通过 `types` 属性或 `path` 属性来引用其他声明文件
+
+  ```ts
+  /// <reference types="foo" />
+  /// <reference path="bar.d.ts" />
+  ```
 
 ### 三、 TypeScript 查找第三方依赖包类型声明文件时的顺序
 

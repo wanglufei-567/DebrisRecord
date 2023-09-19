@@ -77,32 +77,32 @@
     -  镜像==不包含任何动态数据==，其内容在构建之后也不会被改变
   - 镜像构建时，会一层层构建，前一层是后一层的基础 <!--前一层是基础镜像-->每一层构建完就不会再发生改变，后一层上的任何改变只发生在自己这一层
 - **==容器（Container）==**：镜像运行时的实体
-  
+
   - **镜像**（**Image**）和**容器**（**Container**）的关系，就像是面向对象程序设计中的类和实例一样
     - 镜像是静态的定义，容器是镜像运行时的实体
-    - 容器可以被创建、启动、停止、删除、暂停等 
+    - 容器可以被创建、启动、停止、删除、暂停等
   - **容器存储层**的生存周期和容器一样
     - 容器消亡时，==**容器存储层**也随之消亡==，因此，任何保存于容器存储层的信息都会随容器删除而丢失。
   - 按照**Docker**最佳实践的要求，容器不应该向其存储层内写入任何数据 ，**容器存储层要保持无状态化**
     - 所有的文件写入操作，都应该使用**数据卷**（**Volume**）、或者**绑定宿主目录**，在这些位置的读写会跳过容器存储层，直接对宿主（或网络存储）发生读写，其性能和稳定性更高
   - ==数据卷的生存周期独立于容器==，容器消亡，数据卷不会消亡
     - 使用数据卷后，容器可以随意删除、重新run，数据却不会丢失
-  
+
 - **==仓库（Repository）==**：集中存放镜像文件的地方
 
   - 一个**Docker Registry**中可以包含多个仓库（**Repository**），每个仓库可以包含多个标签（Tag），每个标签对应一个镜像 <!--Docker Registry是个服务-->
-    
+
     - 镜像仓库是Docker用来集中存放镜像文件的地方，==类似于代码仓库==
     - 通过`image:tag`的格式来指定具体是这个软件哪个版本的镜像，如果不给出标签，将以`latest`作为默认标签
-    
+
   - **Docker Registry公开服务**和**私有Docker Registry**的概念：
-    
+
     - **Docker Registry公开服务** 是开放给用户使用、允许用户管理镜像的**Registry**服务
-    
+
        <!--例如Docker hub-->
-    
-    - 除了使用公开服务外，用户还可以在本地搭建**私有Docker Registry** 
-    
+
+    - 除了使用公开服务外，用户还可以在本地搭建**私有Docker Registry**
+
        - ==**Docker**官方提供了**Docker Registry**镜像，可以直接使用做为私有**Registry**服务==
        - 开源的**Docker Registry**镜像只提供了**Docker Registry API**的服务端实现，足以支持**Docker**命令，不影响使用，但不包含图形界面，以及镜像维护、用户管理、访问控制等高级
 
@@ -123,10 +123,10 @@
   ```dockerfile
   # 使用官方的Ubuntu 20.04基础镜像
   FROM ubuntu:20.04
-  
+
   # 安装一个简单的Web服务器
   RUN apt-get update && apt-get install -y apache2
-  
+
   # 启动Web服务器
   CMD ["apache2ctl", "-D", "FOREGROUND"]
   ```
@@ -236,7 +236,7 @@
 
   - `registry`：镜像仓库地址；如果未指定镜像仓库地址，默认为官方仓库**Docker Hub**
 
-  - 登录成功后，==**Docker**会将你的认证信息存储在`~/.docker/config.json`文件中的`auths`属性中== 
+  - 登录成功后，==**Docker**会将你的认证信息存储在`~/.docker/config.json`文件中的`auths`属性中==
 
     > 像这样：
     >
@@ -268,3 +268,99 @@
 - `docker logout`：用于退出已登录的 **Docker** 镜像仓库
 
   - 这个命令会删除存储在`~/.docker/config.json`文件中的认证信息
+
+### 四、Docker中常用的命令
+
+以下是一些常用的**Docker**命令，用于管理容器和镜像：
+
+1. **管理镜像**：
+
+   - `docker build -t <image_name> <Dockerfile_path>`：==根据**Dockerfile**构建一个新的镜像==
+     - `-t` 选项用于指定镜像的名称和标签（tag）
+     - `image-name` 为镜像指定的名称
+     - `tag` 为镜像指定的标签，通常用于版本控制
+     - `Dockerfile_path` 表示 **Dockerfile** 所在的当前目录 <!--默认找dockerfile这个文件-->
+   - `docker images`：==**列出所有本地镜像**==
+   - `docker commit <container_id> new_image_name`：==**通过已有容器构建一个新的镜像**==
+   - `docker pull <image_name>`：从**Docker Hub**或其他仓库中拉取镜像
+   - `docker push <image_name>`：将镜像推送到Docker Hub或其他仓库
+   - `docker rmi <image_id>`：删除本地镜像
+   - `docker tag old-image:old-tag new-image:new-tag`：调整镜像tag
+
+2. **创建和运行容器**：
+
+   - `docker run <image_name>`：==**基于指定的镜像创建并启动一个容器 **== <!--没有指定名字就会生成一个随机名字-->
+
+   - `docker run -p 8080:80 --name my_container <image_name>:<tag> -d  `：**==创建并运行一个带有标签（tag）的容器==**
+
+     - `-p 8080:80`：将主机的8080端口映射到容器的80端口
+
+     - `--name my_container`：为容器指定一个名称为`my_container`
+
+     - `image_name`：指定要使用的镜像
+
+     - `tag`: 标签名称
+
+     - ==`-d`：表示以后台模式运行容器==
+
+       <!--`-d` 或 `--detach`: 这个选项告诉Docker在后台以守护进程方式运行容器，而不会将容器的标准输入（stdin）、标准输出（stdout）和标准错误（stderr）连接到终端-->
+
+   - `docker run -it <image_name> /bin/bash`：==**以交互模式启动容器，并进入容器的Shell**== <!--像ssh连接访问远端服务器-->
+
+     - `-it`：这两个选项结合在一起，表示以交互模式运行容器
+       -  `-i` 表示交互式（允许用户输入）
+       - `-t` 表示分配一个伪终端
+     - `/bin/bash`：这是在容器内执行的命令，表示要进入容器的**Bash Shell**
+     - 要退出容器的**Shell**并停止容器，可以输入 `exit` 命令，然后容器将终止
+
+   - `docker exec -it <container_id> /bin/bash`：进入正在运行的容器的Shell
+
+   - `docker attach <container_id>`：附加到正在运行的容器的标准输入、输出和错误流
+
+   - `docker start <container_id>`：启动已经创建的容器
+
+   - `docker stop <container_id>`：停止运行的容器
+
+   - `docker restart <container_id>`：重启容器
+
+   - `docker pause <container_id>`：暂停容器的所有进程
+
+   - `docker unpause <container_id>`：恢复暂停的容器
+
+   - `docker rm <container_id>`：删除一个或多个容器
+
+   - `docker ps`：==**列出运行中的容器**==
+
+   - `docker ps -a`：列出所有容器，包括停止的容器
+
+   - `docker ps  --filter "label=mytag"`：列出指定tag的容器
+
+3. **容器日志和信息**：
+
+   - `docker logs <container_id>`：查看容器的日志
+- `docker inspect <container_id>`：查看容器的详细信息，包括配置和网络设置
+
+4. **容器数据卷**：
+
+   - `docker volume create <volume_name>`：创建一个数据卷
+   - `docker volume ls`：列出所有数据卷
+   - `docker volume rm <volume_name>`：删除一个数据卷
+- `docker run -v <volume_name>:<container_path>`：将数据卷挂载到容器中，用于持久化数据
+
+5. **容器网络**：
+   - `docker network create <network_name>`：创建一个自定义网络
+   - `docker network ls`：列出所有网络
+   - `docker network rm <network_name>`：删除一个自定义网络
+   - `docker network inspect <network_name>`：查看网络的详细信息
+
+6. **其他常用命令**：
+
+   - `docker version`：查看Docker客户端和服务器的版本信息
+   - `docker info`：查看Docker系统的详细信息
+   - `docker login`：登录到Docker Hub或其他仓库
+   - `docker logout`：注销Docker Hub或其他仓库
+   - `docker search <search_term>`：搜索Docker Hub上的镜像
+   - `docker cp <container_id>:<source_path> <destination_path>`：==**从容器复制文件到本地系统**==
+     - `<container_id>:<source_path>`：指定容器的指定文件目录 <!--container_id是容器id不是容器name-->
+   - `docker top <container_id>`：查看容器内运行的进程
+   - `docker stats <container_id>`：查看容器的资源使用情况

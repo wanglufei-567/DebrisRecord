@@ -44,48 +44,7 @@
 
 如果 **TypeScript** 仍然无法找到类型声明文件，它会假设该依赖包不包含类型声明，将其视为一个纯 **JavaScript** 库，无法提供类型检查和推断
 
-### 四、`.ts`文件与`.tsx`文件使用全局声明文件的区别
-
-在普通的 `.ts` 文件中，如果在全局范围内声明了一个类型，它会被默认视为全局可用的类型
-
-这是因为在 `.ts` 文件中，默认情况下，**TypeScript** 假设你是在全局范围内工作，并且==在编译过程中会将所有全局声明合并到一个全局命名空间中==
-
-例如，如果你在一个 `.ts` 文件中声明了一个全局类型：
-
-```typescript
-interface Person {
-  name: string;
-  age: number;
-}
-```
-
-你可以在同一个项目的其他 `.ts` 文件中直接使用 `Person` 类型，而无需进行额外的导入操作
-
-然而，在 `.tsx` 文件中，情况略有不同，`.tsx` 文件通常用于编写 **React** 组件，其中可能会涉及 **JSX** 语法和嵌入式的 **TypeScript** 类型注解
-
-由于 `.tsx` 文件的特殊用途，**TypeScript** 默认不会将全局类型声明合并到全局命名空间中，这是为了避免可能的命名冲突和类型混淆，因此，当在 `.tsx` 文件中使用全局类型声明时，**TypeScript** 并不会假设这些类型对整个项目都是可见的，而是要求显式地导入它们要在 `.tsx` 文件中使用全局类型声明，==需要确保先在文件顶部使用 `import` 或 `/// <reference>` 指令将相关类型声明导入进来==
-
-<!--不是很理解这个原因，但现象就是要先引入才能使用-->
-
-例如：
-
-```typescript
-import { Person } from './types'; // 假设类型声明在 types.ts 文件中
-
-const MyComponent: React.FC = () => {
-  const person: Person = { name: 'John', age: 25 };
-
-  // 组件的其余代码...
-
-  return <div>{person.name}</div>;
-};
-
-export default MyComponent;
-```
-
-通过显式地导入类型声明，可以确保在 `.tsx` 文件中正确使用全局类型，并避免可能的冲突和错误
-
-### 五、TypeScript 的配置文件（`tsconfig.json`）在项目中的生效顺序
+### 四、TypeScript 的配置文件（`tsconfig.json`）在项目中的生效顺序
 
 1. 基于命令行：
    - 如果使用命令行直接指定了 **TypeScript** 配置文件，例如 `tsc --project tsconfig.json`，那么该指定的配置文件将直接生效

@@ -4,26 +4,28 @@
 
 #### 1.1、什么是迭代器Iterator
 
-==**迭代器（Iterator）** 是一种**用于遍历数据集合**的通用接口，为各种不同的数据结构**提供统一的访问机制**==
+==**迭代器（Iterator）** 是一种**用于遍历数据集合**的通用接口，为各种不同的数据结构**提供统一的访问机制**== 
 
-==任何数据结构只要部署**Iterator** 接口（在**js**中就是对象的一个属性**Symbol.iterator** ）就可以完成遍历操作==
+任何数据结构只要部署**Iterator** 接口<!--在js中就是对象的一个属性Symbol.iterator--> 就可以完成遍历操作
 
-在 **JavaScript** 中，许多内置的数据结构都实现了 **Iterator** 接口，包括数组、Set、Map、字符串等。这意味着，这些数据结构都可以通过 **for...of** 循环来遍历。
+在 **JavaScript** 中，许多内置的数据结构都实现了 **Iterator** 接口，包括数组、Set、Map、字符串等。这意味着，这些数据结构都可以通过 **for...of** 循环来遍历
 
-例如，以下代码演示了如何使用 **for...of** 循环遍历一个数组：
-
-```js
-const myArray = [1, 2, 3];
-for (const value of myArray) {
-  console.log(value);
-}
-// 输出:
-// 1
-// 2
-// 3
-```
-
-在该示例中，我们定义了一个名为 **myArray** 的数组，并使用 **for...of** 循环遍历该数组中的每个元素；**for...of** 循环通过获取 **myArray** 对象的**==迭代器==**来实现遍历，因为==数组实现了 **Iterator** 接口==
+> 例如，以下代码演示了如何使用 **for...of** 循环遍历一个数组：
+>
+> ```js
+> const myArray = [1, 2, 3];
+> for (const value of myArray) {
+>   console.log(value);
+> }
+> // 输出:
+> // 1
+> // 2
+> // 3
+> ```
+>
+> 在该示例中，定义了一个名为 **myArray** 的数组，并使用 **for...of** 循环遍历该数组中的每个元素
+>
+> **for...of** 循环通过获取 **myArray** 对象的**迭代器**来实现遍历，因为数组实现了 **Iterator** 接口
 
 除了 **for...of** 循环之外，还可以使用迭代器对象的 ==**next**== 方法来**==手动遍历一个可迭代对象==**
 
@@ -99,7 +101,9 @@ for (const value of myIterable) {
 
 #### 2.1、什么是生成器Generator
 
-==**生成器Generator**==是一种**==特殊类型的函数==**，它可以通过 **yield** 语句来**==暂停函数执行==**，并**==在需要时恢复执行==**
+==**生成器Generator**==是一种**==特殊类型的函数==**，它可以通过 **yield** 语句来**==暂停函数执行==**，并**==在需要时恢复执行==** 
+
+<!--可以交出函数的执行权，即拥有暂停函数执行的效果-->
 
 每次调用 **Generator** 函数时，它都会返回一个==**新的迭代器对象**==，该对象可以==用于遍历生成器生成的值==
 
@@ -350,6 +354,8 @@ var _marked = /*#__PURE__*/regeneratorRuntime.mark(read);
 function read() {
   var a, b, c;
   return regeneratorRuntime.wrap(function read$(_context) {
+    // while(1) 配合函数的return没有任何实际意义
+    // 通常在编程中使用 while(1) 来表示while中的内部会被多次执行
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:

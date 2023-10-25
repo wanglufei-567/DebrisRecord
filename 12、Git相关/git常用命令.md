@@ -1,4 +1,6 @@
-## git config
+## git 常用命令
+
+### 一、git config
 
 git的配置共三个级别
 
@@ -19,6 +21,7 @@ git config --global user.email “you@example.com”
 git config --global user.name “Your Name”
 ```
 
+### 二、commit message
 
 commit信息需要加上如下type前缀
 
@@ -39,3 +42,34 @@ git show 124a9a0ee1d8f1e15e833aff432fbb3b02632105
 git log -p -1 124a9a0ee1d8f1e15e833aff432fbb3b02632105
 ```
 
+### 三、清除缓存
+
+要清除已经被Git缓存记录但在`.gitignore`文件中的未跟踪文件，可以使用以下步骤：
+
+1. 清除缓存记录（Untrack）文件或文件夹：
+
+   ```bash
+   git rm -r --cached 文件名或文件夹名
+   ```
+
+   例如，如果要清除一个名为`example.txt`的文件的缓存记录，可以运行：
+
+   ```bash
+   git rm --cached example.txt
+   ```
+
+   如果要清除一个名为`folder`的文件夹的缓存记录，可以运行：
+
+   ```bash
+   git rm -r --cached folder
+   ```
+
+2. 提交更改：
+
+   ```bash
+   git commit -m "清除缓存记录"
+   ```
+
+这将会从Git缓存中删除指定的文件或文件夹，并将这个更改提交到版本控制系统中，从此以后，这些文件或文件夹将不再被Git跟踪，但仍然保留在工作目录中
+
+请注意，如果这些文件或文件夹之前已经被提交到Git仓库，它们的历史记录仍然会存在于以前的提交中，这只是从当前或将来的提交中删除了它们

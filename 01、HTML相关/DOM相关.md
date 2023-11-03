@@ -31,8 +31,8 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
 
 - `window.scrollY` 和 `window.scrollX`（只读）:
 
-  - `window.scrollY` 返回文档在垂直方向上的滚动距离，以像素为单位
-  - `window.scrollX` 返回文档在水平方向上的滚动距离，以像素为单位
+  - `window.scrollY` 返回整个文档在垂直方向上的滚动距离，以像素为单位
+  - `window.scrollX` 返回整个文档在水平方向上的滚动距离，以像素为单位
 
   ```javascript
   const verticalScrollPosition = window.scrollY;
@@ -41,8 +41,8 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
 
 - `element.scrollTop` 和`element.scrollLeft` （==**可写**==）:
 
-  - `element.scrollTop` 返回特定元素的垂直滚动距离
-  - `element.scrollLeft` 返回特定元素的水平滚动距离
+  - `element.scrollTop` 返回某个特定元素的垂直滚动距离
+  - `element.scrollLeft` 返回某个特定元素的水平滚动距离
 
   ```javascript
   const container = document.getElementById('scrollableContainer');

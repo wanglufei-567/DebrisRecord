@@ -106,9 +106,9 @@ export default class BatchedUpdatesUsage extends Component {
      * wd1 0
      * wd6 0
      * wd2 0
-     * wd3 0
+     * wd3 1
      * wd4 0
-     * wd5 0
+     * wd5 2
      * render
      */
 ```

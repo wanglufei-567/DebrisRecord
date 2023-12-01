@@ -4,9 +4,9 @@
 
 #### 1.1、`__dirname`与 `__filename`
 
-- `__dirname`  用来动态获取当前文件所属目录的绝对路径 
-- `__filename` 用来动态获取当前文件的绝对路径，包含当前文件
-  - `__dirname` 和 `__filename` 是不受命令行中执行node命令时所属路径影响
+- `__dirname`  用来动态获取==**当前文件**所属目录的绝对路径== 
+- `__filename` 用来动态获取==**当前文件**的绝对路径==，包含当前文件
+  - `__dirname` 和 `__filename` 是==不受命令行中执行Node脚本时所属路径影响==
 
 #### 1.2、path.join()
 
@@ -27,7 +27,7 @@ console.log(path.join(__dirname, '/a', {}, '/b'))
 
 #### 1.3、path.resolve()
 
-path.resolve() 方法是以程序为根目录，作为起点，根据参数解析出一个==绝对路径==
+`path.resolve()` 方法是以程序为根目录，作为起点，根据参数解析出一个==绝对路径==
 
  以应用程序为根目录，普通字符串代表子目录，/ 代表绝对路径根目录
 
@@ -45,6 +45,7 @@ console.log(path.resolve('a', '/b')) // E:\b
 console.log(path.resolve(__dirname, 'a/b')) // E:\前端相关\demo_js\test\a\b
 
 // 这个是用当前应用程序启动文件绝对路径与后面的所有字符串拼接，因为最开始的字符串不是以 / 开头的，.. 也是代表上一级目录
-console.log(path.resolve('wwwroot', 'static_files/png/', '../gif/image.gif')) // E:\前端相关\demo_js\test\wwwroot\static_files\gif\image.gif
+console.log(path.resolve('wwwroot', 'static_files/png/', '../gif/image.gif')) 
+// E:\前端相关\demo_js\test\wwwroot\static_files\gif\image.gif
 ```
 

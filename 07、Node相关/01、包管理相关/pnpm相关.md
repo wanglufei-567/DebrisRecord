@@ -18,13 +18,15 @@ pnpm-workspace.yaml
 
 `pnpm-workspace.yaml`可以自定义工作区目录，默认为packages下的所有子目录
 
-```shell
+```yaml
 // pnpm-workspace.yaml
 packages:
     // packages目录下的所有子目录
     - 'packages/*'
+    
     // components目录下的所有子目录
     - 'components/*'
+    
     // 排除test目录下的包
     - '!**/test/**'
 ```
@@ -62,7 +64,7 @@ pnpm add react --filter pkg1(项目名)
 
 也可进入到对应项目下执行以下代码
 
-```shell
+```bash
 // packages/pkg1
 pnpm add react
 ```

@@ -73,6 +73,35 @@
 
 `transform`属性的示例可以用于创建各种动画、用户交互效果和页面布局。这些变换通常==不会影响元素的文档流==，因此可以与其他布局属性一起使用，以实现复杂的页面设计和动画效果
 
+#### 2.2、transition属性
+
+`transition` 是 **CSS** 中的一个属性，主要用于==在一定的时间内平滑地改变 **CSS** 属性的值==，它是一个简写属性，用于设置四个过渡属性：
+
+- `transition-property`：规定设置过渡效果的 **CSS** 属性的名称
+  - 可以是任何 **CSS** 属性，如 `width`、`height`、`color` 等，特殊的值 `all` 表示所有属性都将过渡
+- `transition-duration`：规定完成过渡效果需要多少秒或毫秒
+  - 例如，2s 表示过渡效果持续 2 秒
+- `transition-timing-function`：规定速度效果的速度曲线，这决定了过渡效果的中间状态，也就是过渡效果如何从开始状态过渡到结束状态，常见的值有 ：
+  - `linear`（线性）
+  - `ease`（缓入缓出）
+  - `ease-in`（缓入）
+  - `ease-out`（缓出）
+  - `ease-in-out`（先缓入后缓出）
+- `transition-delay`：定义过渡效果何时开始
+  - 例如，1s 表示过渡效果将在 1 秒后开始
+
+这四个属性可以单独使用，也可以一起使用
+
+当一起使用时，可以使用 transition 属性进行简写，例如：
+
+```css
+div {
+  transition: width 2s ease-in-out 1s;
+}
+```
+
+这行代码表示 `div` 元素的 `width` 属性将在 2 秒内平滑地改变，过渡效果为先缓入后缓出，过渡效果将在 1 秒后开始
+
 ### 三、Flex属性
 
 **Flex** 是 **Flexible Box** 的缩写，意为"**弹性布局**"，用来为盒状模型提供最大的灵活性
@@ -91,3 +120,57 @@ flex: [flex-grow] [flex-shrink] [flex-basis];
   - 可以指定具体的长度值（如像素或百分比），也可以使用关键词如`auto`。默认值是`auto`，它表示子项的本来大小
   - 优先级：`max-width`/`min-width` > `flex-basis` > `width` > `box`
 
+### 四、grid属性
+
+**grid** 属性用于==创建网格布局==，在网格布局中，页面被划分为多个网格，可以任意组合不同的网格，做出各种各样的布局
+
+当一个元素的 `display` 属性设置为 `grid` 或 `inline-grid` 后，它就变成了一个网格容器，这个元素的所有直系子元素将成为网格元素
+
+在 `display` 设置为 `grid` 时，可以设置的一些属性包括：
+
+- `grid-template-rows` 和 `grid-template-columns`：定义网格中的行和列的大小
+- `grid-template-areas`：定义网格区域
+- `grid-auto-rows` 和 `grid-auto-columns`：定义隐式网格的行和列的大小
+- `grid-auto-flow`：控制自动布局算法的运作方式
+- `grid-column-gap` 和 `grid-row-gap`：设置列和行之间的间隙
+- `grid-gap`：`grid-row-gap` 和 `grid-column-gap` 的简写属性
+- `grid-column-start`，`grid-column-end`，`grid-row-start` 和 `grid-row-end`：定义网格元素的网格线
+
+此外，`grid` 属性是一个简写属性，可以用来设置显式网格属性（`grid-template-rows`、`grid-template-columns` 和 `grid-template-areas`），隐式网格属性（`grid-auto-rows`、`grid-auto-columns` 和 `grid-auto-flow`），以及间距属性（`grid-column-gap` 和 `grid-row-gap`）
+
+示例：
+
+```html
+<div class="grid-container">
+  <div class="grid-item">1</div>
+  <div class="grid-item">2</div>
+  <div class="grid-item">3</div>
+  <div class="grid-item">4</div>
+  <div class="grid-item">5</div>
+  <div class="grid-item">6</div>
+</div>
+```
+
+在这个例子中，我们有一个 `.grid-container` 类的元素，它包含了六个 `.grid-item` 类的子元素
+
+```css
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-gap: 10px;
+}
+
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+```
+
+在这个例子中，`.grid-container` 的 `display` 属性被设置为 `grid`，这使得它成为一个网格容器
+
+- `grid-template-columns: auto auto auto` :表示容器被划分为三列，每列的宽度由其内容决定
+- `grid-gap: 10px` :设置了网格单元之间的间距
+
+`.grid-item` 的样式则用于设置网格单元的外观

@@ -92,7 +92,7 @@
 
 这四个属性可以单独使用，也可以一起使用
 
-当一起使用时，可以使用 transition 属性进行简写，例如：
+当一起使用时，可以使用 `transition` 属性进行简写，例如：
 
 ```css
 div {
@@ -101,6 +101,30 @@ div {
 ```
 
 这行代码表示 `div` 元素的 `width` 属性将在 2 秒内平滑地改变，过渡效果为先缓入后缓出，过渡效果将在 1 秒后开始
+
+示例: `hover`到一个元素上时，其宽度可以自适应扩大到父元素宽度
+
+```html
+<div class="parent">
+  <div class="child">文案00000000000</div>
+</div>
+```
+
+```css
+.rounded-div {
+  display: flex;
+  flex-direction: row;
+  width: 400px;
+  height: 100px;
+}
+.element{
+  flex-grow: 0;
+  transition: flex-grow 5s;
+}
+.rounded-div:hover .element {
+  flex-grow: 1;
+}
+```
 
 ### 三、Flex属性
 

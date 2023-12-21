@@ -1,20 +1,23 @@
-## form表单和FormData对象form表单和FormData对象
+## form表单和FormData对象
 
 ### 一、form表单
 
-在**HTML**中，`form`标签被称为表单，表单的主要作用是收集用户的输入，当用户提交表单时，表单中的数据会被发送到服务器，实现客户端与服务端的交互
+在**HTML**中，`form`标签被称为表单元素，表单的主要作用是收集用户的输入，当用户提交表单时，表单中的数据会被发送到服务器，实现客户端与服务端的交互
 
 `form`标签上的几个重要`attribute`：
 
 - `action` ： 规定当提交表单时向何处发送表单数据<!--也就是填写提交地址-->
 - `method` ：规定用于发送**FormData**的 **HTTP** 方法<!--post、get-->
-- `enctype` \- 规定在发送表单数据之前如何对其进行编码<!--默认值是application/x-www-form-urlencoded-->
+- `enctype` : 规定在发送表单数据之前如何对其进行编码<!--默认值是application/x-www-form-urlencoded-->
   - `application/x-www-form-urlencoded` ：把数据组织成 `urlencode`的格式
     - 表现形式为 `key=value&key=value`
     - 适用于普通字符内容提交，提交的数据为纯字符
   - `multipart/form-data`：二进制数据格式
     - 适用于提交的数据为非纯字符，如图片，视频等
   - `text/plain` ： 纯文本提交
+
+`form`标签使用时的注意事项：
+
 - `form` 标签内的 `input` 标签使用 `name` 区分
 - 使用 `<input type="submit">` 提交
 
@@ -30,6 +33,8 @@
 ```
 
 ### 二、FormData 对象
+
+当提交一个表单时，数据通常以键值对（`key1=value1&key2=value2`）的方式发送且**Content-Type**为`application/x-www-form-urlencoded`
 
 表单数据以键值对的形式向服务器发送，这是由浏览器自动完成的，但是有时候，我们需要自己通过 JS 来完成，构造一个表单并发送给服务器，这就需要用到 **FormData** 对象
 

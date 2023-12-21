@@ -20,7 +20,7 @@ http://localhost:3000/post?name=123
 
 数据格式：`key=value&key=value`
 
-当 `Content-type` 为 `application/x-www-form-urlencoded;charset=utf-8` 时，参数会以 `Form Data` 的形式(数据为 String 键值对格式)传递给接口，并且不会显示在接口 url 上。
+当 `Content-type` 为 `application/x-www-form-urlencoded;charset=utf-8` 时，参数会以 `Form Data` 的形式(键值对格式)传递给接口，并且不会显示在接口 url 上。
 
 ```js
 let data = {
@@ -34,7 +34,7 @@ xhr.send(QS.stringify(data));
 
 ![字符串提交场景](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWfA.png)
 
-对表单提交和文件上传时要做特殊处理，需要使用 `new FormData()` 方法处理后传递给接口，`Content-type` 为 `multipart/form-data; boundary=[xxx]` 格式。
+对表单提交和文件上传时要做特殊处理，需要使用 `new FormData()` 方法处理后传递给接口，`Content-type` 为 `multipart/form-data; boundary=[xxx]` 格式
 
 ```js
 const formData = new FormData();
@@ -57,21 +57,20 @@ fetch('http://192.168.1.128:5022/tool/file/upload', {
 ```
 
 - 补充说明
-  1. 服务器为什么会对表单提交和文件上传做特殊处理，因为表单提交数据是名值对的方式，且
-  
-     `Content-Type为application/x-www-form-urlencoded`,而文件上传服务器需要特殊处理，普通的
-  
-     `post`请求（`Content-Type`不是`application/x-www-form-urlencoded`）数据格式不固定，不一定是
-  
-     名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。
-  
-  2. processData: false --> 因为 data 值是 `formdata` 对象，不需要对数据做处理。
-  
-  3. cache: false --> 上传文件不需要缓存。
-  
-  4. contentType: false --> 因为是由 `<form>` 表单构造的 `FormData` 对象，且已经声明了属性 `enctype="multipart/form-data"`，所以这里设置为 false。
-  
-  5. xhrFields: { withCredentials: true }, 跨域请求设置
+  - **POST**请求时，请求体中会包含提交数据，服务端会根据请求头字段**Content-Type**来决定如何解析请求体中的提交数据
+     - 表单提交：
+        - 当提交一个表单时，数据通常以键值对（`key1=value1&key2=value2`）的方式发送且**Content-Type**为`application/x-www-form-urlencoded`
+        - 服务端收到请求之后，会根据**Content-Type**对请求体中的数据按照键值对的形式进行解析
+        - 这种方式适用于文本类型的数据，但不适合传输二进制数据（如文件）
+     - 文件上传：
+        - 文件上传通常需要特殊处理，因为文件数据是二进制的，不能以普通的名值对方式进行传输
+        - 文件上传时，**Content-Type**通常为`multipart/form-data`
+        - 服务端收到请求之后，会根据**Content-Type**对请求体中的数据进行更复杂的处理，因为提交数据包含了二进制文件数据和其他可能的表单数据，服务端需要正确地解析这些数据，并将文件数据存储在适当的位置
+        - 这种方式允许将表单数据作为二进制数据流进行传输，这对于大文件或二进制数据的上传非常有用
+  - `processData: false` --> 因为 `data` 值是 `formdata` 对象，不需要对数据做处理
+  - `cache: false` --> 上传文件不需要缓存
+  - `contentType: false` --> 因为是由 `<form>` 表单构造的 `FormData` 对象，且已经声明了属性 `enctype="multipart/form-data"`，所以这里设置为 `false`
+  - `xhrFields: { withCredentials: true }`,跨域请求设置
 
 ### 三、Request Payload
 
@@ -91,7 +90,7 @@ xhr.send(JSON.stringify(data));
 
 ### 四、Content-Type的差异
 
-- 传统的ajax请求时候，`Content-Type`默认为`text/plain;charset=UTF-8`类型
+- 传统的**ajax**请求时候，`Content-Type`默认为`text/plain;charset=UTF-8`类型
 
   ```js
   var xhr = new XMLHttpRequest();
@@ -103,7 +102,7 @@ xhr.send(JSON.stringify(data));
 
   ![传统ajax提交](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWfp.png)
 
-- 传统的form提交的时候，`Content-Type`默认为`application/x-www-form-urlencoded;charset=utf-8`类型
+- 传统的**form**提交的时候，`Content-Type`默认为`application/x-www-form-urlencoded;charset=utf-8`类型
 
   ```html
   <form action="/" method="POST">
@@ -115,7 +114,7 @@ xhr.send(JSON.stringify(data));
 
   ![clipboard.png](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWeV.png)
 
-- axios传递`key=value&key=value`格式数据的时候，`Content-Type`默认为`application/x-www-form-urlencoded;charset=utf-8`类型
+- **axios**传递`key=value&key=value`格式数据的时候，`Content-Type`默认为`application/x-www-form-urlencoded;charset=utf-8`类型
 
   ```js
   var sence1 = 'name=123&val=456';
@@ -124,7 +123,7 @@ xhr.send(JSON.stringify(data));
 
   ![字符串提交场景](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/bVbqWfA-20220517085949095.png)
 
-- axios传递`{key: value, key: value}`格式数据的时候，`Content-Type`默认为 `application/json;charset=utf-8`类型
+- **axios**传递`{key: value, key: value}`格式数据的时候，`Content-Type`默认为 `application/json;charset=utf-8`类型
 
   ```js
   var sence2 = {name: 123, val: 456};

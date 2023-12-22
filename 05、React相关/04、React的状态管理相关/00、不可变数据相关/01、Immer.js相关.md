@@ -90,6 +90,9 @@ const producer = produce(recipe);
 
 // nextState
 const nextState = producer(baseState);
+
+// 或者
+const nextState = produce(baseState, recipe);
 ```
 
 在**React**中我们可以通过**hooks**的形式使用**Immer.js**，其提供了一个**React Hook** 库**use-Immer**

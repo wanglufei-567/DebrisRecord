@@ -45,6 +45,14 @@ pnpm install
 pnpm install -w
 ```
 
+**仅为某个`package`安装依赖**
+
+```shell
+// 先cd到子包的目录下再进行install
+cd @panda/web 
+pnpm install
+```
+
 **安装全局的公共依赖包**
 
 `pnpm` 提供了 `-w`, `--workspace-root` 参数，可以将依赖包安装到工程的根目录下，作为==所有 `package` 的公共依赖==
@@ -54,7 +62,7 @@ pnpm add react -w
 pnpm add react -w -D // 安装公共开发依赖
 ```
 
-**给某个package单独安装指定依赖**
+**给某个`package`单独安装指定依赖**
 
 ```shell
 pnpm add react --filter pkg1(项目名)

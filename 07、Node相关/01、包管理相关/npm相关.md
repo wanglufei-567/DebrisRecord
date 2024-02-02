@@ -70,6 +70,22 @@ npm info [package]
 dnpm add <user> <package>
 ```
 
+**npm link**
+
+```js
+npm link // 创建链接，在你的包的目录下运行此命令，将会创建一个全局安装的符号链接
+
+npm link <package-name> // 使用链接，在任何需要使用这个包的项目中运行此命令，将会在这个项目的 node_modules 目录下创建一个指向你的包的符号链接
+
+npm unlink <package-name> // 解除链接，在你的项目目录下运行此命令，将会移除对应的链接
+
+npm unlink --no-save // 解除全局链接，在你的包的目录下运行此命令，将会移除全局的链接
+
+npm ls -g --link // 查看全局链接的模块，这个命令会列出所有全局链接的模块1。
+
+// 查看本地链接的模块，可以在 node_modules 目录下使用 ls -l 命令，并通过 grep ^l 来过滤出符号链接1。例如，ls -l node_modules | grep ^l。
+```
+
 ### 二、包版本管理
 
 #### 2.1、npm 管理包版本

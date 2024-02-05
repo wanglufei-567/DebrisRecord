@@ -77,6 +77,31 @@ view.dispatch(transaction)
 
 ![image-20240205164433480](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202402051644817.png)
 
+### 五、Selection
+
+`state` 上除了保存文档属性外，还保存了一份当前的 `selection` 属性
+
+**Selection** 可能由多个 `range` 组成,每个都可能是一个 `cursor` 或者由 `anchor` 和 `head` 描述的 `range`，重叠的 `range` 会自动合并，而且 `range` 会被排序，`selection` 的 `range` 属性总是一个有序的非重叠的 `range` 数组
+
+```js
+import {EditorState, EditorSelection} from "@codemirror/state"
+
+let state = EditorState.create({
+  doc: "hello",
+  selection: EditorSelection.create([
+    EditorSelection.range(0, 4), // 从位置 0 到位置 4的范围（即 “hell”）
+    EditorSelection.cursor(5) // 位置 5 的光标（即 “o” 的后面）
+  ]),
+  extensions: EditorState.allowMultipleSelections.of(true)
+})
+
+console.log(state.selection.ranges.length) // 2
+
+// 将选中的内容替换为 “!”
+let tr = state.update(state.replaceSelection("!"))
+console.log(tr.state.doc.toString()) // "!o!"
+```
+
 
 
 ### Decorations

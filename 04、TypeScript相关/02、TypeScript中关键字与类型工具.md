@@ -1,6 +1,6 @@
 ## TypeScript 使用记录（二）关键字与类型工具
 
-### 4、TS中的关键字
+### 四、TS中的关键字
 
 #### 4.1、`typeof`
 
@@ -43,7 +43,7 @@ type TsType2 = typeof TPeople; // 错误，TPeople 已经是 TS 类型了，不�
 type TsType3 = typeof IPeople; // 错误，IPeople 已经是 TS 类型了，不能再转化
 ```
 
-在 TS 中，`typeof` 只能对**数据**进行转化，所以不能转化 `type` 和 `interface`，因为`enum`枚举类型其实是个`JS`对象，所以可以使用`typeof enum`,不过貌似没啥用，有用的是这种 `keyof typeof enum`
+在 TS 中，`typeof` 只能对**数据**进行转化，所以不能转化 `type` 和 `interface`，因为`enum`枚举类型其实是个`JS`对象，所以可以使用`typeof enum`，不过貌似没啥用，有用的是这种 `keyof typeof enum`
 
 #### 4.2、`keyof`
 
@@ -313,7 +313,7 @@ const Me: IWebDeveloper = {
 
 ##### 4.5.3、条件类型实现
 
-条件类型实现的形式看起来类似于JS中的三目运算符，如果extends左侧的类型可以赋值给extends右侧的类型，则返回`TrueType`,否则返回`FalseType`
+条件类型实现的形式看起来类似于JS中的三目运算符，如果`extends`左侧的类型可以赋值给`extends`右侧的类型，则返回`TrueType`,否则返回`FalseType`
 
 ```typescript
 SomeType extends OtherType ? TrueType : FalseType;
@@ -377,7 +377,7 @@ type Type2 = OnlyWantNumber<string>; // type Type2 = never
 
 当`SomeType`是<u>***泛型类型且传入该泛型参数的是联合类型***</u>，会有些特殊
 
-如果 extends 左侧的类型为<u>***泛型类型且传入该泛型参数的是联合类型***</u>，那么整个表达式会被拆解，就像数学中的分解因式子一样，使用分配律计算最终的结果。分配律是指，***<u>将联合类型的联合项拆成单项</u>***，分别代入条件类型，然后将每个单项代入得到的结果再联合起来，得到最终的判断结果。
+如果 `extends` 左侧的类型为<u>***泛型类型且传入该泛型参数的是联合类型***</u>，那么整个表达式会被拆解，就像数学中的分解因式子一样，使用分配律计算最终的结果。分配律是指，***<u>将联合类型的联合项拆成单项</u>***，分别代入条件类型，然后将每个单项代入得到的结果再联合起来，得到最终的判断结果。
 
 ```typescript
 // 这个是数学中的分解因式子

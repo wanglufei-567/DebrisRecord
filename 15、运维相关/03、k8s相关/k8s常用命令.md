@@ -30,11 +30,26 @@
     - `<container-name>`是容器的名称
     - `<new-image>`是新镜像的地址和标签
 
-- 重启k8s
+- 重启pod
 
   ```bash
   kubectl delete pod <pod-name> 
   ```
+
+- 应用配置文件
+
+  ```bash
+  kubectl apply -f xxx.yaml
+  ```
+
+  - `kubectl apply`：这是kubectl的一个子命令，用于应用配置文件，这个命令会根据配置文件中的定义创建或更新资源
+
+  - `-f xxx.yaml`：这是你想要应用的配置文件
+
+    - `-f`表示文件
+    - `xxx.yaml`是文件的路径
+
+    <!--如果配置文件中的Pod定义与当前运行的Pod有所不同，Kubernetes会尝试更新Pod以匹配配置文件，这可能会导致Pod重启，但这取决于具体的更改内容和Kubernetes的更新策略-->
 
 - 获取pod运行状态信息
 
@@ -64,8 +79,22 @@
   - `/bin/sh`：这是你想要在Pod中运行的命令。在这个例子中，你正在启动一个shell
   - `-c web`：这是传递给`/bin/sh`的参数，表示你想要运行的容器的名称是`web`
 
-  
+- 重启pod某个容器中的nginx
 
+  ```bash
+  kubectl exec -it <pod-name> -c <container-name> -- nginx -s reload
+  ```
+
+  - `<pod-name>` 想要重启Nginx的Pod的名称
+
+  - `<container-name>` 是运行Nginx的容器的名称
+
+  - `nginx -s reload` 是在容器中执行的命令，用于重启Nginx
+
+- 退出容器
+
+  - 输入`exit`命令
+  - 按下`Ctrl+D`
 #### yaml文件
 
 - guandata-web-controller.yaml

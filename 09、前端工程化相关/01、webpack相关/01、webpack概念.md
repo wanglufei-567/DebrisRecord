@@ -2,11 +2,11 @@
 
 ### 一、前言
 
-==组件模块化==是目前主流的开发方式，通常我们会将一个应用涉及到的所有的功能拆分为一个个==组件==，如路由组件、页面组件、表单组件、表格组件等，一个组件对应一个源文件。源文件开发完成到应用部署上线中间，有一步骤很关键，那就是==**构建**==（也可称之为**==打包==**），==构建==就是把==源代码==转换成发布到线上的可执行 JavaScrip、CSS、HTML 代码。
+==组件模块化==是目前主流的开发方式，通常我们会将一个应用涉及到的所有的功能拆分为一个个==组件==，如路由组件、页面组件、表单组件、表格组件等，一个组件对应一个源文件。源文件开发完成到应用部署上线中间，有一步骤很关键，那就是==**构建**==（也可称之为**==打包==**），==构建==就是把==源代码==转换成发布到线上的可执行 **JavaScrip**、**CSS**、**HTML** 代码
 
-> **==构建==**其实是==工程化==、==自动化==思想在前端开发中的体现，把一系列流程用代码去实现，让代码自动化地执行这一系列复杂的流程。 构建给前端开发注入了更大的活力，解放了我们的生产力
+> **==构建==**其实是==工程化==、==自动化==思想在前端开发中的体现，把一系列流程用代码去实现，让代码自动化地执行这一系列复杂的流程，构建给前端开发注入了更大的活力，解放了我们的生产力
 
-被用来进行**构建**的工具，我们称之为==构建工具==；而**webpack**正是目前主流的一款构建工具
+被用来进行**构建**的工具，我们称之为==构建工具==，而**webpack**正是目前主流的一款构建工具
 
 <!--关于前端模块化发展及构建工具的变化，可以看看下面👇这篇文章 -->
 
@@ -16,13 +16,13 @@
 
 先看下**webpack**官网是如何定义自己的👇：
 
-> 本质上，**==webpack==** 是一个现代 JavaScript 应用程序的==静态模块打包器==(`module bundler`)*。当 **webpack** 处理应用程序时，它会递归地构建一个*依赖关系图`(dependency graph`)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 `bundle`
+> 本质上，**==webpack==** 是一个现代 **JavaScript** 应用程序的==静态模块打包器==(`module bundler`)。当 **webpack** 处理应用程序时，它会递归地构建一个依赖关系图`(dependency graph`)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 `bundle`
 
-**模块打包**，通俗地说就是：==找出模块之间的依赖关系，按照一定的规则把这些模块**组织合并**为**一个JavaScript文件**。==
+**模块打包**，通俗地说就是：==找出模块之间的依赖关系，按照一定的规则把这些模块**组织合并**为**一个JavaScript文件**==
 
 **Webpack**认为一切都是**模块**，JS文件、CSS文件、jpg/png图片等等都是**==模块==**，这样的好处是能清晰地描述出各个模块之间的**==依赖关系==**，以方便 **Webpack** 对模块进行组合和打包。
 
-**Webpack**会把所有的这些模块都合并为一个JS文件，这是它最本质的工作。当然，我们可能并不想要它把这些合并成一个JS文件，这个时候我们可以通过一些规则或工具来改变它。
+**Webpack**会把所有的这些模块都合并为一个JS文件，这是它最本质的工作。当然，我们可能并不想要它把这些合并成一个JS文件，这个时候我们可以通过一些规则或工具来改变它
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/32af52ff9594b121517ecdd932644da4.png" alt="img" style="zoom: 30%;" />
 
@@ -31,12 +31,28 @@
 下面是**Webpack**的一些核心概念和功能：
 
 1. **Entry**：入口文件，**Webpack**通过`entry`来找到==需要打包的模块==<!--一个应用可以有多个入口文件，每个入口文件对应一个bundle-->
+
 2. **Output**：==打包后的文件输出的位置和文件名==。
-3. **Loader**：==**Webpack**只能处理**JavaScrip**t模块，而**Loader**可以让**Webpack**处理其他类型的文件==。例如，通过使用`css-loader`和`style-loader`，**Webpack**可以处理**CSS**模块并将其嵌入到**HTML**中。
-4. **Plugin**：==**Webpack**的功能可以通过**Plugin**进一步扩展==。**Plugin**可以执行一些额外的任务，例如压缩代码、拷贝文件等。
-5. **Mode**：设置`mode`可以指定**Webpack**的运行模式，可以是`development`、`production`或`none`。不同的模式会对**Webpack**的行为进行优化，例如`development`模式会启用`devtool`来方便调试。
-6. **Code Splitting**：将打包后的代码拆分成多个`chunk`，以优化性能和减少加载时间。
-7. **Dev Server**：可以使用`webpack-dev-server`来启动一个本地开发服务器，方便在开发过程中调试和热更新。
+
+3. **Loader**：**==文件加载器==**，能够加载资源文件，并对这些文件进行一些处理，诸如编译、压缩等，最终一起打包到指定的文件中
+
+   - **Loader**专注于==文件的转换==，使得**Webpack**能够处理==非**JavaScript**模块==
+
+   - 例如，通过使用`css-loader`和`style-loader`，**Webpack**可以处理**CSS**模块并将其嵌入到**HTML**中
+
+4. **Plugin**：插件，**Plugin**赋予了**Webpack**各种灵活的功能，例如打包优化、资源管理、环境变量注入等，目的是==解决**loader**无法实现的其他事==
+
+   - **Plugin**提供了更丰富的功能扩展，可以在==构建过程中==的不同阶段插入==自定义逻辑==
+     - 例如压缩代码、拷贝文件等
+   - **Plugin**在整个编译周期都起作用
+
+5. **Mode**：设置`mode`可以指定**Webpack**的运行模式，可以是`development`、`production`或`none`
+
+   - 不同的模式会对**Webpack**的行为进行优化，例如`development`模式会启用`devtool`来方便调试
+
+6. **Code Splitting**：将打包后的代码拆分成多个`chunk`，以优化性能和减少加载时间
+
+7. **Dev Server**：可以使用`webpack-dev-server`来启动一个本地开发服务器，方便在开发过程中调试和热更新
 
 ### 三、webpack的基本使用
 
@@ -73,7 +89,7 @@ module.exports = {
 #### 3.1、 入口(entry)
 
 - 入口起点(`entry point`)指示 **webpack** 应该使用哪个模块，来作为构建其内部依赖图(`dependency graph`) 的**开始**。进入入口起点后，**webpack**会找出有==哪些模块和库是入口起点（直接和间接）依赖的==
-- ==默认值是 `./src/index.js`==，但你可以通过在 `webpack configuration` 中配置 `entry` 属性，来指定一个（或多个）不同的入口起点
+- 默认值是 `./src/index.js`，但你可以通过在 `webpack configuration` 中配置 `entry` 属性，来指定一个（或多个）不同的入口起点
 
  `src\index.js`
 
@@ -205,8 +221,8 @@ module.exports = {
   - 需要打印 `debug` 信息
   - 需要 `live reload` 或者 `hot reload` 的功能
 - **`production`生产环境**
-  - 可能需要分离 CSS 成单独的文件，以便多个页面共享同一个 CSS 文件
-  - 需要压缩 HTML/CSS/JS 代码
+  - 可能需要分离 **CSS** 成单独的文件，以便多个页面共享同一个 **CSS** 文件
+  - 需要压缩 **HTML**/**CSS**/**JS** 代码
   - 需要压缩图片
 
 **环境变量的设置方式**
@@ -384,7 +400,7 @@ module.exports = {
   }
 ```
 
-运行命令npm run dev会起一个8080的本地服务，并默认打开网页
+运行命令`npm run dev`会起一个8080的本地服务，并默认打开网页
 
 #### 4.4、webpack-dev-server
 
@@ -405,7 +421,7 @@ module.exports = {
 
 **安装**
 
-```js
+```shell
 npm i less less-loader -D
 npm i node-sass sass-loader -D
 npm rebuild node-sass
@@ -487,9 +503,9 @@ $color:orange;
 通过配置`type`属性设置资源导出类型
 
 - `asset/source` ：导出资源的源代码
-- `asset/resource` ：发送一个单独的文件并导出 URL
-- `asset/inline` ：导出一个资源的 data URI
-- `asset` ：在导出一个 data URI 和发送一个单独的文件之间自动选择。之前通过使用 `url-loader`，并且配置资源体积限制实现
+- `asset/resource` ：发送一个单独的文件并导出 **URL**
+- `asset/inline` ：导出一个资源的 `data` **URI**
+- `asset` ：在导出一个 `data` **URI** 和发送一个单独的文件之间自动选择。之前通过使用 `url-loader`，并且配置资源体积限制实现
 
 #### 6.1、webpack.config.js
 
@@ -558,11 +574,11 @@ JS兼容性通过Babel进行处理，Babel其实是一个编译JavaScript的平�
 
 #### 7.1、安装依赖
 
-- [babel-loader](https://www.npmjs.com/package/babel-loader)使用Babel和webpack转译JavaScript文件
-- [@babel/@babel/core](https://www.npmjs.com/package/@babel/core)Babel编译的核心包
+- [babel-loader](https://www.npmjs.com/package/babel-loader)使用**Babel**和**webpack**转译**JavaScript**文件
+- [@babel/@babel/core](https://www.npmjs.com/package/@babel/core)**Babel**编译的核心包
 - [babel-preset-env](https://www.babeljs.cn/docs/babel-preset-env)
-- [@babel/@babel/preset-react](https://www.npmjs.com/package/@babel/preset-react)React插件的Babel预设
-- [@babel/plugin-proposal-decorators](https://babeljs.io/docs/en/babel-plugin-proposal-decorators)把类和对象装饰器编译成ES5
+- [@babel/@babel/preset-react](https://www.npmjs.com/package/@babel/preset-react)**React**插件的**Babel**预设
+- [@babel/plugin-proposal-decorators](https://babeljs.io/docs/en/babel-plugin-proposal-decorators)把类和对象装饰器编译成**ES5**
 - [@babel/plugin-proposal-class-properties](https://babeljs.io/docs/en/babel-plugin-proposal-class-properties)转换静态类属性以及使用属性初始值化语法声明的属性
 
 ```js

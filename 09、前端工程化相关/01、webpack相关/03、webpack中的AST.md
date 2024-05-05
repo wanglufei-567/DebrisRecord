@@ -24,15 +24,15 @@
 
 **JavaScript Parser**是==将JavaScript代码转化成抽象语法树（AST）的工具==。
 
-**JavaScript Parser**有两种类型：==解析器和转换器==。**解析器**将原始的JavaScript代码转换成抽象语法树，而**转换器**则对抽象语法树进行操作并生成新的抽象语法树。
+**JavaScript Parser**有两种类型：==解析器和转换器==。**解析器**将原始的 **JavaScript** 代码转换成抽象语法树，而**转换器**则对抽象语法树进行操作并生成新的抽象语法树
 
 常见的**JavaScript Parser**包括：
 
-1. **Acorn**：一个快速、轻量级的JavaScript解析器，可以输出标准的ECMAScript5或ECMAScript6的抽象语法树。
-2. **Esprima**：一个用JavaScript编写的高性能JavaScript解析器，支持ECMAScript5和ECMAScript6的语法，可以输出JSON格式的抽象语法树。
-3. **Babel Parser**：一个非常流行的JavaScript转换器，可以将ES6+代码转换为ES5代码，并支持自定义插件和转换规则。
+1. **Acorn**：一个快速、轻量级的 **JavaScript** 解析器，可以输出标准的 **ECMAScript5** 或 **ECMAScript6** 的抽象语法树
+2. **Esprima**：一个用 **JavaScript** 编写的高性能 **JavaScript** 解析器，支持 **ECMAScript5** 和 **ECMAScript6** 的语法，可以输出 **JSON** 格式的抽象语法树
+3. **Babel Parser**：一个非常流行的 **JavaScript** 转换器，可以将 **ES6+** 代码转换为 **ES5** 代码，并支持自定义插件和转换规则
 
-通过使用**JavaScript Parser**，开发者可以轻松地对JavaScript代码进行分析和操作，并且==可以将JavaScript代码转化为可供其他工具使用的中间格式==。
+通过使用**JavaScript Parser**，开发者可以轻松地对 **JavaScript** 代码进行分析和操作，并且==可以将 **JavaScript** 代码转化为可供其他工具使用的中间格式==
 
 常见的**AST节点**：
 
@@ -49,7 +49,7 @@
 
 #### 2.1、AST遍历
 
-AST遍历采用的是深度遍历，下面看下一个AST遍历的示例
+**AST** 遍历采用的是深度遍历，下面看下一个 **AST** 遍历的示例
 
 安装工具包
 
@@ -110,37 +110,37 @@ function newAST() {
 
 #### 3.1、Babel工作流程
 
-Babel是一个JavaScript编译器，可以将当前或较新版本的JavaScript代码转换成向后兼容的版本，以便在任何浏览器或环境中运行。
+**Babel** 是一个 **JavaScript** 编译器，可以将当前或较新版本的 **JavaScript** 代码转换成向后兼容的版本，以便在任何浏览器或环境中运行。
 
-Babel的工作过程主要分为三个阶段，每个阶段都使用插件进行转换
+**Babel** 的工作过程主要分为三个阶段，每个阶段都使用插件进行转换
 
 1. **Parse(解析)** ：==将源代码转换成抽象语法树==，树上有很多的[estree节点](https://github.com/estree/estree)
 2. **Transform(转换)**： ==对抽象语法树进行转换==，将其转换为新的抽象语法树
 3. **Generate(代码生成)**： 将上一步经过转换过的抽象语法树生成新的代码
 
-Babel的插件可以在任何阶段对代码进行修改、添加、删除或替换，以达到各种不同的转换目的。
+**Babel** 的插件可以在任何阶段对代码进行修改、添加、删除或替换，以达到各种不同的转换目的。
 
 ![ast-compiler-flow.jpg](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/ast-compiler-flow.jpg)
 
 #### 3.2、Babel 插件
 
-- [@babel/parser](https://github.com/babel/babel/tree/master/packages/@babel/parser) 可以把源码转换成AST
-- [@babel/traverse](https://www.npmjs.com/package/babel-traverse)用于对 AST 的遍历，维护了整棵树的状态，并且负责替换、移除和添加节点
-- [@babel/generate](https://github.com/babel/babel/tree/master/packages/@babel/generate) 可以把AST生成源码，同时生成sourcemap
-- [@babel/types](https://github.com/babel/babel/tree/master/packages/babel-types) 用于 AST 节点的 Lodash 式工具库, 它包含了构造、验证以及变换 AST 节点的方法，对编写处理 AST 逻辑非常有用
-- [@babel/template](https://www.npmjs.com/package/@babel/template)可以简化AST的创建逻辑
+- [@babel/parser](https://github.com/babel/babel/tree/master/packages/@babel/parser) 可以把源码转换成 **AST**
+- [@babel/traverse](https://www.npmjs.com/package/babel-traverse)用于对 **AST** 的遍历，维护了整棵树的状态，并且负责替换、移除和添加节点
+- [@babel/generate](https://github.com/babel/babel/tree/master/packages/@babel/generate) 可以把 **AST** 生成源码，同时生成 **sourcemap**
+- [@babel/types](https://github.com/babel/babel/tree/master/packages/babel-types) 用于 **AST** 节点的 **Lodash** 式工具库, 它包含了构造、验证以及变换 **AST** 节点的方法，对编写处理 **AST** 逻辑非常有用
+- [@babel/template](https://www.npmjs.com/package/@babel/template)可以简化 **AST** 的创建逻辑
 - [@babel/code-frame](https://www.npmjs.com/package/@babel/code-frame)可以打印代码位置
-- [@babel/core](https://www.npmjs.com/package/@babel/core) Babel 的编译器，核心 API 都在这里面，比如==常见的 transform、parse==，并实现了插件功能
+- [@babel/core](https://www.npmjs.com/package/@babel/core) **Babel** 的编译器，核心 **API** 都在这里面，比如==常见的 transform、parse==，并实现了插件功能
 
 #### 3.3、Babel中的visitor
 
-在Babel中，**visitor**是一个非常重要的概念，==它指的是一个对象，用于描述如何访问和转换抽象语法树（AST）中的各个节点==。
+在 **Babel** 中，**visitor**是一个非常重要的概念，==它指的是一个对象，用于描述如何访问和转换抽象语法树（AST）中的各个节点==。
 
-当Babel对源代码进行转换时，它会遍历整个AST，并根据用户提供的配置和插件对每个节点进行相应的转换。==**visitor**对象就是为了帮助Babel遍历AST，访问每个节点，并进行相应的转换==。
+当 **Babel** 对源代码进行转换时，它会遍历整个 **AST**，并根据用户提供的配置和插件对每个节点进行相应的转换。==**visitor**对象就是为了帮助Babel遍历AST，访问每个节点，并进行相应的转换==。
 
-**visitor**对象包含了多个==以AST节点 `type` 命名的方法==，每个方法对应了AST中不同类型的节点，例如FunctionDeclaration、VariableDeclaration、BinaryExpression等
+**visitor**对象包含了多个==以AST节点 `type` 命名的方法==，每个方法对应了 **AST** 中不同类型的节点，例如**FunctionDeclaration**、**VariableDeclaration**、**BinaryExpression**等
 
-==当Babel遍历AST时，如果匹配上 type，就会visitor对象中对应节点类型的方法==，并将==当前节点作为参数==传递给该方法。然后用户可以在该方法中对节点进行相应的转换。
+==当 **Babel** 遍历 **AST** 时，如果匹配上 type，就会visitor对象中对应节点类型的方法==，并将==当前节点作为参数==传递给该方法。然后用户可以在该方法中对节点进行相应的转换。
 
 <!--也就是说每个AST节点都会有一个对应的处理方法，用来操作AST节点，完成AST的转换-->
 
@@ -149,7 +149,7 @@ Babel的插件可以在任何阶段对代码进行修改、添加、删除或替
 1. **path**：表示当前==节点的路径==，包括当前节点和其祖先节点的引用。通过**path**对象，可以获取当前节点的各种信息，例如==节点的类型、属性、位置==等。
 2. **state**：表示当前==转换的状态==，包括用户传递的配置和插件所维护的状态。state对象可以用于在不同节点之间共享数据和状态。
 
-总之，Babel的**visitor**是一个用于描述如何遍历和转换AST的对象，它是Babel实现各种转换的重要工具。用户可以通过自定义visitor对象和对应的转换方法，对AST进行灵活和高效的转换，从而实现各种语言和扩展的支持。
+总之，**Babel** 的 **visitor** 是一个用于描述如何遍历和转换 **AST** 的对象，它是Babel实现各种转换的重要工具。用户可以通过自定义visitor对象和对应的转换方法，对 **AST** 进行灵活和高效的转换，从而实现各种语言和扩展的支持。
 
 **path参数上的属性：**
 

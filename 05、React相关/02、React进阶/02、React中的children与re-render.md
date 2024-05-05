@@ -23,7 +23,7 @@ const MovingComponent = () => {
 
 由于**React**的组件更新机制，父组件状态更新时会引起其子组件的**re-render**，在这个例子中，每次鼠标移动引起的父组件**MovingComponent**的状态更新，都会导致子组件**ChildComponent** **re-render**，若**ChildComponent** 中存在重逻辑，那么频繁的**re-render**将会引起性能问题
 
-一般我们可以通过**React.memo**包裹子组件来解决其频繁**re-render**的问题，同时通过将子组件作为`children`传递给父组件也可以解决这个问题，看下面👇
+一般我们可以通过**React.memo**包裹子组件来解决其频繁**re-render**的问题，除此之外，我们还可以通==过将子组件作为`children`传递给父组件==来解决这个问题，看下面👇
 
 在上层组件中（**MovingComponent**的父组件）将**ChildComponent**作为`children`，通过`props`传递给**MovingComponent**
 
@@ -44,7 +44,10 @@ const MovingComponent = ({ children }) => {
   const [state, setState] = useState({ x: 100, y: 100 });
 
   return (
-    <div onMouseMove={(e) => setState({ x: e.clientX - 20, y: e.clientY - 20 })} style={{ left: state.x, top: state.y }}>
+    <div 
+      onMouseMove={(e) => setState({ x: e.clientX - 20, y: e.clientY - 20 })} 
+      style={{ left: state.x, top: state.y }}
+    >
       // children now will not be re-rendered
       {children}
     </div>
@@ -56,9 +59,9 @@ const MovingComponent = ({ children }) => {
 
 ### 二、使用children传递子组件的相关疑问
 
-- **问题一：**`children`仍然是在父组件的子组件，为何不受父组件状态更新的影响
+- **问题一：**子组件（**ChildComponent**）通过`children`传递，但其仍然是父组件（**MovingComponent**）的子组件，为何不受父组件状态更新的影响
 
-  直接在父组件中使用
+  **直接在父组件中使用：**
 
   ```jsx
   const MovingComponent = () => {
@@ -75,7 +78,7 @@ const MovingComponent = ({ children }) => {
   };
   ```
 
-  通过`children`传递
+  **通过`children`传递：**
 
   ```jsx
   const MovingComponent = ({ children }) => {

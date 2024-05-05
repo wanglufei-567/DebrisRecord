@@ -6,56 +6,55 @@
 
 > 本质上，**==webpack==** 是一个现代 JavaScript 应用程序的==静态模块打包器==(`module bundler`)。当 **webpack** 处理应用程序时，它会递归地构建一个依赖关系图`(dependency graph`)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 `bundle`
 
-**Webpack**认为一切都是**模块**，JS文件、CSS文件、jpg/png图片等等都是**==模块==**，这里先讨论如何将一个个**==JS模块==**打包成一个`bundle` <!-- bundle是一个单独的js文件-->；
+**Webpack**认为一切都是**模块**，**JS**文件、**CSS**文件、**jpg**/**png**图片等等都是**==模块==**，这里先讨论如何将一个个**==JS模块==**打包成一个`bundle` <!-- bundle是一个单独的js文件-->；
 
-目前JS文件有两种主流的模块规范：**CommonJS**和**ESModule**
+目前**JS**文件有两种主流的模块规范：**CommonJS**和**ESModule**
 
 <!--所谓的模块规范就是一种如何创建、导出和导入模块的标准范式-->
 
-1. **CommonJS规范**
+- **CommonJS规范**：
 
-**CommonJS规范**是目前**Node**中采用的一种模块规范。**CommonJS**模块是**==同步加载的==**，它使用`require()`函数来导入模块，使用`module.exports`来导出模块。
+  **CommonJS规范**是目前**Node**中采用的一种模块规范，**CommonJS**模块是**==同步加载的==**，它使用`require()`函数来导入模块，使用`module.exports`来导出模块
 
-例如，一**个CommonJS**模块可以使用以下语法导出模块：
+  例如，一**个CommonJS**模块可以使用以下语法导出模块：
 
-```js
-// math.js
-const add = (a, b) => {
-  return a + b;
-}
-module.exports = add;
-```
+  ```js
+  // math.js
+  const add = (a, b) => {
+    return a + b;
+  }
+  module.exports = add;
+  ```
 
-在另一个文件中使用`require()`函数导入`math.js`模块：
+  在另一个文件中使用`require()`函数导入`math.js`模块：
 
-```js
-// app.js
-const add = require('./math.js');
-console.log(add(1, 2)); // 3
-```
+  ```js
+  // app.js
+  const add = require('./math.js');
+  console.log(add(1, 2)); // 3
+  ```
+- **ESModule规范**：
 
-1. **ESModule规范**
+  **ESModule**是**ECMAScript6**中新增的一种模块规范，**ESModule**模块是**==异步加载的==**，它使用`import`语句来导入模块，使用`export`语句来导出模块
 
-**ESModule**是**ECMAScript6**中新增的一种模块规范。**ESModule**模块是**==异步加载的==**，它使用`import`语句来导入模块，使用`export`语句来导出模块。
+  例如，一个**ESModule**模块可以使用以下语法导出模块：
 
-例如，一个**ESModule**模块可以使用以下语法导出模块：
+  ```js
+  // math.js
+  export const add = (a, b) => {
+    return a + b;
+  }
+  ```
 
-```js
-// math.js
-export const add = (a, b) => {
-  return a + b;
-}
-```
+  在另一个文件中使用`import`语句导入`math.js`模块：
 
-在另一个文件中使用`import`语句导入`math.js`模块：
+  ```js
+  // app.js
+  import { add } from './math.js';
+  console.log(add(1, 2)); // 3
+  ```
 
-```js
-// app.js
-import { add } from './math.js';
-console.log(add(1, 2)); // 3
-```
-
-webpack可以将采用不同模块规范的JS文件打包成一个bundle，而且支持采用commonJS规范的JS文件和ESModule规范的JS文件之间混合依赖，结下来看下webpack是如何处理这采用两种模块规范的JS文件
+**webpack**可以将采用不同模块规范的 **JS** 文件打包成一个 **bundle**，而且支持采用 **commonJS** 规范的 **JS** 文件和 **ESModule** 规范的 **JS** 文件之间混合依赖，接下来看下**webpack**是如何处理这采用两种模块规范的 **JS** 文件
 
 ### 二、模块规范的兼容
 
@@ -287,7 +286,7 @@ return module.exports;
 
 - `module`：模块对象，缓存`cachedModule`中存放的便是此对象
 - `module.exports`：模块对象的`exports`的属性，也就是最终返回值，同时也是模块的导出值
-- `__webpack_require__`： `require`方法，因为可能存在模块嵌套引入，所以这里将`require`方法传入
+- `__webpack_require__`： `require`方法，因为可能存在==模块嵌套引入==，所以这里将`require`方法传入
 
 ------
 
@@ -448,9 +447,9 @@ console.log(title.age);
 
 `commonJS`文件加载`ES6 modules`文件整体和`commonJS`文件加载`commonJS`文件一致，都是通过实现`require`方法完成模块的引入
 
-不同的是`ES6 modules`模块中`module.exports`对象上的属性定义了==`getter`访问器==，后续使用相关属性时，是通过`getter`访问器获取到我们导出的值，而`commoJS`模块中`module.exports`对象上的属性直接就是我们导出的值
+不同的是`ES6 modules`模块中`module.exports`对象上的属性定义了==`getter`访问器==，后续使用相关属性时，是通过`getter`访问器获取到我们导出的值，而`commoJS`模块中`module.exports`对象上的==属性直接就是导出的值== <!--对象属性创建时就已经被赋值了-->
 
-所以说==`commonJS`导出的是值，`ESModule`导出的是引用==
+所以说==`commonJS`导出的是值，`ESModule`导出的是引用==  
 
 #### 2.3、ES6 modules文件 加载 ES6 modules 文件
 
@@ -577,7 +576,7 @@ console.log(_title__WEBPACK_IMPORTED_MODULE_0__.age);
 可以发现，`ESModule`规范同样也是==将每个模块都封装成一个函数==
 
 - 函数入参是一个带有`exports`属性的`module`对象
-- 函数体就是模块内容，在函数内部也就是模块内部完成对`module.exports`上属性的定义，这里和`commonJS`规范不同的是，`ESModule`没有直接进行赋值，而是==通过`d`方法给`module.exports`上属性创建了getter访问器==
+- 函数体就是模块内容，在函数内部也就是模块内部完成对`module.exports`上属性的定义，这里和`commonJS`规范不同的是，`ESModule`没有直接进行赋值，而是==通过`d`方法给`module.exports`上属性创建了`getter`访问器==
 - 最终返回值便是`module.exports`
 
 #### 2.4、ES6 modules文件 加载commonJS 文件
@@ -699,11 +698,11 @@ console.log(_title__WEBPACK_IMPORTED_MODULE_0__.age);
 
 #### 2.5、异步加载
 
-异步加载是指使用`import`语句创建一个`promise`对象，在模块请求回来之后在进行相关逻辑处理，
+**异步加载**是指使用`import`语句创建一个`promise`对象，在模块请求回来之后在进行相关逻辑处理，
 
-和同步加载不同的是，同步加载是直接将所有的模块打包成一个JS文件，这样浏览器只需请求一个JS文件即可
+和**同步加载**不同的是，同步加载是直接将所有的模块打包成一个**JS**文件，这样浏览器只需请求一个**JS**文件即可
 
-而异步加载则是将被引入的文件单独打包成另一个JS文件，浏览器需要多请求一次获取这个文件，是通过JSONP来实现的再次请求
+而**异步加载**则是==将被引入的文件单独打包成另一个JS文件，浏览器需要多请求一次获取这个文件，是通过JSONP来实现的再次请求==
 
 `src\index.js`
 
@@ -858,7 +857,7 @@ require.e('hello')
 异步加载的原理
 
 - 首先，主文件中会定义一个全局变量`window["webpack5"]`，并修改其`push`方法为`webpackJsonpCallback`
-  - `webpackJsonpCallback`方法会将异步模块合并到主文件的`module`对象上
-- 然后，在在主文件中异步加载逻辑的位置，利用JSONP原理(创建`script`标签)去请求异步模块
-- 最后，异步模块请求回来之后，异步模块自执行一段逻辑，调用全局变量`window["webpack5"]`上的`webpackJsonpCallback`方法，完成模块的合并并标识此异步模块已经加载完成
+  - `webpackJsonpCallback`方法==会将异步模块合并到主文件的`module`对象上==
+- 然后，在在主文件中异步加载逻辑的位置，利用**JSONP**原理<!--创建`script`标签-->去请求异步模块
+- 最后，异步模块请求回来之后，==异步模块自执行一段逻辑==，调用全局变量`window["webpack5"]`上的`webpackJsonpCallback`方法，完成模块的合并并标识此异步模块已经加载完成
 

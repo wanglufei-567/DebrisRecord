@@ -64,8 +64,6 @@ application是koa的实例  简写app
   http.createServer(app.callback()).listen(3000);
   ```
 
-- 
-
 - **app.callback()**
 
   返回适用于 `http.createServer()` 方法的回调函数来处理请求

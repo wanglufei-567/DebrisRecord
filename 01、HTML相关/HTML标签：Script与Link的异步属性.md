@@ -35,17 +35,18 @@
 
 - `defer`属性：默认值为`false`
   - 没有设置或设置为`false`，脚本会立即加载并执行
-  - 当设置为`true`时，脚本会在文档解析完成后，触发**DOMContentLoaded**事件前执行
+  - 当设置为`true`时，脚本会在文档解析完成后，触发  **DOMContentLoaded** 事件前执行
   - 如果有多个带有`defer`属性的`<script>`标签，它们会按照在文档中出现的顺序依次执行
 
 ```html
 <script src="app.js" defer></script>
 ```
 
-- `async`属性：当`<script>`标签添加了`async`属性后，浏览器会**异步**加载并执行这个脚本。这意味着脚本的加载和执行不会阻塞文档的解析，一旦脚本加载完成，就会立即执行，不会等待其他脚本或DOMContentLoaded事件。
+- `async`属性：当`<script>`标签添加了`async`属性后，浏览器会 **异步** 加载并执行这个脚本
+  - 这意味着脚本的加载和执行不会阻塞文档的解析，一旦脚本加载完成，就会立即执行，不会等待其他脚本或 **DOMContentLoaded** 事件
 - `async`属性：默认值为`false`
   - 如果没有设置或设置为`false`，脚本会在文档解析过程中同步加载和执行
-  - 当设置为`true`时，脚本会异步加载，一旦脚本可用，就会立即执行，不会等待其他脚本或DOMContentLoaded事件
+  - 当设置为`true`时，脚本会异步加载，一旦脚本可用，就会立即执行，不会等待其他脚本或 **DOMContentLoaded** 事件
 
 ```html
 <script src="app.js" async></script>
@@ -75,7 +76,7 @@
 
 对于那些可能在当前页面使用到的资源可以利用 `Preload`，而对一些可能在将来的某些页面中被使用的资源可以利用 `Prefetch`
 
-如果从加载优先级上看，`Preload` 会提升请求优先级；而Prefetch会把资源的优先级放在最低，当浏览器空闲时才去预加载
+如果从加载优先级上看，`Preload` 会提升请求优先级；而 `Prefetch` 会把资源的优先级放在最低，当浏览器空闲时才去预加载
 
 
 

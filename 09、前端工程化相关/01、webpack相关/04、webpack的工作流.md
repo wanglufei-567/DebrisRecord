@@ -45,23 +45,46 @@ compiler.run((err, stats) => {
 
 **webpack**工作流中有许多很重要的概念，它们是`webpack`实现各种功能的核心
 
-- **compiler**：==**webpack**的编译器，用于编译整个项目==
-  - 在**webpack**启动时，会创建一个`compiler`对象，==该对象包含了整个webpack配置和所有插件的信息==，包括 `options`、`loaders`、`plugins` 这些信息，这个对象在 **webpack** 启动的时候被实例化，它是全局唯一的，可以简单地把它理解为 `webpack` 实例
+- **compiler**：**webpack ** 的==编译器==，用于编译整个项目
   
-  - `compiler`对象提供了各种钩子函数（`Hooks`），用于==监听和控制**webpack**编译过程的不同阶段==，例如读取配置文件、解析入口文件、打包输出等。
+  - 在**webpack**启动时，会创建一个`compiler`对象，该对象包含了整个 **webpack** 配置和所有插件的信息
   
-    - 用户可以通过编写插件并监听`compiler`的钩子函数，来实现对**webpack**编译过程的控制和扩展
+    - 包括 `options`、`loaders`、`plugins` 这些信息
+    - 这个对象在 **webpack** 启动的时候被实例化，它是全局唯一的，可以简单地把它理解为 `webpack` 实例
   
+  - `compiler`对象提供了各种钩子函数（`Hooks`），用于监听和控制 **webpack** 编译过程的不同阶段
+  
+    - 例如读取配置文件、解析入口文件、打包输出等
+  - 用户可以通过编写插件并监听`compiler`的钩子函数，来实现对**webpack**编译过程的控制和扩展
+    
      <!--插件中可以拿到compiler对象-->
-- **compilation**：==**webpack**的编译上下文，用于表示一次编译过程中的所有资源和状态==
   
-  - ==在每次编译时，都会创建一个`compilation`对象==，该对象包含了编译过程中的==模块资源(`modules`)==、编译==生成资源(`asset files)`==、==变化的文件(`files`)==、以及==被跟踪依赖的状态信息(`fileDependencies`)==等信息
-  - 当 **webpack** 以开发模式运行时，每当检测到一个变化，一次新的 `compilation` 将被创建。`compilation` 对象也提供了很多事件回调供插件做扩展。<!--通过 compilation 也可以读取到 compiler 对象-->
-- **tapable**：==**webpack**的事件处理器，用于实现事件的发布和订阅==
+- **compilation**：**webpack**的==编译上下文==，用于表示一次编译过程中的所有资源和状态
   
-  - **tapable**是**webpack**的一个核心工具，它暴露了 `tap`、`tapAsync`、`tapPromise` 方法，可以使用这些方法来触发 `compiler` 钩子，使得插件可以监听 **webpack** 在运行过程中广播的事件，然后通过 `compiler` 对象去操作**webpack**。我们也可以使用这些方法注入自定义的构建步骤，这些步骤将在整个编译过程中的不同时机触发。
-- **chunk**： ==**webpack**中的代码块，表示一组相关联的模块，例如一个入口文件及其所有依赖的模块==
-- **bundle**：==**webpack**中的打包文件，表示经过处理和打包后的最终输出文件==。
+  - 在每次编译时，都会创建一个`compilation`对象，该对象包含了编译过程中的
+  
+    - 模块资源(`modules`)
+    - 编译生成资源(`asset files)`
+    - 变化的文件(`files`)
+    - 被跟踪依赖的状态信息(`fileDependencies`)
+  
+  - 当 **webpack** 以开发模式运行时，每当检测到一个变化，一次新的 `compilation` 将被创建
+  
+    - `compilation` 对象也提供了很多事件回调供插件做扩展
+  
+    <!--通过 compilation 也可以读取到 compiler 对象-->
+  
+- **tapable**：**webpack** 的==事件处理器==，用于实现事件的发布和订阅
+  
+  - **tapable**是**webpack**的一个核心工具，它暴露了 `tap`、`tapAsync`、`tapPromise` 方法
+    - 可以使用这些方法来触发 `compiler` 钩子，使得插件可以监听 **webpack** 在运行过程中广播的事件，然后通过 `compiler` 对象去操作**webpack**
+  - 我们也可以使用这些方法注入自定义的构建步骤，这些步骤将在整个编译过程中的不同时机触发
+  
+- **chunk**： **webpack**中的==代码块==，表示一组相关联的模块
+
+  - 例如一个入口文件及其所有依赖的模块
+
+- **bundle**：**webpack**中的==打包文件==，表示经过处理和打包后的==最终输出文件==
   
   - **webpack**可以生成多个`bundle`，例如每个入口文件对应一个`bundle`，或者根据代码分割和动态导入生成多个`bundle`等
 
@@ -71,28 +94,30 @@ compiler.run((err, stats) => {
 
 **webpack**的整体工作流程：
 
-1. 初始化参数：从==配置文件和 Shell 语句中读取并合并参数==,得出最终的配置对象
-2. 用上一步得到的参数==初始化 **Compiler** 对象==
+1. 初始化参数：从配置文件和 **Shell** 语句中读取并合并参数，得出最终的配置对象
+2. 用上一步得到的参数初始化 **Compiler** 对象
 3. ==加载所有配置的插件==
 4. 执行对象的 `run` 方法==开始执行编译==
 5. 根据配置中的`entry`找出==入口文件==
 6. 从入口文件出发,调用所有配置的`Loader`对模块==进行编译==
 7. 再找出==该模块依赖的模块==，再==递归本步骤==直到==所有入口依赖的文件==都经过了本步骤的处理
-8. ==根据入口和模块之间的依赖关系，组装成一个个包含多个模块的 **Chunk**==
+8. ==根据==入口和模块之间的==依赖关系==，==组装成==一个个包含多个模块的 ==**Chunk**==
 9. 再把每个**Chunk** 转换成一个单独的文件加入到输出列表 <!--files中-->
 10. 在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统 <!--写入文件-->
 
 ### 二、实现webpack工作流
 
-先准备下配置文件
+#### 2.1、准备配置文件
 
-`webpack.config.js`
+##### 2.1.1、webpack.config.js
 
 ```js
 const path = require('path');
+// 插件
 const Run1Plugin = require('./plugins/run1-plugin');
 const Run2Plugin = require('./plugins/run2-plugin');
 const DonePlugin = require('./plugins/done-plugin');
+
 module.exports = {
   mode: 'development',
   devtool: false,
@@ -101,7 +126,7 @@ module.exports = {
   },
   entry: {
     entry1: './src/entry1.js',
-    entry2:'./src/entry2.js'//name就是此模块属于哪个模块
+    entry2:'./src/entry2.js' // name就是此模块属于哪个模块
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -132,18 +157,18 @@ module.exports = {
 }
 ```
 
-------
+##### 2.1.2、插件
 
-**插件：**
-
-==每个插件都是一个类，而每个类都需要**定义一个apply方法**==
+==每个插件都是一个类==，而每个类都需要定义一个 ==**apply** 方法==
 
 `plugins\run-plugin.js`
 
 ```js
 class RunPlugin {
   //每个插件都是一个类，而每个类都需要定义一个apply方法
+  // apply 方法接收编译器 compiler作为入参
   apply(compiler) {
+    // 通过编译器拿到钩子函数 run，在编译开始时执行
     compiler.hooks.run.tap("RunPlugin", () => {
       console.log("run:开始编译");
     });
@@ -156,8 +181,8 @@ module.exports = RunPlugin;
 
 ```js
 class DonePlugin {
-  //每个插件都是一个类，而每个类都需要定义一个apply方法
   apply(compiler) {
+     // 通过编译器拿到钩子函数 done，在编译结束时执行
     compiler.hooks.done.tap("DonePlugin", () => {
       console.log("done:结束编译");
     });
@@ -166,17 +191,15 @@ class DonePlugin {
 module.exports = DonePlugin;
 ```
 
-------
+##### 2.1.3、loader
 
-**loader：**
-
-==每个**loader**其实就是一个**函数**，函数**入参是源代码**==
+每个 **loader** 其实==就是一个**函数**==，函数入参是**源代码**
 
 `loaders\logger1-loader.js`
 
 ```js
 function loader(source) {
-  return source + "//logger1"; //let name= 'entry1';/logger1
+  return source + "//logger1"; // 结果为：let name= 'entry1';/logger1
 }
 module.exports = loader;
 ```
@@ -186,12 +209,12 @@ module.exports = loader;
 ```js
 function loader(source) {
   //let name= 'entry1';
-  return source + "//logger2"; //let name= 'entry1';//logger1///logger2
+  return source + "//logger2"; // 结果为：let name= 'entry1';//logger1//logger2
 }
 module.exports = loader;
 ```
 
-------
+##### 2.1.4、入口文件
 
 `src\entry1.js`
 
@@ -213,7 +236,7 @@ console.log("entry2", title);
 module.exports = "title";
 ```
 
-------
+#### 2.2、具体实现
 
 接下来实现一个简易版本的`webpack`
 
@@ -237,29 +260,32 @@ module.exports = webpack;
 
 **1、初始化参数：从==配置文件和 Shell 语句中读取并合并参数==,得出最终的配置对象**
 
-```diff
+```js
 /**
  * @description webpack方法
  * @params options 配置文件中的配置信息
  */
 function webpack(options) {
-+  //argv[0]是Node程序的绝对路径 argv[1] 正在运行的脚本
-+  const argv = process.argv.slice(2);
-+  const shellOptions = argv.reduce((shellOptions, options) => {
-+    // options = '--mode=development'
-+    const [key, value] = options.split('=');
-+    shellOptions[key.slice(2)] = value;
-+    return shellOptions;
-+  }, {});
-+  const finalOptions = { ...options, ...shellOptions };
+  // argv[0]是Node程序的绝对路径 argv[1] 正在运行的脚本
+  // 从 argv[2] 开始是用户输入的参数
+  const argv = process.argv.slice(2);
+
+  // 讲 shell 参数转变成对象
+  const shellOptions = argv.reduce((shellOptions, options) => {
+      // options = '--mode=development'
+      const [key, value] = options.split('=');
+      shellOptions[key.slice(2)] = value;
+      return shellOptions;
+    }, {});
+  
+  // 合并配置文件信息 和 shell 语句中的参数
+  const finalOptions = { ...options, ...shellOptions };
 }
 
 module.exports = webpack;
 ```
 
-**webpack**的配置对象是由配置文件`webpack.config.js`和**Shell**语句中参数组合而成
-
-**Shell**语句中的参数可以通过`process.argv`拿到，但是前两项是命令的路径可以直接跳过从第三项开始处理，`process.argv.slice(2)`，`shell`中的参数长这个样子：`'--mode=development'`
+**webpack** 的配置对象是由配置文件`webpack.config.js`和 **Shell** 语句中参数组合而成
 
 打印看下最后的配置项`finalOptions`
 
@@ -283,8 +309,8 @@ finalOptions {
 
 **2、用上一步得到的参数初始化 ==Compiler 对象==**
 
-```diff
-+const Compiler = require('./Compiler');
+```js
+const Compiler = require('./Compiler');
 
 /**
  * @description webpack方法
@@ -293,19 +319,20 @@ finalOptions {
 function webpack(options) {
   //argv[0]是Node程序的绝对路径 argv[1] 正在运行的脚本
   const argv = process.argv.slice(2);
+  
   const shellOptions = argv.reduce((shellOptions, options) => {
     // options = '--mode=development'
     const [key, value] = options.split('=');
     shellOptions[key.slice(2)] = value;
     return shellOptions;
   }, {});
+  
   const finalOptions = { ...options, ...shellOptions };
   console.log('finalOptions', finalOptions)
 
-+  //2.用上一步得到的参数初始化 `Compiler` 对象
-+  const compiler = new Compiler(finalOptions);
-
-+  return compiler;
+  //2.用上一步得到的参数初始化 `Compiler` 对象
+  const compiler = new Compiler(finalOptions);
+  return compiler;
 }
 
 module.exports = webpack;
@@ -317,34 +344,42 @@ module.exports = webpack;
 ```js
 const { SyncHook } = require('tapable');
 
+// 编译器
 class Compiler{
+  // 接收 webpack 配置信息作为构造函数的入参
   constructor(options) {
     this.options = options;
+    
+    // 钩子函数
     this.hooks = {
       run: new SyncHook(),//在开始编译之前调用
-      done:new SyncHook() //在编译完成时执行
+      done: new SyncHook() //在编译完成时执行
     }
   }
 }
 module.exports = Compiler;
 ```
 
-示例化一个`Compiler`对象，将配置信息挂到`Compiler`对象的`options`属性上
+实例化一个`Compiler`对象，将配置信息挂到`Compiler`对象的`options`属性上
 
-另外引入`tapable`给`Compiler`对象`hooks`属性上添加钩子函数 <!--webpack内部依赖tapable-->
+引入`tapable`给`Compiler`对象`hooks`属性上添加钩子函数 <!--webpack内部依赖tapable-->
 
 > 下面是一段简易版本的`tapable`
 >
 > ```js
 > class SyncHook {
 >   constructor() {
->     this.taps = [];
+>    this.taps = [];
 >   }
+>   
+>   // 注册监听函数
 >   tap(name, fn) {
->     this.taps.push(fn);
+>    this.taps.push(fn);
 >   }
+>   
+>   // 触发监听函数
 >   call() {
->     this.taps.forEach((tap) => tap());
+>    this.taps.forEach((tap) => tap());
 >   }
 > }
 > 
@@ -355,11 +390,12 @@ module.exports = Compiler;
 > 
 > class Plugin {
 >   apply() {
->     hook.tap("Plugin", () => {
->       console.log("Plugin ");
->     });
+>    hook.tap("Plugin", () => {
+>      console.log("Plugin ");
+>    });
 >   }
 > }
+> 
 > new Plugin().apply();
 > hook.call();
 > ```
@@ -370,7 +406,9 @@ module.exports = Compiler;
 
 **3、==加载所有配置的插件==**
 
-```diff
+`webpack2.js` 完整内容 👇
+
+```js
 const Compiler = require('./Compiler');
 
 /**
@@ -391,15 +429,16 @@ function webpack(options) {
   const finalOptions = { ...options, ...shellOptions };
   console.log('finalOptions', finalOptions)
 
-  //2.用上一步得到的参数初始化 `Compiler` 对象
+  // 2.用上一步得到的参数初始化 `Compiler` 对象
   const compiler = new Compiler(finalOptions);
 
-+  // //3.加载所有配置的插件
-+  const { plugins } = finalOptions;
-+  for (let plugin of plugins) {
-+    plugin.apply(compiler);
-+  }
-
+  // 3.加载所有配置的插件
+  const { plugins } = finalOptions;
+  for (let plugin of plugins) {
+    // 将 compiler 传递给每个插件实例，插件中会通过 compiler.hooks.xxx.tap 完成钩子函数的注册监听
+    plugin.apply(compiler);
+  }
+  
   return compiler;
 }
 
@@ -428,6 +467,7 @@ plugins: [
 class RunPlugin {
   //每个插件都是一个类，而每个类都需要定义一个apply方法
   apply(compiler) {
+    // compiler.hooks.run 是一个由 tapable SyncHook 创建的钩子函数
     compiler.hooks.run.tap("RunPlugin", () => {
       console.log("run:开始编译");
     });
@@ -444,8 +484,8 @@ module.exports = RunPlugin;
 
 将`debugger.js`中的`webpack`替换成自己实现的`webpack2`
 
-```diff
-+ const webpack = require('./webpack2');
+```js
+const webpack = require('./webpack2');
 const webpackConfig = require('./webpack.config');
 const compiler = webpack(webpackConfig);
 //4.执行`Compiler`对象的 run 方法开始执行编译
@@ -485,6 +525,7 @@ class Compiler {
       done: new SyncHook() //在编译完成时执行
     };
   }
+  
   run(callback) {
     //在编译开始前触发run钩子执行
     this.hooks.run.call();
@@ -534,11 +575,11 @@ class Compilation {
   constructor(options, compiler) {
     this.options = options;
     this.compiler = compiler;
-    this.modules = [];//这里放置本次编译涉及的所有的模块
-    this.chunks = [];//本次编译所组装出的代码块
-    this.assets = {};//key是文件名,值是文件内容
-    this.files = [];//代表本次打包出来的文件
-    this.fileDependencies =new Set();//本次编译依赖的文件或者说模块
+    this.modules = []; // 这里放置本次编译涉及的所有的模块
+    this.chunks = []; // 本次编译所组装出的代码块
+    this.assets = {}; // key是文件名,值是文件内容
+    this.files = []; // 代表本次打包出来的文件
+    this.fileDependencies =new Set(); // 本次编译依赖的文件或者说模块
   }
   build(callback) {
     //...
@@ -552,33 +593,124 @@ class Compilation {
 
 `Compilation.js`
 
-```diff
+```js
+const path = require('path');
+
+// process.cwd()获取到当前执行node命令的目录，也就是根目录
+// 处理baseDir，将'\'替换成'/'
+const baseDir = normalizePath(process.cwd());
+function normalizePath(path) {
+  return path.replace(/\\/g, '/');
+}
+
 class Compilation {
   constructor(options, compiler) {
     this.options = options;
     this.compiler = compiler;
-    this.modules = [];//这里放置本次编译涉及的所有的模块
-    this.chunks = [];//本次编译所组装出的代码块
-    this.assets = {};//key是文件名,值是文件内容
-    this.files = [];//代表本次打包出来的文件
-    this.fileDependencies =new Set();//本次编译依赖的文件或者说模块
+    this.modules = []; // 这里放置本次编译涉及的所有的模块
+    this.chunks = []; // 本次编译所组装出的代码块
+    this.assets = {}; // key是文件名,值是文件内容
+    this.files = []; // 代表本次打包出来的文件
+    this.fileDependencies =new Set(); // 本次编译依赖的文件或者说模块
   }
+  
   build(callback) {
-+    //5.根据配置中的entry找出入口文件
-+    let entry = {};
-+    if (typeof this.options.entry === 'string') {
-+      entry.main = this.options.entry;
-+    } else {
-+      entry = this.options.entry;
-+    }
- );
+   //5.根据配置中的entry找出入口文件
+    let entry = {};
+    if (typeof this.options.entry === 'string') {
+       entry.main = this.options.entry;
+    } else {
+      entry = this.options.entry;
+    }
+    
+    // 遍历所有的入口文件
+    for (let entryName in entry) {
+      //处理入口文件的文件路径，path.posix.join 用正斜杠 / 作为分隔符
+      let entryFilePath = path.posix.join(baseDir, entry[entryName]);
+      this.fileDependencies.add(entryFilePath);
+    }
+    
+  }
 }
+
 module.exports = Compilation;
+```
+
+这一步很简单，就是将 `webpackconfig.js` 文件中的 `entry` 👇 转换成绝对路径存储到 `fileDependencies` 中
+
+```js
+module.exports = {
+  // ... 
+  
+  entry: {
+    entry1: './src/entry1.js',
+    entry2:'./src/entry2.js' // name就是此模块属于哪个模块
+  },
+  // ...
+}
+```
+
+打印下 `this.fileDependencies` ，结果为👇
+
+```js
+// fileDependencies Set(1) {
+//  '/xx/src/entry1.js'
+//  '/xx/src/entry1.js'
+// }
 ```
 
 ------
 
 **6、从入口文件出发,调用所有配置的`Loader`对模块==进行编译==**
+
+`Compilation.js`
+
+```js
+const path = require('path');
+
+// process.cwd()获取到当前执行node命令的目录，也就是根目录
+// 处理baseDir，将'\'替换成'/'
+const baseDir = normalizePath(process.cwd());
+function normalizePath(path) {
+  return path.replace(/\\/g, '/');
+}
+
+class Compilation {
+  constructor(options, compiler) {
+    this.options = options;
+    this.compiler = compiler;
+    this.modules = []; // 这里放置本次编译涉及的所有的模块
+    this.chunks = []; // 本次编译所组装出的代码块
+    this.assets = {}; // key是文件名,值是文件内容
+    this.files = []; // 代表本次打包出来的文件
+    this.fileDependencies =new Set(); // 本次编译依赖的文件或者说模块
+  }
+  
+  build(callback) {
+   //5.根据配置中的entry找出入口文件
+    let entry = {};
+    if (typeof this.options.entry === 'string') {
+       entry.main = this.options.entry;
+    } else {
+      entry = this.options.entry;
+    }
+    
+    // 遍历所有的入口文件
+    for (let entryName in entry) {
+      //处理入口文件的文件路径，path.posix.join 用正斜杠 / 作为分隔符
+      let entryFilePath = path.posix.join(baseDir, entry[entryName]);
+      this.fileDependencies.add(entryFilePath);
+      
+      //6.从入口文件出发,调用所有配置的Loader对模块进行编译
+      // 得到入口文件对应的模块
+      let entryModule = this.buildModule(entryName, entryFilePath);
+    }
+    
+  }
+}
+
+module.exports = Compilation;
+```
 
 **7、再找出==该模块依赖的模块==，再==递归本步骤==直到==所有入口依赖的文件==都经过了本步骤的处理**
 
@@ -586,7 +718,7 @@ module.exports = Compilation;
 
 **9、==再把每个Chunk 转换成一个单独的文件加入到输出列表==**
 
-`Compilation.js`
+`Compilation.js` 完整内容 👇
 
 ```js
 const path = require('path');
@@ -601,6 +733,7 @@ const baseDir = normalizePath(process.cwd());
 function normalizePath(path) {
   return path.replace(/\\/g, '/');
 }
+
 class Compilation {
   constructor(options, compiler) {
     this.options = options;
@@ -841,7 +974,9 @@ module.exports = Compilation;
 
 **10、在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统**
 
-```diff
+`Compiler.js` 完整内容 👇
+
+```js
 const { SyncHook } = require('tapable');
 const Compilation = require('./Compilation');
 const fs = require('fs');
@@ -863,11 +998,11 @@ class Compiler {
     const onCompiled = (err, stats, fileDependencies) => {
       //stats指的是统计信息，其中包含modules chunks files=bundle assets等信息
 
-+      //10.在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
-+      for (let filename in stats.assets) {
-+        let filePath = path.join(this.options.output.path, filename);
-+        fs.writeFileSync(filePath, stats.assets[filename], 'utf8');
-+      }
+     //10.在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
+      for (let filename in stats.assets) {
+        let filePath = path.join(this.options.output.path, filename);
+        fs.writeFileSync(filePath, stats.assets[filename], 'utf8');
+      }
 
       // 执行用户的回调
       callback(err, { toJson: () => stats });
@@ -900,7 +1035,7 @@ module.exports = Compiler;
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230315113131442.png" alt="image-20230315113131442" style="zoom:50%;" />
 
-这里实现的只是简易版本的，但是也完成文件打包
+这里实现的只是简易版本的，但是也完成了文件打包
 
 最后再回顾下整个作流程👇
 

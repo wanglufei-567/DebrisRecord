@@ -1,6 +1,58 @@
 ## k8s常用命令
 
-- 替换容器中的镜像
+### 一、Pod相关
+
+- **获取 Pod 运行状态信息**
+
+  ```bash
+  kubectl get pod
+  # or
+  kubectl get pod <pod-name>
+  ```
+
+- **查看某个 Pod 的详细状态信息**
+
+  ```shell
+   kubectl describe pod <pod-name> 
+  ```
+
+- **重启 pod**
+
+  ```bash
+  kubectl delete pod <pod-name> 
+  ```
+
+- **查看某个 Pod 的配置信息**
+
+  ```bash
+  kubectl get pod <pod-name> -o yaml
+  # -o yaml 以 YAML 格式输出 Pod 的配置信息
+  # -o json 以 JSON 格式输出 Pod 的配置信息
+  ```
+
+### 二、容器相关
+
+- **进入某个 Pod 中的某个容器**
+
+  ```bash
+  kubectl exec -it <container-name> /bin/sh -c web
+  ```
+
+  - `kubectl exec`：这是 `kubectl` 的一个子命令，用于在 **Pod** 中执行命令
+  - `-it`：这是两个参数的组合
+    - `-i`表示**交互式**，意味着命令将与终端交互
+    - `-t`表示**tty**，它会为命令分配一个伪终端，可以像在本地一样使用终端
+  - `<container-name>`：这是要在其中执行命令的 **Pod** 名称
+  - `/bin/sh`：要在 **Pod** 中运行的命令
+    - 在这个例子中，表示正在启动一个 **shell**
+  - `-c web`：这是传递给`/bin/sh`的参数，表示想要运行的容器的名称是 `web`
+
+- **退出容器**
+
+  - 输入`exit`命令
+  - 按下`Ctrl+D`
+
+- **替换容器中的镜像**
 
   ```bash
   kubectl set image deployment/<deployment-name> <container-name>=<new-image>
@@ -9,17 +61,17 @@
   # kubectl set image deployment/guandata-web-deployment web=registry.cn-hangzhou.aliyuncs.com/guandata/guandata-web:xxx
   ```
 
-  - `kubectl set image`：这是kubectl的一个子命令，用于更新资源的镜像。
+  - `kubectl set image`：这是 `kubectl` 的一个子命令，用于更新资源的镜像
 
   - `deployment/<deployment-name>`：这是你想要更新镜像的部署的名称
 
     - `deployment/`前缀表示这是一个部署资源
 
-      > 在Kubernetes中，Deployment是一种资源对象，它描述了应用程序的运行方式（如使用哪个Docker镜像，端口号是多少等），以及如何更新和扩展应用程序。
+      > 在 **Kubernetes** 中，**Deployment** 是一种资源对象，它描述了应用程序的运行方式（如使用哪个 **Docker** 镜像，端口号是多少等），以及如何更新和扩展应用程序
       >
-      > Deployment会管理Pod的生命周期，包括创建Pod，更新Pod的镜像，扩展Pod的数量，以及在Pod出现故障时重新创建Pod
+      > **Deployment** 会管理 **Pod** 的生命周期，包括创建 **Pod**，更新 **Pod** 的镜像，扩展 **Pod** 的数量，以及在 **Pod** 出现故障时重新创建 **Pod**
       >
-      > 如果你想查看当前有哪些Deployment，你可以使用以下的`kubectl`命令
+      > 如果想查看当前有哪些 **Deployment**，可以使用以下的`kubectl`命令
       >
       > ```bash
       > kubectl get deployments
@@ -30,19 +82,26 @@
     - `<container-name>`是容器的名称
     - `<new-image>`是新镜像的地址和标签
 
-- 重启pod
+- 重启 **Pod** 某个容器中的 **Nginx**
 
   ```bash
-  kubectl delete pod <pod-name> 
+  kubectl exec -it <pod-name> -c <container-name> -- nginx -s reload
   ```
 
-- 应用配置文件
+  - `<pod-name>` 想要重启 **Nginx**  的 **Pod** 的名称
+
+  - `<container-name>` 是运行 **Nginx** 的容器的名称
+
+  - `nginx -s reload` 是在容器中执行的命令，用于重启 **Nginx**
+### 三、配置文件相关
+
+- **应用配置文件**
 
   ```bash
   kubectl apply -f xxx.yaml
   ```
 
-  - `kubectl apply`：这是kubectl的一个子命令，用于应用配置文件，这个命令会根据配置文件中的定义创建或更新资源
+  - `kubectl apply`：这是 `kubectl` 的一个子命令，用于应用配置文件，这个命令会根据配置文件中的定义创建或更新资源
 
   - `-f xxx.yaml`：这是你想要应用的配置文件
 
@@ -51,50 +110,6 @@
 
     <!--如果配置文件中的Pod定义与当前运行的Pod有所不同，Kubernetes会尝试更新Pod以匹配配置文件，这可能会导致Pod重启，但这取决于具体的更改内容和Kubernetes的更新策略-->
 
-- 获取pod运行状态信息
-
-  ```bash
-  kubectl get pod
-  # or
-  kubectl get pod <pod-name>
-  ```
-
-- 查看某个pod的详细状态信息
-
-  ```shell
-   kubectl describe pod <pod-name> 
-  ```
-
-- 进入某个pod中的某个容器
-
-  ```bash
-  kubectl exec -it <container-name> /bin/sh -c web
-  ```
-
-  - `kubectl exec`：这是kubectl的一个子命令，用于在Pod中执行命令
-  - `-it`：这是两个参数的组合
-    - `-i`表示**交互式**，意味着命令将与你的终端交互
-    - `-t`表示**tty**，它会为命令分配一个伪终端，使得你可以像在本地一样使用终端
-  - `<container-name>`：这是你想要在其中执行命令的Pod的名称
-  - `/bin/sh`：这是你想要在Pod中运行的命令。在这个例子中，你正在启动一个shell
-  - `-c web`：这是传递给`/bin/sh`的参数，表示你想要运行的容器的名称是`web`
-
-- 重启pod某个容器中的nginx
-
-  ```bash
-  kubectl exec -it <pod-name> -c <container-name> -- nginx -s reload
-  ```
-
-  - `<pod-name>` 想要重启Nginx的Pod的名称
-
-  - `<container-name>` 是运行Nginx的容器的名称
-
-  - `nginx -s reload` 是在容器中执行的命令，用于重启Nginx
-
-- 退出容器
-
-  - 输入`exit`命令
-  - 按下`Ctrl+D`
 #### yaml文件
 
 - guandata-web-controller.yaml
@@ -123,7 +138,7 @@
 
       - appId=`cat /tmp/app/id`：从文件`/tmp/app/id`中读取内容，并将这个内容赋值给变量`appId`
 
-        - 文件`/tmp/app/id`是容器中的文件，在构建**Docker**镜像时创建的
+        - 文件`/tmp/app/id`是容器中的文件，在构建 **Docker** 镜像时创建的
 
           ```dockerfile
           # dockerfile 文件
@@ -162,7 +177,7 @@
         command: ["/bin/sh","-c"]
         # 新增复制场景应用资源逻辑
         args:
-          - "rm -f /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; mkdir -p /guandata-web;mkdir -p /tmp/logs; cp -r /tmp/guandata-web/assets /guandata-web; rm -rf /tmp/guandata-web/conf/apps; mkdir -p /tmp/guandata-web/conf/apps; mkdir -p /tmp/guandata-web/assets/build-app; cp /apps/*.json /tmp/guandata-web/conf/apps/; cp -r /apps/* /tmp/guandata-web/assets/build-app/; cd /tmp/guandata-web/; node server.js"
+          - "rm -f /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; mkdir -p /guandata-web;mkdir -p /tmp/logs; rm -rf /tmp/guandata-web/conf/apps; mkdir -p /tmp/guandata-web/conf/apps; mkdir -p /tmp/guandata-web/assets/build-app; cp /apps/*.json /tmp/guandata-web/conf/apps/; cp -r /apps/* /tmp/guandata-web/assets/build-app/;  cp -r /tmp/guandata-web/assets /guandata-web; cd /tmp/guandata-web/; node server.js"
         volumeMounts:
           - mountPath: /tmp/conf/
             name: config
@@ -185,8 +200,6 @@
 
         - `-p`选项会确保如果父目录不存在，会先创建父目录
 
-      - `cp -r /tmp/guandata-web/assets /guandata-web`：将`/tmp/guandata-web/assets`目录复制到`/guandata-web`目录
-
       - `rm -rf /tmp/guandata-web/conf/apps`：删除`/tmp/guandata-web/conf/apps`目录及其下所有文件，`-rf`选项表示递归删除并且强制删除
 
       - `mkdir -p /tmp/guandata-web/conf/apps; mkdir -p /tmp/guandata-web/assets/build-app`：创建两个目录`/tmp/guandata-web/conf/apps`和`/tmp/guandata-web/assets/build-app`
@@ -196,6 +209,8 @@
       - `cp -r /apps/* /tmp/guandata-web/assets/build-app/`：将`/apps/`目录下的所有文件和目录复制到`/tmp/guandata-web/assets/build-app/`目录
 
         <!--这里的/apps是存储卷shared-apps的挂载路径，所以这里就是将插件容器复制进去的文件，再复制出去-->
+
+      - `cp -r /tmp/guandata-web/assets /guandata-web`：将`/tmp/guandata-web/assets`目录复制到`/guandata-web`目录
 
       - `cd /tmp/guandata-web/`：切换当前工作目录到`/tmp/guandata-web/`
 

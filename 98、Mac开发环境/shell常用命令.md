@@ -1,3 +1,15 @@
+## 常用的 shell 命令
+
+### 一、什么是shell
+
+> Shell 是 Linux 系统中的命令解释器，它是连接用户和 Linux 内核的桥梁
+>
+> 用户在终端中输入的命令首先被 Shell 解析，然后传递给操作系统执行
+>
+> 常见的 Shell 包括 Bash（Bourne Again Shell）、Zsh、Fish 等
+
+### 二、常用命令
+
 #### 查看端口占用的进程信息
 
 ```shell
@@ -44,4 +56,9 @@ ps -M pid
 kill -9 PID
 ```
 
+**查看 IP**
+
+```shell
+ifconfig
+```
 

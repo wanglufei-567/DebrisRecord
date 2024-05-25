@@ -19,7 +19,7 @@
 
 ### 2.1、scroll事件
 
-当用户滚动指定的元素时，会触发 `scroll` 事件，这个事件适用于所有可滚动的元素和 window 对象（浏览器窗口）
+当用户滚动指定的元素时，会触发 `scroll` 事件，这个事件适用于所有可滚动的元素和 `window` 对象（浏览器窗口）
 
 使用示例：
 
@@ -29,15 +29,7 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
 
 相关属性：
 
-- `window.scrollY` 和 `window.scrollX`（只读）:
-
-  - `window.scrollY` 返回整个文档在垂直方向上的滚动距离，以像素为单位
-  - `window.scrollX` 返回整个文档在水平方向上的滚动距离，以像素为单位
-
-  ```javascript
-  const verticalScrollPosition = window.scrollY;
-  const horizontalScrollPosition = window.scrollX;
-  ```
+<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251730710.png" alt="scrollTop / scrollHeight / clientHeight"  /><img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251732975.png" alt="img" style="zoom: 40%;" />
 
 - `element.scrollTop` 和`element.scrollLeft` （==**可写**==）:
 
@@ -69,9 +61,56 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
   const isOverflowingVertically = container.scrollHeight > container.clientHeight;
   ```
 
+- `window.scrollY` 和 `window.scrollX`（只读）:
+
+  - `window.scrollY` 返回整个文档在垂直方向上的滚动距离，以像素为单位
+  - `window.scrollX` 返回整个文档在水平方向上的滚动距离，以像素为单位
+
+  ```javascript
+  const verticalScrollPosition = window.scrollY;
+  const horizontalScrollPosition = window.scrollX;
+  ```
+
+
 相关事件：
 
 - `scrollend`：当用户停止滚动时，会触发 `scrollend` 事件
   - 这个事件可以用来检测用户何时停止滚动，从而执行一些操作，比如懒加载图片
 - `scrollstart`：当用户开始滚动时，会触发 `scrollstart` 事件
   - 这个事件可以用来检测用户何时开始滚动
+
+### 三、DOM 位置距离相关
+
+<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251737181.png" alt="区别图" style="zoom:65%;" /><img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251737040.png" alt="img" style="zoom:55%;" />
+
+- `clientX`/`clientY`：这两个属性表示的是**鼠标指针**相对于**浏览器窗口可视区域**的  **X**  和  **Y**  坐标（单位为像素），不包括任何滚动偏移
+
+- `clientWidth`/`clientHeight`：这两个属性表示元素的内部**宽度和高度**（单位为像素）
+
+  - ==包括内边距，但不包括垂直滚动条（如果有）、边框和外边距==
+  - 计算公式为
+    - `clientWidth` = `content`宽度 + 左`padding` + 右`padding`
+    - `clientHeight` = `content`高度 + 左`padding` + 右`padding` 
+
+- `clientLeft`/`clientTop`: 这两个属性表示元素边框的宽度和高度
+
+  - `clientLeft` 属性（只读）不包括元素的左内边距或左外边距
+  - `clientTop` 属性（只读）不包括元素的上外边距和上内边距
+
+- `offsetX`/`offsetY`：这两个属性表示**鼠标指针**相对于**触发事件的元素**的内填充边（`padding edge`）的 **X** 和 **Y** 坐标
+
+- `offsetWidth`/`offsetHeight`：这两个属性表示元素的内部**宽度和高度（**单位为像素）
+
+  - ==包括内边距、垂直滚动条（如果有）、边框，但不包括外边距==
+  - 计算公式为
+    - `offsetWidth` = `content`宽度 + 左`padding` + 右`padding` + 左`boder` + 右`boder`
+    - `offsetHeight` = `content`高度 + 左`padding` + 右`padding` + 左`boder` + 右`boder`
+
+- `offsetLeft`/`offsetTop`：这两个属性表示当前节点的 **左/上边框外边缘** 到最近的已定位父级（`offsetParent`） **左/上边框内边缘** 的距离
+
+  
+
+
+
+
+

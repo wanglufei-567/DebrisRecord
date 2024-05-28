@@ -4,9 +4,11 @@
 
 **定义：**
 
-> **`for await...of` 语句**创建一个循环，该循环遍历异步可迭代对象以及同步可迭代对象，包括: 内置的 [`String`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String), [`Array`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array)，类似数组对象 (例如 [`arguments`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/arguments) 或 [`NodeList`](https://developer.mozilla.org/zh-CN/docs/Web/API/NodeList))，[`TypedArray`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), [`Map`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map), [`Set`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set) 和用户定义的异步/同步迭代器。它使用对象的每个不同属性的值调用要执行的语句来调用自定义迭代钩子。
+> **`for await...of` 语句**创建一个循环，该循环遍历异步可迭代对象以及同步可迭代对象
 >
-> 类似于 [`await`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/await) 运算符一样，该语句只能在一个[async function](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/async_function#异步函数) 内部使用。
+> 它使用对象的每个不同属性的值调用要执行的语句来调用自定义迭代钩子
+>
+> 类似于 `await`符一样，该语句只能在 `async function` 内部使用。
 
 <!--屁话，看不懂-->
 
@@ -20,11 +22,11 @@ for await (variable of iterable) {
 
 `variable`
 
-在每次迭代中，将不同属性的值分配给变量。变量有可能以`const`, `let`, 或者 `var`来声明。
+在每次迭代中，将不同属性的值分配给变量，变量有可能以`const`, `let`, 或者 `var`来声明
 
 `iterable`
 
-被迭代枚举其属性的对象。与 for...of 相比，这里的对象可以返回 `Promise`，如果是这样，那么 `variable` 将是 `Promise` 所包含的值，否则是值本身。
+被迭代枚举其属性的对象，与 `for...of` 相比，这里的对象可以返回 `Promise`，如果是这样，那么 `variable` 将是 `Promise` 所包含的值，否则是值本身
 
 <!--iterable是Promise的话，variable就是Promise resolve的值-->
 
@@ -73,7 +75,7 @@ test31();
 // res 3
 ```
 
-打印结果还是符合我们的心智模型的，先打印了同步的部分："start"和"end"，之后按照`setTimeout`延迟时间顺序打印"resolve"和"res"
+打印结果还是符合我们的心智模型的，先打印了同步的部分：`"start"`和`"end"`，之后按照`setTimeout`延迟时间顺序打印`"resolve"`和`"res"`
 
 `forEach`的内部实现机制如下
 
@@ -111,9 +113,9 @@ test32();
 // res 3
 ```
 
-采用这种写法之后，可以更加直观的理解打印结果的顺序了，先打印`callback`中同步的部分"start"，再打印最后的同步部分"end"，之后是`callback`中异步的部分"resolve"和"res"；
+采用这种写法之后，可以更加直观的理解打印结果的顺序了，先打印`callback`中同步的部分`"start"`，再打印最后的同步部分`"end"`，之后是`callback`中异步的部分`"resolve"`和`"res"`；
 
-需要注意的是：这里的`callback`之间是隔离开的，"res"的打印顺序完全取决于`setTimeout`中`resolve`的时机(`resolve`之后，`await`后面的代码，相当于是`then`中注册的回调，会放到微任务队列中，队列中回调的位置取决于`resolve`的时机)
+需要注意的是：这里的`callback`之间是隔离开的，`"res"`的打印顺序完全取决于`setTimeout`中`resolve`的时机(`resolve`之后，`await`后面的代码，相当于是`then`中注册的回调，会放到微任务队列中，队列中回调的位置取决于`resolve`的时机)
 
 **使用`for...of`遍历**
 
@@ -272,5 +274,4 @@ async function test22() {
 }
 test22()
 ```
-
 

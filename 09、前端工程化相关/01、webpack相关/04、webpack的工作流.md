@@ -22,10 +22,10 @@ compiler.run((err, stats) => {
     //stats代表统计结果对象
     console.log(
       stats.toJson({
-        files: true, //代表打包后生成的文件
-        assets: true, //其它是一个代码块到文件的对应关系
-        chunks: true, //从入口模块出发，找到此入口模块依赖的模块，或者依赖的模块依赖的模块，合在一起组成一个代码块
-        modules: true //打包的模块
+        files: true, // 代表打包后生成的文件
+        assets: true, // 其它是一个代码块到文件的对应关系
+        chunks: true, // 从入口模块出发，找到此入口模块依赖的模块，或者依赖的模块依赖的模块，合在一起组成一个代码块
+        modules: true // 打包的模块
       })
     );
   }
@@ -33,7 +33,7 @@ compiler.run((err, stats) => {
 
 ```
 
-**webpack ** 本身就是一个**函数**，将配置文件`webpack.config.js`传递给 **webpack** 方法可以得到一个 **compiler** 对象，通过调用`compiler.run`便可以开始进行编译并完成构建
+**webpack ** 本身就是一个**函数**，将配置文件`webpack.config.js`传递给 **webpack** 方法可以得到一个 **compiler** 对象，通过调用`compiler.run`便可以开始进行编译并完成构建，另外`run` 方法接受一个回调，可以用来查看编译过程中的错误信息或编译信息
 
 看下打包后的产物👇
 

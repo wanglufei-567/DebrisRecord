@@ -30,29 +30,46 @@
 
 下面是**Webpack**的一些核心概念和功能：
 
-1. **Entry**：入口文件，**Webpack**通过`entry`来找到==需要打包的模块==<!--一个应用可以有多个入口文件，每个入口文件对应一个bundle-->
+1. **entry**：入口文件，**Webpack**通过`entry`来找到==需要打包的模块==<!--一个应用可以有多个入口文件，每个入口文件对应一个bundle-->
 
-2. **Output**：打包后的文件输出的位置和文件名
+2. **output**：打包后的文件输出的位置和文件名
 
-3. **Loader**：**==文件加载器==**，能够加载资源文件，并对这些文件进行一些处理，诸如编译、压缩等，最终一起打包到指定的文件中
+3. **loader**：**==文件加载器==**，能够加载资源文件，并对这些文件进行一些处理，诸如编译、压缩等，最终一起打包到指定的文件中
 
    - **Loader**专注于==文件的转换==，使得**Webpack**能够处理==非**JavaScript**模块==
 
    - 例如，通过使用`css-loader`和`style-loader`，**Webpack**可以处理**CSS**模块并将其嵌入到**HTML**中
 
-4. **Plugin**：插件，**Plugin**赋予了**Webpack**各种灵活的功能，例如打包优化、资源管理、环境变量注入等，目的是==解决**loader**无法实现的其他事==
+4. **plugin**：插件，**plugin**赋予了**Webpack**各种灵活的功能，例如打包优化、资源管理、环境变量注入等，目的是==解决**loader**无法实现的其他事==
 
-   - **Plugin**提供了更丰富的功能扩展，可以在==构建过程中==的不同阶段插入==自定义逻辑==
+   - **plugin**提供了更丰富的功能扩展，可以在==构建过程中==的不同阶段插入==自定义逻辑==
      - 例如压缩代码、拷贝文件等
-   - **Plugin**在整个编译周期都起作用
+   - **plugin**在整个编译周期都起作用
 
-5. **Mode**：设置`mode`可以指定**Webpack**的运行模式，可以是`development`、`production`或`none`
+5. **mode**：设置`mode`可以指定**Webpack**的运行模式，可以是`development`、`production`或`none`
 
    - 不同的模式会对**Webpack**的行为进行优化，例如`development`模式会启用`devtool`来方便调试
 
-6. **Code Splitting**：将打包后的代码拆分成多个`chunk`，以优化性能和减少加载时间
+6. **resolve** ：用于设置模块如何解析
 
-7. **Dev Server**：可以使用`webpack-dev-server`来启动一个本地开发服务器，方便在开发过程中调试和热更新
+   常用配置如下：
+
+   - `alias`：配置别名，简化模块引入
+   - `extensions`：在引入模块时可不带后缀
+   - `symlinks`：用于配置 `npm link` 是否生效，禁用可提升编译速度
+
+7. **optimization**： 用于自定义 **Webpack** 的内置优化配置，一般用于生产模式提升性能
+
+   常用配置项如下：
+
+   - `minimize`：是否需要压缩 **bundle**
+   - `minimizer`：配置压缩工具，如 **TerserPlugin**、**OptimizeCSSAssetsPlugin**
+   - `splitChunks`：拆分 **bundle**
+   - `runtimeChunk`：是否需要将所有生成 **chunk** 之间共享的运行时文件拆分出来
+
+8. **Code Splitting**：将打包后的代码拆分成多个`chunk`，以优化性能和减少加载时间
+
+9. **Dev Server**：可以使用`webpack-dev-server`来启动一个本地开发服务器，方便在开发过程中调试和热更新
 
 ### 三、webpack的基本使用
 

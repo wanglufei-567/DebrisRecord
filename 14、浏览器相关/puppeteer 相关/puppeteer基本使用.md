@@ -2,7 +2,9 @@
 
 ### 一、什么是 Puppeteer？
 
-**Puppeteer** 是一个用于控制 **Chrome** 或 **Chromium** 浏览器的 **Node.js** 库。它提供了一组高层次的 **API**，可以用来执行各种==**浏览器自动化任务**==，如网页抓取、生成 PDF、截图、测试和自动化表单填写等
+**Puppeteer** 是一个用于控制 **Chrome** 或 **Chromium** 浏览器的 **Node.js** 库
+
+它提供了一组操作 **Chrome** 的 **API**，可以用来执行各种==**浏览器自动化任务**==，如网页抓取、生成 PDF、截图、测试和自动化表单填写等
 
 **Puppeteer** 可以以无头模式（没有图形界面的浏览器）运行，但也可以在完整的浏览器环境中运行
 
@@ -101,13 +103,13 @@ const puppeteer = require('puppeteer');
 })();
 ```
 
-#### 4.3、在页面上下文中执行自定义逻辑
+#### 4.3、在页面上下文中执行自定义 JS 脚本 
 
 ```js
 page.evaluate(pageFunction[, …args])
 ```
 
-这个方法可以在页面上下文中执行 **Node** 中自定义的**JavaScript** 函数，返回一个 **Promise**，解析为函数的返回值
+这个方法可以在页面上下文中执行 **Node** 中自定义的 **JavaScript** 函数，返回一个 **Promise**，解析为函数的返回值
 
 参数：
 

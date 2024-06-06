@@ -33,26 +33,26 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
 
 - `element.scrollTop` 和`element.scrollLeft` （==**可写**==）:
 
-  - `element.scrollTop` 返回某个特定元素的垂直滚动距离
-  - `element.scrollLeft` 返回某个特定元素的水平滚动距离
+  - `element.scrollTop` 返回某个特定滚动容器==元素==的垂直滚动距离
+  - `element.scrollLeft` 返回某个特定滚动容器==元素==的水平滚动距离
 
   ```javascript
   const container = document.getElementById('scrollableContainer');
   const scrollTop = container.scrollTop;
   ```
 
-  - `scrollTop` 和`scrollLeft` 属性可用于将元素滚动到指定位置
+  - `scrollTop` 和`scrollLeft` 属性可用于将==元素==滚动到指定位置
 
   ```javascript
   const container = document.getElementById('scrollableContainer');
   container.scrollTop = 200; // 将容器滚动到垂直位置200像素处
   ```
 
-- `element.scrollHeight` 和 `element.scrollWidth`（只读）:
+- `element.scrollHeight` 和 `element.scrollWidth`（**==只读==**）:
 
-  - `element.scrollHeight` 返回元素的内容高度，包括不可见部分
+  - `element.scrollHeight` 返回==元素==的内容高度，包括不可见部分
 
-  - `element.scrollWidth` 返回元素的内容宽度，包括不可见部分 
+  - `element.scrollWidth` 返回==元素==的内容宽度，包括不可见部分 
 
     <!--这些属性可用于检查元素是否需要滚动-->
 
@@ -61,10 +61,10 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
   const isOverflowingVertically = container.scrollHeight > container.clientHeight;
   ```
 
-- `window.scrollY` 和 `window.scrollX`（只读）:
+- `window.scrollY` 和 `window.scrollX`（**==只读==**）:
 
-  - `window.scrollY` 返回整个文档在垂直方向上的滚动距离，以像素为单位
-  - `window.scrollX` 返回整个文档在水平方向上的滚动距离，以像素为单位
+  - `window.scrollY` 返回==整个文档==在垂直方向上的滚动距离，以像素为单位
+  - `window.scrollX` 返回==整个文档==在水平方向上的滚动距离，以像素为单位
 
   ```javascript
   const verticalScrollPosition = window.scrollY;
@@ -83,19 +83,21 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251737181.png" alt="区别图" style="zoom:65%;" /><img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251737040.png" alt="img" style="zoom:55%;" />
 
-- `clientX`/`clientY`：这两个属性表示的是**鼠标指针**相对于**浏览器窗口可视区域**的  **X**  和  **Y**  坐标（单位为像素），不包括任何滚动偏移
+#### 3.1、位置距离属性
 
+- `clientX`/`clientY`：这两个属性表示的是**鼠标指针**相对于**浏览器窗口可视区域**的  **X**  和  **Y**  坐标（单位为像素），不包括任何滚动偏移
 - `clientWidth`/`clientHeight`：这两个属性表示元素的内部**宽度和高度**（单位为像素）
 
   - ==包括内边距，但不包括垂直滚动条（如果有）、边框和外边距==
   - 计算公式为
     - `clientWidth` = `content`宽度 + 左`padding` + 右`padding`
     - `clientHeight` = `content`高度 + 左`padding` + 右`padding` 
-
 - `clientLeft`/`clientTop`: 这两个属性表示元素边框的宽度和高度
 
   - `clientLeft` 属性（只读）不包括元素的左内边距或左外边距
   - `clientTop` 属性（只读）不包括元素的上外边距和上内边距
+
+------
 
 - `offsetX`/`offsetY`：这两个属性表示**鼠标指针**相对于**触发事件的元素**的内填充边（`padding edge`）的 **X** 和 **Y** 坐标
 
@@ -105,12 +107,30 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
   - 计算公式为
     - `offsetWidth` = `content`宽度 + 左`padding` + 右`padding` + 左`boder` + 右`boder`
     - `offsetHeight` = `content`高度 + 左`padding` + 右`padding` + 左`boder` + 右`boder`
-
 - `offsetLeft`/`offsetTop`：这两个属性表示当前节点的 **左/上边框外边缘** 到最近的已定位父级（`offsetParent`） **左/上边框内边缘** 的距离
 
-  
+#### 3.2、位置距离方法
 
+- `getBoundingClientRect()` ：用于获取元素的大小及其相对于视口的位置，返回一个 `DOMRect` 对象，其中包含了元素的位置和尺寸信息
 
+  `DOMRect` 对象包含以下几个属性：
 
+  - `x` / `left`：元素左上角的 x 坐标
+  - `y` / `top`：元素左上角的 y 坐标
+  - `width`：元素的宽度，通常等于 `offsetWidth` <!--包含内边距、边框、滚动条-->
+  - `height`：元素的高度，通常等于 `offsetHeight` <!--包含内边距、边框、滚动条-->
+  - `right`：元素右下角的 x 坐标
+  - `bottom`：元素右下角的 y 坐标
 
+  这些坐标是相对于视口的，也就是说，如果页面被滚动了，这些值会改变
+
+  如果需要获取元素相对于整个文档的位置，可以加上 `window.scrollX` 和 `window.scrollY`
+
+  例如：
+
+  ```javascript
+  var rect = element.getBoundingClientRect();
+  var x = window.pageXOffset + rect.left;
+  var y = window.pageYOffset + rect.top;
+  ```
 

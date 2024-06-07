@@ -102,14 +102,9 @@ let tr = state.update(state.replaceSelection("!"))
 console.log(tr.state.doc.toString()) // "!o!"
 ```
 
-
-
-### Decorations
+### 六、Decorations
 
 CodeMirror编辑器的DOM结构是由其EditorState和EditorView进行生成的，就像React一样也是有VirtualDOM，手动修改DOM结构之后，在下一次更新之后，手动修改的内容便会消失
-
-> q q q
->
 
 Mark decorations 
 

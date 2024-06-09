@@ -34,21 +34,21 @@
 
 2. **output**：打包后的文件输出的位置和文件名
 
-3. **loader**：**==文件加载器==**，能够加载资源文件，并对这些文件进行一些处理，诸如编译、压缩等，最终一起打包到指定的文件中
+3. **mode**：设置`mode`可以指定**Webpack**的运行模式，可以是`development`、`production`或`none`
+
+   - 不同的模式会对**Webpack**的行为进行优化，例如`development`模式会启用`devtool`来方便调试
+
+4. **loader**：**==文件加载器==**，能够加载资源文件，并对这些文件进行一些处理，诸如编译、压缩等，最终一起打包到指定的文件中
 
    - **Loader**专注于==文件的转换==，使得**Webpack**能够处理==非**JavaScript**模块==
 
    - 例如，通过使用`css-loader`和`style-loader`，**Webpack**可以处理**CSS**模块并将其嵌入到**HTML**中
 
-4. **plugin**：插件，**plugin**赋予了**Webpack**各种灵活的功能，例如打包优化、资源管理、环境变量注入等，目的是==解决**loader**无法实现的其他事==
+5. **plugin**：插件，**plugin**赋予了**Webpack**各种灵活的功能，例如打包优化、资源管理、环境变量注入等，目的是==解决**loader**无法实现的其他事==
 
    - **plugin**提供了更丰富的功能扩展，可以在==构建过程中==的不同阶段插入==自定义逻辑==
      - 例如压缩代码、拷贝文件等
    - **plugin**在整个编译周期都起作用
-
-5. **mode**：设置`mode`可以指定**Webpack**的运行模式，可以是`development`、`production`或`none`
-
-   - 不同的模式会对**Webpack**的行为进行优化，例如`development`模式会启用`devtool`来方便调试
 
 6. **resolve** ：用于设置模块如何解析
 

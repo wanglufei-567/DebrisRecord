@@ -23,7 +23,7 @@
 经过优化后，我们可以期待以下的结果：
 
 1. **更快的构建速度**：通过合理的配置和插件的使用，显著提高 **Webpack** 的构建速度
-2. **更小的输出文件**：通过代码压缩、**Tree Shaking** 和代码分割等技术，显著减少输出文件的大小
+2. **更小的输出文件**：通过**代码分割**、**Tree Shaking** 和**代码压缩**等技术，显著减少输出文件的大小
 3. **更高的运行效率**：通过代码优化和资源懒加载等技术，提高代码的运行效率
 
 ### 二、环境准备
@@ -276,7 +276,7 @@ module.exports = smp.wrap({
 
 ##### 3.1.1、使用 Webpack 资源模块
 
-**Webpack5** 引入了一种新的方式来处理**静态资源**，即[**资源模块(Asset Modules)**](https://webpack.docschina.org/guides/asset-modules/)，它允许使用资源文件（字体，图标等）而无需配置额外 `loader`
+**Webpack5** 引入了一种新的方式来处理**静态资源**，即[资源模块(Asset Modules)](https://webpack.docschina.org/guides/asset-modules/)，它允许使用资源文件（字体，图标等）而无需配置额外 `loader`
 
 **Webpack5** 提供了四种资源模块类型，每种类型都有不同的用途和生成的产物形式，可以通过配置 `type` 属性设置资源导出类型：👇
 
@@ -460,7 +460,7 @@ module.exports = {
 
 #### 3.2、优化 resolve、modules 配置
 
-**Webpack** 的 [resolve](https://webpack.docschina.org/configuration/resolve/#root) 配置项用于设置模块解析方式，可通过优化 `resolve` 配置来覆盖默认配置项，减少解析范围
+**Webpack** 的 [resolve](https://webpack.docschina.org/configuration/resolve/#root) 配置项用于设置模块解析方式，可通过优化 `resolve` 配置来覆盖默认配置项减少解析范围
 
 ##### 3.2.1、alias
 
@@ -568,7 +568,7 @@ module.exports = smp.wrap({
 
 <!--需要注意的是，启动子进程同样需要时间，只有当某个 loader 的耗时成为 Webpack 构建速度的瓶颈时，使用 thread-loader 才是比较合适的-->
 
-#### 3.5、缓存机制 （重点❗）
+#### 3.5、缓存机制 （重点❗❗）
 
 **Webpack** 的 `cache` 机制通过缓存生成的 `webpack` 模块和 `chunk`，来改善构建速度
 
@@ -729,7 +729,7 @@ module.exports = {
 
 > `package.json` 中的 `sideEffects` 字段是 **Webpack** 用来标识哪些文件或模块有副作用的
 >
-> **副作用**是指文件在被导入时，会产生一些全局的影响或修改其他模块或全局状态的行为
+> ==**副作用**是指文件在被导入时，会产生一些全局的影响或修改其他模块或全局状态的行为==
 >
 > `sideEffects` 字段有助于 **Webpack** 更好地进行 **Tree Shaking**，从而删除未使用的代码
 
@@ -783,11 +783,11 @@ module.exports = {
 
 **SplitChunksPlugin 的作用**：
 
-1. **减少重复代码**：将应用程序中共享的依赖提取到单独的文件中，避免重复加载相同的模块
-2. **提高缓存效率**：分离出的公共模块可以被浏览器缓存，从而在后续的页面加载中直接使用缓存，减少加载时间
+1. **减少重复代码**：将应用程序中==共享的依赖提取到单独的文件中，避免重复加载相同的模块==
+2. **提高缓存效率**：分离出的==公共模块==可以被浏览器==缓存==，从而在后续的页面加载中直接使用缓存，减少加载时间
 3. **优化加载顺序**：按需加载代码块，减少初始加载体积，提高首屏渲染速度
 
-**Wepack5** 中`SplitChunksPlugin` 是默认开启的，但默认情况下，它只会影响到**按需加载**的 **chunks**
+**Wepack5** 中`SplitChunksPlugin` 是默认开启的 <!--开发环境也默认开启，但配置会比生产环境宽松-->，但默认情况下，它只会影响到**按需加载**的 **chunks** <!--比如，import()加载的代码块-->
 
 **SplitChunksPlugin 的配置参数**：
 
@@ -795,14 +795,12 @@ module.exports = {
 module.exports = {
   optimization: {
     splitChunks: {
-      chunks: 'async', // 仅分割异步加载的代码块
-      minSize: 20000, // 模块的最小大小，单位为字节
-      minRemainingSize: 0, // 确保拆分后块的最小大小
+      chunks: 'async', // 可选值：'all', 'async', 'initial'
+      minSize: 20000, // 拆分前的最小模块大小，单位为字节
       minChunks: 1, // 模块被引用的最少次数
       maxAsyncRequests: 30, // 按需加载时的最大并行请求数
       maxInitialRequests: 30, // 入口点的最大并行请求数
-      enforceSizeThreshold: 50000, // 强制执行拆分的大小阈值
-      cacheGroups: {
+      cacheGroups: { // 为不同类型的模块创建不同的缓存组
         defaultVendors: {
           test: /[\\/]node_modules[\\/]/, // 匹配第三方模块
           priority: -10, // 优先级，数值越大优先级越高
@@ -822,19 +820,25 @@ module.exports = {
 
 **配置参数说明**：
 
-1. **chunks**：决定哪些 **chunks** 会被选优化
+1. **chunks**：决定哪些 **chunks** 会被选优化 <!--常用-->
    -  `'async'`：默认值，表示只对异步加载的 **chunks** 进行优化
      - 异步加载的 **chunks** 通常是那些通过动态导入`import()`加载的代码块
    -  `'initial'` ：表示只对同步加载的 **chunks** 进行优化
      - 同步加载的 **chunks** 通常是那些在页面加载时就加载的代码块，
      - 例如通过`<script>`标签引入的代码块
-   -  `'all'`：表示对所有的 **chunks** 进行优化，无论它们是同步加载的还是异步加载的
-2. **minSize**：决定了生成 **chunk** 的最小体积（以`bytes`为单位）
+   -  `'all'`：表示对所有的 **chunks** 进行优化，无论它们是同步加载的还是异步加载的 <!--推荐这个-->
+2. **minSize**：拆分前 **chunk** 的最小体积，只有大于此值的模块才会被拆分 <!--重要-->
    - 默认值为 `20000` 字节，表示只有当 **chunk** 的体积大于 20KB 时，才会被拆分
-3. **minRemainingSize**：决定了生成 **chunk** 所需的主 **chunk**（**bundle**）的最小体积
-   - 默认值为 `0`
+3. **maxSize**：拆分后模块的最大体积，超过此值时会进一步拆分 <!--重要-->
 4. **minChunks**：决定了拆分前必须共享模块的最小 **chunks** 数
    - 默认值为 `1`，表示只有当一个模块被至少一个 **chunk** 使用时，才会被拆分
+5. **cacheGroups**：缓存组，可以为不同类型的模块创建不同的缓存组，每个缓存组可以有自己的配置，这样就可以根据需要对不同类型的模块进行不同的优化 <!--可以自定义缓存组-->
+   - 常用配置项
+     - **test**: 用于匹配要包含在此组中的模块。可以是正则表达式、函数或字符串
+     - **priority**: 优先级，数值越大优先级越高，优先级高的组会优先匹配模块
+       -  当一个模块符合多个 `cacheGroups` 时，优先级较高的组会先匹配到该模块
+     - **reuseExistingChunk**: 是否允许重用已经存在的块
+       - 有助于减少生成的 **chunk** 数量，复用已有的 **chunk**，从而优化缓存
 
 #### 4.4、Code Minification（代码压缩）
 
@@ -851,7 +855,7 @@ module.exports = {
               test: /\\.js(\\?.*)?$/i, // 匹配文件的测试条件，默认值为/\\.m?js(\\?.*)?$/i
               include: /\\/includes/, // 需要包含的文件
               exclude: /\\/excludes/, // 需要排除的文件
-              parallel: true, // 是否使用多进程并行运行以提高构建速度。默认值为true
+              parallel: true, // 是否使用多进程并行运行以提高构建速度，默认值为true
               terserOptions: { // 传递给 Terser 的压缩选项，可以配置更多 Terser 的参数
                 compress: { // 用于配置代码压缩的选项
                   ecma: 5,

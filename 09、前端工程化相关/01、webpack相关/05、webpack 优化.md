@@ -711,7 +711,7 @@ module.exports = {
 
    这样配置后，`html-webpack-plugin` 插件就会根据模板文件生成 **HTML** 文件，并自动引入 **Webpack** 打包后的 **JS** 和 **CSS** 文件，同时也会引入在模板文件中指定的 **CDN** 库
 
-#### 4.2、Tree Shaking（摇树优化）
+#### 4.2、摇树优化（Tree Shaking）
 
 [Tree Shaking](https://webpack.docschina.org/guides/tree-shaking/) 是一种用于**删除未使用代码（Dead Code**）的技术，主要用于 **JavaScript** 应用程序的打包和优化，其目标是减少最终输出的文件体积，从而提升加载速度和执行性能
 
@@ -875,11 +875,15 @@ module.exports = {
 }
 ```
 
+<!--Tree Shaking、代码分离、代码压缩在生产环境都是默认开启的，开发环境中打包产物又是存储在内存中，所以不能很好的直观对比前后文件体积大小，其实最好的优化方式就是将 webpack 升级到 V5 版本，可以对比升级前后的打包文件体积大小-->
+
 ### 五、提高运行效率
 
 #### 5.1、按需加载
 
 通过 **Webpack** 提供的 [import() 语法](https://webpack.docschina.org/api/module-methods/#import-1) 功能进行代码分离，通过按需加载，可以大大提升网页加载速度
+
+<!--异步模块的按需加载会大大减少减少初始加载时间-->
 
 使用方式如下：
 
@@ -894,6 +898,13 @@ export default function App () {
     )
 }
 ```
+
+### 六、总结
+
+- 加快构建速度
+  - 最有效的配比是 `cache`，二次构建速度得到大幅度提升
+- 减小文件体积
+  - **Tree Shaking**、代码分离、代码压缩都能大幅度减小打包体积
 
 
 

@@ -244,11 +244,15 @@ module.exports = {
 
 **环境变量的设置方式**
 
-1. 命令行中使用`--mode`用来设置==模块内的`process.env.NODE_ENV`==
-2. 配置文件中设置`mode`属性来设置==模块内的`process.env.NODE_ENV`==
-3. 配置文件中使用**webpack**插件`DefinePlugin`用来设置==模块内的全局变量==
-4. 命令行中使用跨平台设置环境变量的工具`cross-env`来设置==`node`环境==的`process.env.NODE_ENV`
-5. 通过`.env`文件配置环境变量
+1. 命令行中使用`--mode`用来设置==模块内的`process.env.NODE_ENV `== <!--Webpack 的 process.env-->
+2. 配置文件中设置`mode`属性来设置==模块内的`process.env.NODE_ENV`== <!--Webpack 的 process.env-->
+3. 配置文件中使用**webpack**插件`DefinePlugin`用来设置==模块内的全局变量== <!--Webpack 的 process.env-->
+4. 命令行中使用跨平台设置环境变量的工具`cross-env`来设置==`node`环境==的`process.env.NODE_ENV` <!--node 的 process.env-->
+5. 通过`.env`文件配置环境变量 <!--node 的 process.env-->
+
+> node 的 `process.env`  是一个包含用户环境信息的对象，直接从操作系统的环境变量中读取值
+>
+> Webpack 的 `process.env`  并不会直接从操作系统中读取环境变量，它使用静态字符串替换的方式来注入环境变量，Webpack 在构建过程中会将代码中的 `process.env` 替换为指定的值。
 
 **1、命令行配置**
 
@@ -346,7 +350,7 @@ console.log('process.env.NODE_ENV',process.env.NODE_ENV);// development
 
 **5、`.env`文件**
 
-通过第三方工具包dotenv读取.env配置文件中的环境变量
+通过第三方工具包 `dotenv` 读取 `.env` 配置文件中的环境变量
 
 配置文件
 
@@ -368,7 +372,7 @@ NAME="PROD"
 NAME="DEV"
 ```
 
-使用方式
+使用方式：
 
 ```js
 require('dotenv').config()

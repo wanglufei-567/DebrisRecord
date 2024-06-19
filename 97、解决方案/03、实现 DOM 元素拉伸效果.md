@@ -23,8 +23,14 @@ resize: none | both | horizontal | vertical | block | inline;
 
 **注意事项：**
 
-- `resize` 属性仅在元素的 `overflow` 属性值不是 `visible` 时才有效。
-- 对于某些元素（例如 `<textarea>`），在某些浏览器中可能需要使用 `overflow: auto` 或 `overflow: scroll` 来确保调整大小功能正常工作。
+- `resize` 属性仅在元素的 `overflow` 属性值==**不是** `visible` 时才有效==
+
+  > 当通过设置`resize` 属性允许用户调整元素大小时，浏览器需要明确的边界来处理这个调整
+  >
+  > 然而，`overflow: visible` 会让内容溢出元素的边界，没有明确的可视范围
+  >
+  > 因此，`resize` 和 `overflow: visible` 不能一起使用，以确保调整元素大小时的行为是明确且可控的
+- 对于某些元素（例如 `<textarea>`），在某些浏览器中可能需要使用 `overflow: auto` 或 `overflow: scroll` 来确保调整大小功能正常工作
 
 **使用示例：**
 
@@ -162,6 +168,8 @@ p {
 `re-resizable` 是一个用于 **React** 的可调整大小（`resizable`）的组件
 
 它提供了一种简单的方法来实现可调整大小的 **UI** 元素，支持多种方向的调整，并提供了丰富的 API 和事件来满足不同的需求
+
+<!--其实其内部实现方式就是 CSS 的 resize-->
 
 **安装**
 

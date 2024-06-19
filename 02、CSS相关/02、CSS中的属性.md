@@ -130,6 +130,15 @@ div {
 
 **Flex** 是 **Flexible Box** 的缩写，意为"**弹性布局**"，用来为盒状模型提供最大的灵活性
 
+> 在传统的CSS布局中，元素被分为 `block-level` 和 `inline-level` ：
+>
+> - `block-level `元素通常会占据其父元素的整个宽度
+> - `inline-level` 元素则不会，它们会在文档流中水平排列
+>
+> 当一个元素的 `display` 属性设置为 `flex`，这个元素便成为了一个弹性容器，其子元素的布局不再由它们原本的 `block` 或 `inline` 属性决定，而是由弹性盒模型（`Flexbox Layout`）控制
+>
+> 在弹性盒模型中，子元素变成了弹性项目（`flex items`），并且都是作为块级别的盒子来处理，它们的宽度==默认是由它们的内容决定的==，这与`inline-block`元素类似，但弹性项目的宽度也可以通过设置 `flex` 属性来控制
+
  `flex`属性是`flex-grow`, `flex-shrink` 和 `flex-basis`的简写，默认值为 `0 1 auto`，简写形式如下：
 
 ```css

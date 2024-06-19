@@ -81,13 +81,13 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
 
 ### 三、DOM 位置距离相关
 
-<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251737181.png" alt="区别图" style="zoom:65%;" /><img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251737040.png" alt="img" style="zoom:55%;" />
+<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251737181.png" alt="区别图" />
+               <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202405251737040.png" alt="img" style="zoom:90%;" />
 
 #### 3.1、位置距离属性
 
 - `clientX`/`clientY`：这两个属性表示的是**鼠标指针**相对于**浏览器窗口可视区域**的  **X**  和  **Y**  坐标（单位为像素），不包括任何滚动偏移
 - `clientWidth`/`clientHeight`：这两个属性表示元素的内部**宽度和高度**（单位为像素）
-
   - ==包括内边距，但不包括垂直滚动条（如果有）、边框和外边距==
   - 计算公式为
     - `clientWidth` = `content`宽度 + 左`padding` + 右`padding`

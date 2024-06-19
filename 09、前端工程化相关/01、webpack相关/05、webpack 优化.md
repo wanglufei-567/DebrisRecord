@@ -92,7 +92,7 @@ module.exports = {
 
 #### 3.1、编译进度
 
-大型项目的编译时间往往要很久，这个过程中若是想知道当前编译进展到哪个阶段了，可以通过 [progress-bar-webpack-plugin](https://www.npmjs.com/package/speed-measure-webpack-plugin) 插件查看编译进度
+大型项目的编译时间往往要很久，这个过程中若是想知道当前编译进展到哪个阶段了，可以通过 [progress-bar-webpack-plugin](https://www.npmjs.com/package/progress-bar-webpack-plugin) 插件查看编译进度
 
 安装：
 

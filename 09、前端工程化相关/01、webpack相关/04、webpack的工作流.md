@@ -243,8 +243,6 @@ module.exports = "title";
 `webpack2.js`
 
 ```js
-const Compiler = require('./Compiler');
-
 /**
  * @description webpack方法
  * @params options 配置文件中的配置信息
@@ -261,8 +259,6 @@ module.exports = webpack;
 `webpack2.js`
 
 ```js
-const Compiler = require('./Compiler');
-
 /**
  * @description webpack方法
  * @params options 配置文件中的配置信息

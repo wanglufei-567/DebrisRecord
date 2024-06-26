@@ -1,4 +1,4 @@
-## Javascript基础（十）—Proxy相关
+## Javascript基础 — Proxy相关
 
 **Proxy**对象是一个强大的工具，可以用来拦截对象的各种操作，包括函数调用
 

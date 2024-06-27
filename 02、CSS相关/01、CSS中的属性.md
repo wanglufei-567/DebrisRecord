@@ -143,27 +143,25 @@ div {
 >
 > 在弹性盒模型中，子元素变成了弹性项目（`flex items`），并且都是作为块级别的盒子来处理，它们的宽度==默认是由它们的内容决定的==，这与`inline-block`元素类似，但弹性项目的宽度也可以通过设置 `flex` 属性来控制
 
- `flex`属性是`flex-grow`, `flex-shrink` 和 `flex-basis`的简写，默认值为 `0 1 auto`，简写形式如下：
+-  `flex`属性是`flex-grow`, `flex-shrink` 和 `flex-basis`的简写，默认值为 `0 1 auto`，简写形式如下：
 
-```css
-flex: [flex-grow] [flex-shrink] [flex-basis];
-```
+  ```css
+  flex: [flex-grow] [flex-shrink] [flex-basis];
+  ```
 
-- `flex-grow`：定义子容器的瓜分剩余可用空间的比例
-  - 默认为 `0`，即如果存在剩余空间，也不会去瓜分
-- `flex-shrink`：定义子容器在空间不足时缩小的比例
-  - 也是一个无单位的数字，默认值是1
-- `flex-basis`：定义弹性子项在分配空间之前的基础大小
-  - 可以指定具体的长度值（如像素或百分比），也可以使用关键词如`auto`。默认值是`auto`，它表示子项的本来大小
-  - 优先级：`max-width`/`min-width` > `flex-basis` > `width` > `box`
+  - `flex-grow`：定义子容器的瓜分剩余可用空间的比例
+    - 默认为 `0`，即如果存在剩余空间，也不会去瓜分
+  - `flex-shrink`：定义子容器在空间不足时缩小的比例
+    - 也是一个无单位的数字，默认值是1
 
-
-
-
-
+  - `flex-basis`：定义弹性子项在分配空间之前的基础大小
+    - 可以指定具体的长度值（如像素或百分比），也可以使用关键词如`auto`，默认值是`auto`，它表示子项的本来大小
+    - 优先级：`max-width`/`min-width` > `flex-basis` > `width` > `box`
+    
+    
 
 
-### 十、不常用的属性：
+### 不常用的属性：
 
 #### grid属性
 

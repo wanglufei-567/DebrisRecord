@@ -105,6 +105,8 @@ p {
 
    - 将目标元素传递给 `observe` 方法，以开始监听其大小变化
 
+   - 当 `observe` 方法被调用时，监听函数会立即执行一次，提供被观察元素的当前尺寸
+
      ```js
      resizeObserver.observe(element)
      ```

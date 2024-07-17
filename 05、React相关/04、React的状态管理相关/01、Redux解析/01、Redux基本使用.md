@@ -8,7 +8,7 @@
 
 #### 1.1、Redux应用场景
 
-随着 JavaScript 单页应用开发日趋复杂，管理不断变化的 **state** 非常困难，**Redux**的出现就是为了解决**state**里的数据问题
+随着 **JavaScript** 单页应用开发日趋复杂，管理不断变化的 **state** 非常困难，**Redux**的出现就是为了解决**state**里的数据问题
 
 在**React**中，数据在组件中是**单向流动**的，数据从一个方向父组件流向子组件(通过`props`)，由于这个特征，两个非父子关系的组件（或者称作兄弟组件）之间的通信就比较麻烦
 
@@ -24,7 +24,7 @@
 
 - 应用程序的状态以集中式**Store**的方式进行集中管理
 - 当应用程序需要修改状态时，通过 **Dispatch** 发起一个 **Action**
-- 然后 **Reducer** 根据 **Action** 的类型和负载处理状态的变化
+- 然后 **Reducer** 根据 **Action** 的类型和 **payload** 处理状态的变化
 - 最终返回一个新的状态对象，**Store** 会将这个新的状态对象存储起来，并**通知**应用程序的界面更新
 
 #### 1.3、Redux 三大原则
@@ -39,7 +39,7 @@
 
 - **store：**是个对象，==统一管理和维护**state**，**reducer**，**action**== 
   
-  <!--store就是保存数据的地方，可以把它看成一个容器，整个应用只能有一个store。Redux 提供 createStore这个函数，用来生成store-->
+  <!--store就是保存数据的地方，可以把它看成一个容器，整个应用只能有一个store；Redux 提供 createStore这个函数，用来生成store-->
   
   - **reducer：** 纯函数，决定了**action**的变化如何更新**state**，
     
@@ -135,33 +135,33 @@ export default store;
 
 **UI 组件**有以下几个特征：
 
-- 只负责 UI 的呈现，不带有任何业务逻辑
+- 只负责 **UI** 的呈现，不带有任何业务逻辑
 - 没有状态（即不使用`this.state`这个变量）
 - 所有数据都由参数（`this.props`）提供
-- 不使用任何 Redux 的 API
+- 不使用任何 **Redux** 的 **API**
 
-下面就是一个 UI 组件的例子。
+下面就是一个 **UI** 组件的例子
 
 ```javascript
 const Title =
 value => <h1>{value}</h1>;
 ```
 
-==因为不含有状态，UI 组件又称为"纯组件"，即它纯函数一样，纯粹由参数决定它的值==
+==因为不含有状态，**UI** 组件又称为"纯组件"，即它纯函数一样，纯粹由参数决定它的值==
 
 **容器组件**的特征恰恰相反：
 
 - 负责管理数据和业务逻辑，不负责 UI 的呈现
 - 带有内部状态
-- 使用 Redux 的 API
+- 使用 **Redux** 的 **API**
 
-==总之，只要记住一句话就可以了：UI 组件负责 UI 的呈现，容器组件负责管理数据和逻辑==
+==总之，只要记住一句话就可以了：**UI** 组件负责 **UI** 的呈现，容器组件负责管理数据和逻辑==
 
-如果一个组件既有 UI 又有业务逻辑，那怎么办？
+如果一个组件既有 **UI** 又有业务逻辑，那怎么办？
 
 回答是，将它拆分成下面的结构：==外面是一个**容器组件**，里面包了一个**UI 组件**==。前者负责与外部的通信，将数据传给后者，由后者渲染出视图
 
-**React-Redux** 规定，所有的 ==UI 组件都由用户提供==，==容器组件则是由 React-Redux 自动生成==；也就是说，用户负责视觉层，状态管理则是全部交给它
+**React-Redux** 规定，所有的 ==**UI** 组件都由用户提供==，==容器组件则是由 **React-Redux** 自动生成==；也就是说，用户负责视觉层，状态管理则是全部交给它
 
 #### 3.2、React-Redux中的核心概念
 
@@ -185,11 +185,11 @@ value => <h1>{value}</h1>;
 
 为了定义业务逻辑，需要给出下面两方面的信息。
 
-> （1）输入逻辑：外部的数据（即`state`对象）如何转换为 UI 组件的参数
+> （1）输入逻辑：外部的数据（即`store`中的`state`对象）如何转换为 **UI** 组件的参数
 >
-> （2）输出逻辑：用户发出的动作如何变为 Action 对象，从 UI 组件传出去。
+> （2）输出逻辑：用户发出的动作如何变为 **Action** 对象，从 **UI** 组件传出去
 
-因此，`connect`方法的完整 API 如下👇
+因此，`connect`方法的完整 **API** 如下👇
 
 > ```javascript
 > import { connect } from 'react-redux'
@@ -200,16 +200,16 @@ value => <h1>{value}</h1>;
 > )(TodoList)
 > ```
 
-上面代码中，`connect`方法接受两个参数：`mapStateToProps`和`mapDispatchToProps`，它们定义了 UI 组件的业务逻辑
+上面代码中，`connect`方法接受两个参数：`mapStateToProps`和`mapDispatchToProps`，它们定义了 **UI** 组件的业务逻辑
 
 - `mapStateToProps`
-  - 负责==输入逻辑==，即将`state`映射到 UI 组件的参数（`props`）
+  - 负责==输入逻辑==，即将`store`中的`state`映射到 **UI** 组件的参数（`props`）
 - `mapDispatchToProps`
-  - 负责==输出逻辑==，即将用户对 UI 组件的操作映射成 **action**
+  - 负责==输出逻辑==，即将用户对 **UI** 组件的操作映射成 **action**
 
 ##### 3.2.2、mapStateToProps
 
-`mapStateToProps`是一个函数，它的作用就是像它的名字那样，建立一个从（外部的）`state`对象到（UI 组件的）`props`对象的映射关系。
+`mapStateToProps`是一个函数，它的作用就是像它的名字那样，建立一个从（**外部的**）`state`对象到（**UI 组件的**）`props`对象的映射关系
 
 作为函数，`mapStateToProps`执行后应该返回一个对象，里面的每一个键值对就是一个映射
 
@@ -218,35 +218,37 @@ value => <h1>{value}</h1>;
 ```javascript
 const mapStateToProps = (state) => {
 return {
- todos: getVisibleTodos(state.todos, state.visibilityFilter)
-}
+   todos: getVisibleTodos(state.todos, state.visibilityFilter)
+  }
 }
 ```
 
 上面代码中，`mapStateToProps`是一个函数，它接受`state`作为参数，返回一个对象
 
-这个对象有一个`todos`属性，代表 UI 组件的同名参数，后面的`getVisibleTodos`也是一个函数，可以从`state`算出 `todos` 的值
+这个对象有一个`todos`属性，代表 **UI** 组件的同名参数，**UI** 组件中可以从 `props` 上获取到这个`todos`属性
 
-下面就是`getVisibleTodos`的一个例子，用来算出`todos`
+后面的`getVisibleTodos`也是一个函数，表示从`state`派生出一个新的状态值（`todos`）
 
-```javascript
-const getVisibleTodos = (todos, filter) => {
-switch (filter) {
- case 'SHOW_ALL':
-   return todos
- case 'SHOW_COMPLETED':
-   return todos.filter(t => t.completed)
- case 'SHOW_ACTIVE':
-   return todos.filter(t => !t.completed)
- default:
-   throw new Error('Unknown filter: ' + filter)
-}
-}
-```
+- 下面👇就是`getVisibleTodos`的一个例子，用来算出`todos`
 
-==`mapStateToProps`会订阅 **Store**，每当`state`更新的时候，就会自动执行，重新计算 UI 组件的参数，从而触发 UI 组件的重新渲染==
+  ```javascript
+  const getVisibleTodos = (todos, filter) => {
+    switch (filter) {
+     case 'SHOW_ALL':
+       return todos
+     case 'SHOW_COMPLETED':
+       return todos.filter(t => t.completed)
+     case 'SHOW_ACTIVE':
+       return todos.filter(t => !t.completed)
+     default:
+       throw new Error('Unknown filter: ' + filter)
+    }
+  }
+  ```
 
-`mapStateToProps`的第一个参数总是`state`对象，还可以使用第二个参数，代表容器组件的`props`对象。
+==`mapStateToProps`会订阅 **Store**，每当`state`更新的时候，就会自动执行，重新计算 **UI** 组件的参数，从而触发 **UI** 组件的重新渲染==
+
+`mapStateToProps`的第一个参数是`state`对象，第二个参数代表**容器组件**的`props`对象
 
 ```javascript
 // 容器组件的代码
@@ -261,7 +263,7 @@ return {
 }
 ```
 
-使用`ownProps`作为参数后，如果容器组件的参数发生变化，也会引发 UI 组件重新渲染。
+使用`ownProps`作为参数后，如果容器组件的参数发生变化，也会引发 **UI** 组件重新渲染。
 
 <!--`connect`方法可以省略`mapStateToProps`这个参数，那样的话，UI 组件就不会订阅Store，就是说 Store 的更新不会引起 UI 组件的更新-->
 
@@ -269,11 +271,11 @@ return {
 
 `mapDispatchToProps`是`connect`函数的第二个参数，==用来建立 UI 组件的参数到`store.dispatch`方法的映射==
 
-也就是说，它定义了哪些用户的操作应该当作 **action**，传给 **store**，==它可以是一个函数，也可以是一个对象==
+也就是说，它定义了哪些用户的操作应该当作 **action**，传给 **store**，==它可以是一个**函数**，也可以是一个**对象**== <!--为对象这种情况容易忽略-->
 
 - 如果`mapDispatchToProps`是一个函数
 
-  `mapDispatchToProps`会得到`dispatch`和`ownProps`（容器组件的`props`对象）两个参数
+  - `mapDispatchToProps`会得到`dispatch`和`ownProps`（容器组件的`props`对象）两个参数
 
   ```js
   const mapDispatchToProps = (
@@ -291,14 +293,16 @@ return {
   }
   ```
 
-  从上面代码可以看到，`mapDispatchToProps`作为函数，应该返回一个对象，该对象的每个键值对都是一个映射，==定义了 UI 组件的参数怎样发出 Action==
+  从上面代码可以看到，`mapDispatchToProps`作为函数，应该返回一个对象，该对象的每个键值对都是一个映射，==定义了 **UI** 组件的参数怎样发出 **Action**==
 
 - 如果`mapDispatchToProps`是一个对象
 
-  它的每个键名也是对应 UI 组件的同名参数，键值应该是一个函数，会被当作 **action creator** ，返回的 **action** 会由 **Redux** 自动发出
+  - 它的每个键名是对应 **UI** 组件的同名参数（**UI** 组件中可以从 `props` 上获取到），键值应该是一个函数，会被当作 **action creator** ，返回的 **action** 会由 **Redux** ==自动发出== <!--内部执行 dispatch-->
 
-  举例来说，上面的`mapDispatchToProps`写成对象就是下面这样
-
+  
+  - 举例来说，上面的`mapDispatchToProps`写成对象就是下面这样
+  
+  
   ```js
   const mapDispatchToProps = {
     onClick: (filter) => {
@@ -310,9 +314,9 @@ return {
 
 ##### 3.2.4、Provider 组件
 
-`connect`方法生成容器组件以后，需要让容器组件拿到`state`对象，才能生成 UI 组件的参数。
+`connect`方法生成容器组件以后，需要让容器组件拿到`state`对象，才能生成 **UI** 组件的参数
 
-一种解决方法是将`state`对象作为参数，传入容器组件。但是，这样做比较麻烦，尤其是容器组件可能在很深的层级，一级级将`state`传下去就很麻烦。
+一种解决方法是将`state`对象作为参数，传入容器组件；但是，这样做比较麻烦，尤其是容器组件可能在很深的层级，一级级将`state`传下去就很麻烦
 
 **React-Redux** 提供`Provider`组件，可以让容器组件拿到`state`
 
@@ -419,9 +423,9 @@ export default connect(
 
 #### 4.1、createSelector方法
 
-`createSelector` 是**reselect**库中的一个方法，它用于创建==可记忆的选择器==，选择器是一个函数，它==接收 Redux store 的状态作为输入==，并根据需要计算和返回==派生的数据==
+`createSelector` 是**reselect**库中的一个方法，它用于创建==可记忆的选择器==，选择器是一个函数，它==接收 **Redux store** 的状态作为输入==，并根据需要计算和返回==派生的数据==
 
-使用 `createSelector` 可以==避免在每次状态更新时都重新计算派生数据==，从而提高性能。它使用了一种称为记忆化（memoization）的技术，它会缓存上一次计算的结果，并在下次调用时检查输入是否发生变化。如果输入没有变化，`createSelector` 将返回缓存的结果，而不会重新计算
+使用 `createSelector` 可以==避免在每次状态更新时都重新计算派生数据==，从而提高性能；它使用了一种称为记忆化（**memoization**）的技术，它会缓存上一次计算的结果，并在下次调用时检查输入是否发生变化；如果输入没有变化，`createSelector` 将返回缓存的结果，而不会重新计算
 
 `createSelector` 的基本用法如下：
 
@@ -505,9 +509,9 @@ const mySelector = createSelector(
    };
    ```
 
-   在上面的示例中，通过 `useSelector` hook，我们订阅了 `getFilteredUsers` 的派生数据选择器，并将派生数据 `filteredUsers` 注入到组件中
+   在上面的示例中，通过 `useSelector` **hook**，我们订阅了 `getFilteredUsers` 的派生数据选择器，并将派生数据 `filteredUsers` 注入到组件中
 
-   当 **Redux store** 中与 `getFilteredUsers` 相关的状态发生变化时，React 组件将自动重新渲染
+   当 **Redux store** 中与 `getFilteredUsers` 相关的状态发生变化时，**React** 组件将自动重新渲染
 
 使用 `createSelector` 结合 **React** 和 **Redux**，可以根据需要计算派生数据，并在输入数据变化时进行优化。这可以提高组件的性能，避免不必要的渲染和计算
 

@@ -64,6 +64,8 @@ p {
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202406191552275.png" alt="image-20240619155215478" style="zoom:50%;" />
 
+<!--也可以直接使用拖动改变元素尺寸的三方库，re-resizable，这个库提供了一个名为 Resizable 的组件，允许用户通过拖动边缘或角落来改变元素的尺寸-->
+
 ### 二、使用 ResizeObserver 监控元素尺寸变化
 
 `ResizeObserver` 是一个 **JavaScript** 内置构造函数 ，用于观察元素的大小变化，它提供了一种更高效的方法来检测 **DOM** 元素尺寸的变化，而不需要轮询或监听全局的 `resize` 事件

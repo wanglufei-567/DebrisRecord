@@ -80,3 +80,101 @@
 
 4. **避免使用负的边距**：尽量避免使用负的边距，特别是在子元素可能会导致溢出的情况下
 
+### 二、flex 布局中为有时需要将父容器的 height 设置为 0
+
+**Flex 布局中的父子关系**
+
+当我们在 flex 容器中设置子元素的 `flex: 1` 时，这意味着该子元素会尝试填充其父容器的剩余空间
+
+但是，父容器本身的高度如何计算？这取决于其父容器的高度和它自己的 flex 属性。
+
+**设置 `height: 0` 的原因**
+
+在一些特定情况下，如果不设置 `height: 0`，父容器的高度可能会受到其内容的高度影响，而不是 flex 算法计算出来的高度，通过设置 `height: 0`，我们确保父容器的高度完全由 flex 算法计算，而不会因为内容高度而有所偏差
+
+**具体例子**
+
+假设我们有以下结构：
+
+```html
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;  /* Full viewport height */
+  }
+
+  .parent {
+    flex: 1;
+    display: flex;
+  }
+
+  .child {
+    flex: 1;
+    background-color: lightblue;
+  }
+</style>
+
+<div class="container">
+  <div class="parent">
+    <div class="child">
+      Content goes here.
+    </div>
+  </div>
+</div>
+```
+
+在这种情况下：
+
+- `container` 是一个 flex 容器，它将其高度（100% 视口高度）分配给它的子元素
+- `parent` 设置了 `flex: 1`，试图填充 `container` 的剩余空间
+- `child` 也设置了 `flex: 1`，试图填充 `parent` 的剩余空间
+
+这种情况下，理论上应该是可行的，`child` 会填充 `parent` 的高度，`parent` 会填充 `container` 的高度
+
+**问题场景**
+
+问题出现在某些特定场景下，例如：
+
+1. **父容器的高度由内容决定**：如果 `parent` 容器内有其它内容，它的高度可能会受到这些内容的影响，而不是完全由 flex 算法决定
+
+2. **多重嵌套的 flex 布局**：在多重嵌套的 flex 布局中，某些中间层的容器高度可能会因为其内容高度而导致计算不准确，从而影响子容器的高度
+
+通过设置 `height: 0`，我们确保 `parent` 容器的高度完全由 flex 算法决定，而不受其内容高度的影响。这在复杂的布局中尤为重要
+
+**具体的工作方式**
+
+为了更好地理解，我们可以将 `height: 0` 添加到之前的示例中：
+
+```html
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;  /* Full viewport height */
+  }
+
+  .parent {
+    flex: 1;
+    display: flex;
+    height: 0;  /* This ensures the parent's height is determined by flex algorithm */
+  }
+
+  .child {
+    flex: 1;
+    background-color: lightblue;
+  }
+</style>
+
+<div class="container">
+  <div class="parent">
+    <div class="child">
+      Content goes here.
+    </div>
+  </div>
+</div>
+```
+
+这样，`parent` 的高度完全由 flex 算法计算，而不是其内容高度，确保 `child` 能够正确填充 `parent`。
+
+将 `parent` 的 `height` 设置为 `0` 是一种确保其高度完全由 flex 算法计算的技术手段，避免因内容高度影响布局，这在复杂或多层嵌套的 flex 布局中尤其重要，确保所有子元素能正确填充其父元素。希望这个解释能帮助你更好地理解这个问题。如果还有其他问题，欢迎继续讨论！

@@ -6,7 +6,7 @@
 
 - `__dirname`  用来动态获取==**当前文件**所属目录的绝对路径== 
 - `__filename` 用来动态获取==**当前文件**的绝对路径==，包含当前文件
-  - `__dirname` 和 `__filename` 是==不受命令行中执行Node脚本时所属路径影响==
+  - `__dirname` 和 `__filename` 与**命令行**在什么文件路径下执行脚本无关
 
 #### 1.2、path.join()
 
@@ -27,25 +27,39 @@ console.log(path.join(__dirname, '/a', {}, '/b'))
 
 #### 1.3、path.resolve()
 
-`path.resolve()` 方法是以程序为根目录，作为起点，根据参数解析出一个==绝对路径==
+`path.resolve` 方法用于将路径片段解析为**绝对路径**
 
- 以应用程序为根目录，普通字符串代表子目录，/ 代表绝对路径根目录
+它会从右到左依次处理传入的路径片段，直到构造出一个绝对路径为止，如果没有传入绝对路径片段，则会将当前工作目录作为起点
+
+<!--将当前工作目录作为起点的意思是，命令行在哪个路径下执行的脚本，这个路径就是起点，后面的路径片段会跟在这个起点后面，也就是说目录的起点和脚本文件自己本身的路径无关，而是和在哪个路径下执行的脚本有关-->
+
+具体来说，`path.resolve` 做了以下几件事：
+
+1. **处理相对路径**：如果路径片段是相对路径（例如 `./folder` 或 `../folder`），`path.resolve` 会将其解析为相对于当前工作目录的绝对路径
+2. **处理绝对路径**：如果路径片段中存在绝对路径（例如 `/folder`），`path.resolve` 会直接从这个绝对路径开始，忽略之前的所有片段
+3. **返回绝对路径**：最终结果是一个标准化的绝对路径，其中包含了所有的路径解析和整合
 
 ```js
-// 当前执行的 js 文件路径为: E:\前端相关\demo_js\test\31.path.js
-const path = require('path')
+const path = require('path');
 
-// 得到应用程序启动文件的目录（得到当前执行文件绝对路径）
-console.log(path.resolve()) // E:\前端相关\demo_js\test
+// 示例 1: 从当前工作目录解析相对路径
+const absolutePath1 = path.resolve('folder', 'file.txt');
+console.log(absolutePath1);
+// 输出类似: /Users/username/project/folder/file.txt
 
-// 解释: / 斜杠代表根目录，一般拼接的时候需要小心点使用 / 斜杠
-console.log(path.resolve('a', '/b')) // E:\b
+// 示例 2: 从绝对路径开始解析
+const absolutePath2 = path.resolve('/folder', 'subfolder', 'file.txt');
+console.log(absolutePath2);
+// 输出: /folder/subfolder/file.txt
 
-// 这个就是将文件路径拼接，并不管这个路径是否真实存在
-console.log(path.resolve(__dirname, 'a/b')) // E:\前端相关\demo_js\test\a\b
+// 示例 3: 使用 ".." 和 "." 来进行路径导航
+const absolutePath3 = path.resolve('/folder', './subfolder', '../file.txt');
+console.log(absolutePath3);
+// 输出: /folder/file.txt
 
-// 这个是用当前应用程序启动文件绝对路径与后面的所有字符串拼接，因为最开始的字符串不是以 / 开头的，.. 也是代表上一级目录
-console.log(path.resolve('wwwroot', 'static_files/png/', '../gif/image.gif')) 
-// E:\前端相关\demo_js\test\wwwroot\static_files\gif\image.gif
+// 示例 4: 如果没有传入路径片段，则返回当前工作目录的绝对路径
+const absolutePath4 = path.resolve();
+console.log(absolutePath4);
+// 输出: 当前工作目录的绝对路径
 ```
 

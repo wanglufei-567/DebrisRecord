@@ -42,8 +42,6 @@
 <script src="app.js" defer></script>
 ```
 
-- `async`属性：当`<script>`标签添加了`async`属性后，浏览器会 **异步** 加载并执行这个脚本
-  - 这意味着脚本的加载和执行不会阻塞文档的解析，一旦脚本加载完成，就会立即执行，不会等待其他脚本或 **DOMContentLoaded** 事件
 - `async`属性：默认值为`false`
   - 如果没有设置或设置为`false`，脚本会在文档解析过程中同步加载和执行
   - 当设置为`true`时，脚本会异步加载，一旦脚本可用，就会立即执行，不会等待其他脚本或 **DOMContentLoaded** 事件

@@ -1,6 +1,68 @@
 ## Linux常用命令
 
-### 一、查看文件或文件夹的读写权限信息
+### 一、什么是shell
+
+> Shell 是 Linux 系统中的命令解释器，它是连接用户和 Linux 内核的桥梁
+>
+> 用户在终端中输入的命令首先被 Shell 解析，然后传递给操作系统执行
+>
+> 常见的 Shell 包括 Bash（Bourne Again Shell）、Zsh、Fish 等
+
+### 二、查看端口进程
+
+查看端口占用的进程信息
+
+```shell
+lsof -i:端口号
+
+# lsof -i:8000
+COMMAND   PID USER   FD   TYPE   DEVICE SIZE/OFF NODE NAME
+nodejs  26993 root   10u  IPv4 37999514      0t0  TCP *:8000 (LISTEN)
+```
+
+`kill` 杀掉端口
+
+```shell
+kill -9 PID
+```
+
+`netstat -tunlp` 用于显示 `tcp`，`udp` 的端口和进程等相关情况
+
+```shell
+netstat -tunlp | grep 端口号
+```
+
+查看 `tcp` 端口占用情况
+
+```shell
+netstat -anvp tcp
+```
+
+查看进程状态
+
+```shell
+top -pid pid
+```
+
+查看子进程
+
+```shell
+pstree -p pid
+```
+
+查看线程
+
+```shell
+ps -M pid
+```
+
+查看 `IP`
+
+```shell
+ifconfig
+```
+
+### 二、查看文件或文件夹的读写权限信息
 
 ```bash
 ls -l <directory-path>
@@ -47,7 +109,7 @@ ls -l <directory-path>
 - `r-x`表示同一组内的其他用户有读取和执行的权限，但没有写入的权限
 - `r-x`表示其他所有用户有读取和执行的权限，但没有写入的权限
 
-### 二、给某个用户添加文件权限
+### 三、给某个用户添加文件权限
 
 在**Linux**系统中，可以使用`chmod`命令或`chown`命令来修改文件或目录的权限:
 
@@ -74,7 +136,7 @@ ls -l <directory-path>
   - `<username>`表示新的所有者的用户名
   - `<file-path>`表示想要修改所有者的文件或目录的路径
 
-### 三、查看当前用户角色
+### 四、查看当前用户角色
 
 在**Linux**系统中，可以使用以下命令来查看当前用户的角色：
 
@@ -82,7 +144,7 @@ ls -l <directory-path>
 - `id -un`：此命令也可以用来查看当前用户的用户名
 - `who -H`：此命令可以列出当前所有的用户名、窗口列表、开启时间和目录层次
 
-#### 四、查看与编辑文件
+### 五、查看与编辑文件
 
 - `cat`命令：`cat`命令将文本文件的全部内容发送到终端窗口以供查看
   - 例如，如果输入`cat filename`，它将显示文件`filename`的全部内容
@@ -92,7 +154,7 @@ ls -l <directory-path>
   - 保存并退出：按下`Esc`键，然后输入`:wq`，最后按下`Enter`键
   - 不保存并退出：按下`Esc`键，然后输入`:q!`，最后按下`Enter`键
 
-### 四、在终端输出文本字符串或命令结果
+### 六、在终端输出文本字符串或命令结果
 
 在**Linux**系统中，可以使用 `echo` 命令来进行信息的输出：
 
@@ -104,3 +166,85 @@ ls -l <directory-path>
     - `--help`：显示带有 `echo` 命令及其选项信息的帮助消息
     - `--version`：打印 `echo` 命令的版本信息
   - `string` 是用户提供的要显示的字符串
+
+### 七、SSH 连接
+
+#### 7.1、创建秘钥与公钥
+
+如果用户目录下没有`.ssh`目录，则需要新建一个
+
+```powershell
+cd ~/.ssh
+ssh-keygen -t rsa -f id_rsa_my
+ssh-keygen -t rsa -f id_rsa_company
+```
+
+一路回车即可
+
+上面`ssh-keygen` 命令参数：
+
+- -t: 指定生成`rsa` 类型秘钥
+- -f: 指定生成秘钥的名字，可以不指定该参数，默认就会生成2个文件：私钥`id_rsa`，公钥`id_rsa.pub`。由于需要生成两对私钥公钥，因此需要指定`-f`，否则生成两次后，私钥公钥会覆盖
+
+上面的命令调用完后会生成四个文件：
+
+- `id_rsa_my`
+- `id_rsa_my.pub`
+- `id_rsa_company`
+- `id_rsa_company.pub`
+
+#### 7.2、创建config
+
+在`.ssh`目录下创建`config` 文件，`SSH` 通过这个文件才知道哪个私钥去对应哪个公钥
+
+```bash
+touch config
+```
+
+`config`文件内容：
+
+```perl
+# my
+Host my
+HostName github.com
+IdentityFile ~/.ssh/id_rsa_my
+
+# company
+Host test7
+User root
+HostName 52.131.227.208
+IdentityFile ~/.ssh/id_rsa_test_company
+```
+
+`config`文件部分参数含义，仅做记录
+
+```bash
+# Host: 主机别名
+# HostName: 托管平台域名地址，如github.com
+# IdentityFile: 该Host私钥文件
+# User: 托管平台用户名
+# Port: 端口号，可不填（如果不是默认22号端口则需要指定）
+# PreferredAuthentications publickey
+```
+
+#### 7.3、创建 SSH 连接
+
+在命令行中输入以下命令以测试连接：
+
+```bash
+ssh user@hostname_or_ip
+```
+
+- **user**：你要登录的用户名
+- **hostname_or_ip**：服务器的主机名或 IP 地址
+
+如果是第一次连接到这个主机，会被询问是否要接受服务器的指纹，输入 `yes` 然后按下回车即可
+
+如果成功登录到远程主机，**SSH** 连接就没有问题，可以在远程主机上运行一些命令来确认连接的稳定性，例如：
+
+```bash
+uname -a  # 显示操作系统信息
+whoami    # 显示当前登录用户
+```
+
+### 

@@ -246,5 +246,3 @@ ssh user@hostname_or_ip
 uname -a  # 显示操作系统信息
 whoami    # 显示当前登录用户
 ```
-
-### 

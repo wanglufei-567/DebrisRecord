@@ -12,7 +12,7 @@
 - `docker images`：==**列出所有本地镜像**==
 - `docker commit <container_id> new_image_name`：==**通过已有容器构建一个新的镜像**==
 - `docker pull <image_name>`：从**Docker Hub**或其他仓库中拉取镜像
-- `docker push <image_name>`：将镜像推送到Docker Hub或其他仓库
+- `docker push <image_name>`：将镜像推送到**Docker Hub**或其他仓库
 - `docker rmi <image_id>`：删除本地镜像
 
 ### 二、创建和运行容器
@@ -44,7 +44,7 @@
     - `/bin/bash`：这是在容器内执行的命令，表示要进入容器的**Bash Shell**
     - 要退出容器的**Shell**并停止容器，可以输入 `exit` 命令，然后容器将终止
 
-- `docker exec -it <container_id> /bin/bash`：进入正在运行的容器的Shell
+- `docker exec -it <container_id> /bin/bash`：进入正在运行的容器的 **Shell**
 
 - `docker attach <container_id>`：附加到正在运行的容器的标准输入、输出和错误流
 
@@ -97,15 +97,15 @@
 
       <!--container_id是容器id不是容器name-->
 
-- `docker version`：查看Docker客户端和服务器的版本信息
+- `docker version`：查看 **Docker** 客户端和服务器的版本信息
 
-- `docker info`：查看Docker系统的详细信息
+- `docker info`：查看 **Docker** 系统的详细信息
 
-- `docker login`：登录到Docker Hub或其他仓库
+- `docker login`：登录到 **Docker Hub** 或其他仓库
 
-- `docker logout`：注销Docker Hub或其他仓库
+- `docker logout`：注销 **Docker Hub** 或其他仓库
 
-- `docker search <search_term>`：搜索Docker Hub上的镜像
+- `docker search <search_term>`：搜索 **Docker Hub** 上的镜像
 
 - `docker top <container_id>`：查看容器内运行的进程
 

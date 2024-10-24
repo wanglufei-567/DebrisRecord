@@ -49,21 +49,134 @@ dynamicMockFn.mockImplementation(() => 'dynamic value');
 
 #### 1.2、 `jest.mock()`
 
-`jest.mock()` 是 **Jest** 用于 **Mock** 整个模块的函数
+`jest.mock` 是 **Jest** 提供的一个功能，它可以在测试中==拦截对某个模块的引用==，==并返回模拟实现==，被用来 **mock** 模块中的**依赖或函数**，便于在单元测试中**隔离**特定的**模块或功能**
 
-它可以在测试中==拦截对某个模块的引用==，并返回模拟实现，通常用于模拟第三方依赖或复杂的业务逻辑模块
+通过 `jest.mock`，可以创建一个虚假的模块或函数，以控制其行为，==确保测试专注于代码的逻辑，而不是依赖外部模块==
 
-- **如何使用**：
+**基本语法：**
+
+```javascript
+jest.mock(moduleName, factory, options);
+```
+
+- `moduleName`: 要 **mock** 的模块路径或名称
+- `factory`: 可选，返回一个替代的 **mock** 实现函数
+- `options`: 可选，指定一些额外的配置，比如 `virtual` 属性（用于虚拟模块的情况）
+
+**适用场景:**
+
+1. **隔离外部依赖**：当模块依赖第三方库、数据库或外部 **API** 时，使用 `jest.mock` 可以==避免直接调用这些外部资源==，防止测试依赖它们的实际行为
+2. **替代复杂逻辑**：如果某些依赖模块包含复杂逻辑或副作用，可以通过 `jest.mock` 简化，==专注于测试当前模块的功能==
+3. **控制输出**：通过 **mock**，可以为函数提供自定义返回值，以测试特定场景下的代码行为
+
+**使用示例:**
+
+##### 1.2.1、Mock 默认导出的模块
+
+```javascript
+// math.js
+export default function add(a, b) {
+  return a + b;
+}
+
+// add.test.js
+import add from './math';
+
+// 使用 jest.mock 来 mock 'math' 模块
+jest.mock('./math');
+
+test('mock default export', () => {
+  // 设置 mock 返回值
+  add.mockImplementation(() => 42);
+
+  expect(add(1, 2)).toBe(42);
+  expect(add).toHaveBeenCalled();
+});
+```
+
+##### 1.2.2、Mock 命名导出模块
+
+```javascript
+// math.js
+export function add(a, b) {
+  return a + b;
+}
+
+export function subtract(a, b) {
+  return a - b;
+}
+
+// math.test.js
+import * as math from './math';
+
+jest.mock('./math');
+
+test('mock named export', () => {
+  // 为 add 和 subtract 提供 mock 实现
+  math.add.mockImplementation(() => 10);
+  math.subtract.mockImplementation(() => 5);
+
+  expect(math.add(1, 2)).toBe(10);
+  expect(math.subtract(10, 5)).toBe(5);
+});
+```
+
+##### 1.2.3、Mock 第三方模块
+
+```javascript
+// 使用 axios 库
+import axios from 'axios';
+import getData from './getData'; // 假设 getData 使用 axios 获取数据
+
+jest.mock('axios');
+
+test('mock axios module', async () => {
+  const mockResponse = { data: { success: true } };
   
-  ```javascript
-  jest.mock('./myModule', () => ({
-    fetchData: jest.fn(() => Promise.resolve('mocked data'))
-  }));
-  ```
+  // 模拟 axios 的 get 方法返回数据
+  axios.get.mockResolvedValue(mockResponse);
+  
+  const data = await getData();
+  expect(data).toEqual({ success: true });
+  expect(axios.get).toHaveBeenCalled();
+});
+```
 
-- **放置位置**：`jest.mock()` 一般放在 `describe` 的外部，这样每个测试用例都会使用到 **Mock** 的模块，不过也可以根据需要在 `describe` 内部放置
+##### 1.2.4、Mock 部分模块
 
-##### 1.2.1、 `jest.mock()` 的放置问题：`describe` 外部还是内部？
+若是只想 **mock** 模块的一部分，而不是整个模块，可以在 `jest.mock` 之后对部分函数进行自定义处理
+
+```javascript
+// math.js
+export function add(a, b) {
+  return a + b;
+}
+export function multiply(a, b) {
+  return a * b;
+}
+
+// math.test.js
+import * as math from './math';
+
+jest.mock('./math', () => ({
+  ...jest.requireActual('./math'), // 保留 multiply 的实际实现
+  add: jest.fn(), // 仅 mock add 函数
+}));
+
+test('mock only one function', () => {
+  math.add.mockImplementation(() => 10);
+
+  expect(math.add(1, 2)).toBe(10);
+  expect(math.multiply(2, 3)).toBe(6); // multiply 仍然是原始实现
+});
+```
+
+**注意事项**
+
+- `jest.mock` 通常在文件的顶层调用，因为 **Jest** 在模块导入时就会自动 **mock** 相关依赖
+- 如果想要对特定的测试用例使用不同的 **mock** 行为，可以通过 `mockImplementationOnce` 来临时设置 **mock** 行为
+
+##### 1.2.5、 `jest.mock()` 的放置问题：`describe` 外部还是内部？
 
 **Mock** 模块的时机非常关键，`jest.mock()` 通常放在 `describe` 外部，这是因为 **Jest** 的 **Mock** 机制会在模块加载时拦截模块调用
 

@@ -50,7 +50,60 @@
     whereis command_name
     ```
 
-### 二、查看与编辑文件
+### 三、文件夹相关
+
+- **创建文件夹：**
+
+  ```bash
+  mkdir <directory-name>
+  ```
+
+- **查看当前目录 :**
+
+  ```bash
+  # 显示当前所在的工作目录路径
+  pwd
+  ```
+
+- **删除文件夹:**
+
+  ```bash
+  # rmdir 用于删除空目录
+  rmdir <directory-name>  
+  
+  # rm -r 或 --recursive 用于递归删除包含文件和子目录的目录
+  rm -r <directory-name>
+  
+  # rm -f 或 --force 强制删除目录及其内容
+  rm -rf <directory-name>
+  ```
+
+- **移动或重命名文件或目录：**
+
+  ```bash
+  # mv：是 "move" 的缩写，用来移动或重命名文件或目录
+  mv old-folder new-folder
+  
+  # <old-directory-name>：原目录名（或文件名）
+  # <new-directory-name>：新目录名（或文件名）
+  ```
+
+- **复制目录及其内容:**
+
+  ```bash
+  # cp：是 "copy" 的缩写，用来复制文件或目录
+  cp -r <source-directory> <destination-directory>
+  
+  # -r：表示递归复制整个目录
+  # <source-directory>：源目录（要复制的目录）
+  # <destination-directory>：目标目录（复制到的位置）
+  
+  # 示例
+  cp -r packages/locale/en /locale/input
+  # 若是 /locale/input 中已经存在一个 en 文件了，这个命令会覆盖目标位置的 en 文件夹及其内容
+  ```
+
+### 四、文件相关
 
 - **查找文件：**
 
@@ -88,7 +141,7 @@
     # 不保存并退出：按下`Esc`键，然后输入`:q!`，最后按下`Enter`键
     ```
 
-### 二、查看端口进程
+### 五、查看端口进程
 
 查看端口占用的进程信息
 

@@ -34,9 +34,24 @@
 
 2. **output**：打包后的文件输出的位置和文件名
 
-3. **mode**：设置`mode`可以指定**Webpack**的运行模式，可以是`development`、`production`或`none`
+3. **mode**：设置`mode`可以指定**Webpack**的运行模式
 
-   - 不同的模式会对**Webpack**的行为进行优化，例如`development`模式会启用`devtool`来方便调试
+   配置项：
+
+   - **`production`** （**默认值**）
+     - 适用于生产环境，启用生产模式下的一些优化，主要是为了提高性能，它会：
+       - 启用代码压缩（如 `TerserPlugin`）
+       - 删除无用代码（`tree-shaking`）
+       - 使用更高效的模块加载策略
+       - 启用其他的优化（如 **CSS** 压缩）
+
+   - **`development`**
+     - 适用于开发环境，启用开发模式下的一些优化，主要是为了提高开发效率，它会：
+       - 启用 `source maps`，便于调试
+       - 禁用代码压缩，方便调试时查看原始代码
+       - 启用模块热替换（**HMR，Hot Module Replacement**）
+   - **`none`**
+     - 适用于禁用所有优化，此时，**Webpack** 不会进行任何默认的优化，构建过程更加原始，适合用于特定的用例（例如，只需要使用 **Webpack** 的某些特性而不需要优化功能）
 
 4. **loader**：**==文件加载器==**，能够加载资源文件，并对这些文件进行一些处理，诸如编译、压缩等，最终一起打包到指定的文件中
 
@@ -105,8 +120,8 @@ module.exports = {
 
 #### 3.1、 入口(entry)
 
-- 入口起点(`entry point`)指示 **webpack** 应该使用哪个模块，来作为构建其内部依赖图(`dependency graph`) 的**开始**。进入入口起点后，**webpack**会找出有==哪些模块和库是入口起点（直接和间接）依赖的==
-- 默认值是 `./src/index.js`，但你可以通过在 `webpack configuration` 中配置 `entry` 属性，来指定一个（或多个）不同的入口起点
+- 入口( `entry` )指示 **webpack** 应该使用哪个模块，来作为构建其内部依赖图的**起点**，从入口起点开始，**webpack**会找出有==哪些模块和库是入口起点（直接和间接）依赖的==
+- `entry` 默认值是 `./src/index.js`，可以通过在 `webpack configuration` 中配置 `entry` 属性，来指定一个（或多个）不同的入口起点
 
  `src\index.js`
 
@@ -127,7 +142,7 @@ module.exports = {
 #### 3.2、 输出(output)
 
 - `output` 属性告诉**webpack**在哪里输出它所创建的 `bundle`，以及如何命名这些文件
-- 主要输出文件的默认值是 `./dist/main.js`，其他生成文件默认放置在 `./dist` 文件夹中。
+- 主要输出文件的默认值是 `./dist/main.js`，其他生成文件默认放置在 `./dist` 文件夹中
 
 `webpack.config.js`
 
@@ -148,7 +163,7 @@ module.exports = {
 npm run dev
 ```
 
-看下输出文件`./dist/main.js`
+输出文件`./dist/main.js`
 
 ```js
 console.log(111);
@@ -242,7 +257,7 @@ module.exports = {
   - 需要压缩 **HTML**/**CSS**/**JS** 代码
   - 需要压缩图片
 
-**环境变量的设置方式**
+##### 3.5.1、环境变量的设置方式
 
 1. 命令行中使用`--mode`用来设置==模块内的`process.env.NODE_ENV `== <!--Webpack 的 process.env-->
 2. 配置文件中设置`mode`属性来设置==模块内的`process.env.NODE_ENV`== <!--Webpack 的 process.env-->
@@ -250,9 +265,9 @@ module.exports = {
 4. 命令行中使用跨平台设置环境变量的工具`cross-env`来设置==`node`环境==的`process.env.NODE_ENV` <!--node 的 process.env-->
 5. 通过`.env`文件配置环境变量 <!--node 的 process.env-->
 
-> node 的 `process.env`  是一个包含用户环境信息的对象，直接从操作系统的环境变量中读取值
+> **node** 的 `process.env`  是一个包含用户环境信息的对象，直接从操作系统的环境变量中读取值
 >
-> Webpack 的 `process.env`  并不会直接从操作系统中读取环境变量，它使用静态字符串替换的方式来注入环境变量，Webpack 在构建过程中会将代码中的 `process.env` 替换为指定的值。
+> **Webpack** 的 `process.env`  并不会直接从操作系统中读取环境变量，它使用静态字符串替换的方式来注入环境变量，**Webpack** 在构建过程中会将工程代码中的 `process.env` 替换为指定的值
 
 **1、命令行配置**
 
@@ -281,7 +296,9 @@ console.log(process.env.NODE_ENV);// development | production
 console.log('NODE_ENV',process.env.NODE_ENV);// undefined
 ```
 
-或者使用`--mode`直接指定模块内的环境变量
+或者使用 `--mode` 直接指定模块内的环境变量
+
+<!--通过 --mode 指定的 mode 比在 webpack.config.js 中指定的 mode 优先级要高-->
 
 ```json
   "scripts": {
@@ -290,8 +307,6 @@ console.log('NODE_ENV',process.env.NODE_ENV);// undefined
   },
 ```
 
-------
-
 **2、配置文件中设置`mode`**
 
 ```js
@@ -299,8 +314,6 @@ module.exports = {
   mode: 'development'
 }
 ```
-
-------
 
 **3、使用DefinePlugin设置==模块内的全局变量==**
 
@@ -327,8 +340,6 @@ console.log(NODE_ENV);//  production
 console.log('process.env.NODE_ENV_XXX',process.env.NODE_ENV_XXX);// undefined
 console.log('NODE_ENV',NODE_ENV);// error ！！！
 ```
-
-------
 
 **4、cross-env**
 
@@ -389,18 +400,18 @@ console.log(DEV.parsed.NAME) // DEV
 
 #### 4.1、安装服务器
 
-```js
+```bash
 npm install webpack-dev-server --save-dev
 ```
 
 #### 4.2、webpack.config.js
 
-| 类别      | 配置名称   | 描述                                                         |
-| :-------- | :--------- | :----------------------------------------------------------- |
-| output    | path       | 指定输出到硬盘上的目录                                       |
-| output    | publicPath | 表示的是打包生成的index.html文件里面引用资源的前缀           |
-| devServer | publicPath | 表示的是打包生成的静态文件所在的位置(若是devServer里面的publicPath没有设置，则会认为是output里面设置的publicPath的值) |
-| devServer | static     | 用于配置提供额外静态文件内容的目录                           |
+| 类别        | 配置名称     | 描述                                                         |
+| :---------- | :----------- | :----------------------------------------------------------- |
+| `output`    | `path`       | 指定输出到硬盘上的目录                                       |
+| `output`    | `publicPath` | 表示的是打包生成的 `index.html` 文件里面引用资源的前缀       |
+| `devServer` | `publicPath` | 表示的是打包生成的静态文件所在的位置（若是 `devServer` 里面的 `publicPath` 没有设置，则会认为是 `output` 里面设置的 `publicPath` 的值) |
+| `devServer` | `static`     | 用于配置提供额外静态文件内容的目录                           |
 
 ```js
 module.exports = {
@@ -425,10 +436,10 @@ module.exports = {
 
 #### 4.4、webpack-dev-server
 
-关于开发服务器**webpack-dev-server**需要知道的是：
+关于开发服务器**webpack-dev-server**需要知道的是：⚠️
 
-1. 使用`webpack`打包项目，得到输出的文件，==放到输出目录里==<!--output配置的目录-->
-2. ==使用`webpack-dev-server`（`webpack serve`）打包的话，**结果文件并不会写入硬盘，只会写到内存里**== <!--所以使用开发服务器时，在工程里看不到打包后的文件-->
+1. 使用 `webpack` 打包项目，得到输出的文件，==放到输出目录里== <!--output配置的目录-->
+2. 使用`webpack-dev-server`（`webpack serve`）打包的话，**==结果文件并不会写入硬盘，只会写到内存里==**  <!--所以使用开发服务器时，在工程里看不到打包后的文件-->
 
 `webpack-dev-server`会启一个**http服务器**，用来返回打包后的文件
 

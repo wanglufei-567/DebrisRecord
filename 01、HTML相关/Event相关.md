@@ -2,11 +2,13 @@
 
 ### 一、Event
 
-**Event**（事件） 是在浏览器中发生的操作，可以由用户或浏览器本身启动，这些操作这些动作包括点击、加载页面、按键、鼠标移动等等
+**Event**（事件） 是指在浏览器中发生的一些交互操作，可以由用户或浏览器本身触发，这些操作包括点击、加载页面、按键、鼠标移动等
 
-当 **DOM** 中出现的事件被触发时，浏览器会==自动创建一个 **Event** 对象==，这个 **Event** 对象==存储了本次事件相关的信息==，包括事件类型、事件目标、触发元素等等
+当 **DOM** 中出现的事件被触发时，浏览器会==自动创建一个 **Event** 对象==，这个 **Event** 对象==存储了本次事件相关的信息==，包括「事件类型」、「事件目标」、「触发元素」等等
 
-**Event** 构造函数的语法
+#### 1.1、Event 构造函数
+
+**Event** 构造函数的语法👇：
 
 ```js
  event = new Event(typeArg, eventInit);
@@ -18,6 +20,8 @@
   - `bubbles`，可选，`Boolean`类型，默认值为认值为 `false`，表示该事件是否冒泡
   - `cancelable`，可选，`Boolean`类型，默认值为 `false`，表示该事件能否被取消
   - `composed`，可选，`Boolean`类型，默认值为 `false`，指示事件是否会在影子 **DOM** 根节点之外触发侦听器
+
+#### 1.2、Event 对象
 
 **Event** 对象上常用的属性和方法：
 
@@ -42,20 +46,20 @@ document.dispatchEvent(ev);
 myDiv.dispatchEvent(ev);
 ```
 
- **DOM** 元素（比如 <button>、<div>、<span> 等等）可以接收 (或者监听) 这些事件，并且通过事件处理器（事件监听回调函数）去响应（或者处理）它们
+ **DOM** 元素（比如 <button>、<div>、<span> 等等）可以**接收** (或者**监听**) 这些事件，并且通过「事件处理器」（事件监听回调函数）去响应（或者处理）它们
 
 可以使用 `EventTarget.addEventListener()`   给 **DOM** 元素添加事件处理器，使用 `removeEventListener()` 方法移除这些事件处理器
 
 ### 二、EventTarget
 
-**EventTarget**  是一个接口，由**可以接收事件**并且**可以创建侦听器**的对象实现 （一般是 **DOM** 元素）换句话说，任何**可以接收和处理事件**的对象都会实现 **EventTarget** 接口
+**EventTarget**  是一个接口，由**可以接收事件**并且**可以创建侦听器**的对象实现 （一般是 **DOM** 元素）<!--换句话说，任何可以接收和处理事件的对象都会实现 EventTarget 接口-->
 
 在 **Web** 中，最常见的事件目标包括 **Element**（**HTML** 元素）、**document**（文档对象）和 **window**（窗口对象）
 
 **EventTarget**  接口主要提供了三个方法：
 
 - `addEventListener(type, listener, options)`：在 **EventTarget** 上注册特定事件类型的事件侦听器
-  - `type`：`String`类型
+  - `type`：**String** 类型
     - 表示监听的**事件类型**
   - `listener`：当所监听的事件类型触发时，会接收到一个事件通知（实现了 `Event` 接口的对象）的对象
     - `listener` 必须是一个实现了 `EventListener` 接口的对象，或者是一个函数 <!--通常是一个函数-->
@@ -69,7 +73,7 @@ myDiv.dispatchEvent(ev);
       - 设置为 `true` 时，表示 `listener` 永远不会调用 `preventDefault()`
       - 如果 `listener` 仍然调用了这个函数，客户端将会忽略它并抛出一个控制台警告
 - `removeEventListener(type, listener, options)`：在 **EventTarget** 中删除事件侦听器
-  - `type`：`String`类型
+  - `type`：**String** 类型
     - 表示需要移除的事件类型
   - `listener`：需要从目标事件移除的**事件监听器**函数
   - `options`：一个指定事件侦听器特征的可选对象，可选项有：

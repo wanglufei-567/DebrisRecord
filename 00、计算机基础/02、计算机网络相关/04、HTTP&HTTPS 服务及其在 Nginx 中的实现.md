@@ -1,4 +1,4 @@
-## HTTP/HTTPS 服务及其在 Nginx 中的实现
+## HTTP&HTTPS 服务及其在 Nginx 中的实现
 
 ### 一、基础知识
 

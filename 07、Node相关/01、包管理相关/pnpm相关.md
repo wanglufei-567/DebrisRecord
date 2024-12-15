@@ -8,7 +8,7 @@
 
 #### 1.1、 pnpm 优势
 
-1. **pa**
+1. **更小的内存占用**
    - **pnpm** 使用一个「全局的」存储目录（类似于缓存），并通过硬链接或符号链接将包引用到项目中
    - 避免了传统包管理器重复下载和存储相同版本的依赖，从而大幅减少磁盘占用
 2. **更快的安装速度**
@@ -63,16 +63,10 @@ pnpm-workspace.yaml
   pnpm install
   ```
 
-- 仅为`workpace package`安装依赖
-
-  ```shell
-  pnpm install -w
-  ```
-
 - 安装全局的公共依赖包
 
   - `pnpm` 提供了 `-w`, `--workspace-root` 参数，可以将依赖包安装到工程的根目录下，作为所有 `package` 的公共依赖
-  
+
   ```shell
   pnpm add react -w
   pnpm add react -w -D // 安装公共开发依赖

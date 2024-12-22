@@ -272,7 +272,7 @@ console.log(view.state.field(counterField)); // 输出计数器值
 - **`StateEffect` 的作用**: 用于表示附加效果，它们通常不会直接影响文档或选择，但会影响与这些事务相关的「自定义状态字段」（`StateField`）
 - **如何与 `StateField` 配合使用**: 通过将 **StateEffect** 附加到事务中，**StateField** 可以通过 `transaction.effects` 来响应这些效果，从而更新自定义状态字段的值
 - 相关语法:
-  - `StateEffect.define<Value>()` 用来定义一个新的效果类型
+  - `StateEffect.define<Value>()` 用来定义一个新的「副作用」
   - `StateEffect.of(value)` 用来创建一个特定的效果实例，将值附加到效果中
   - 在 `StateField.update` 函数中，使用 `effect.is()` 方法来检查事务中是否包含该效果，并根据需要更新状态
 

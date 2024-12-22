@@ -126,9 +126,9 @@ export { highlightField }
     - **参数**：
       - `field`：表示当前 `StateField` 的实例，已经初始化并绑定到编辑器的状态中
     - **返回值**：
-      - 一个扩展（**Extension**），可以是：
-        - 使用 `facet.from` 创建的 Extension
-        - 其他 **CodeMirror Extension** （例如 View 插件、语言支持等）
+      - 一个扩展（**Extension**）可以是：
+        - 使用 `facet.from` 创建的 **Extension**
+        - 其他 **CodeMirror Extension** （例如 **ViewPlugin**、语言支持等）
 
   - `EditorView.decorations.from(f)`：让编辑器视图自动从当前 `StateField` 的实例中获取装饰信息，并在视图中应用它们
 
@@ -146,7 +146,7 @@ import {  highlightField } from "./highlightField"; // 假设上面定义了 cou
 // 创建 EditorState
 const state = EditorState.create({
   doc: "Hello, world!",
-  extensions: [ highlightField] // 添加自定义的 StateField
+  extensions: [ highlightField()] // 添加自定义的 StateField
 });
 
 // 创建 EditorView

@@ -513,6 +513,17 @@ type Param = ParamType<Func>; // Param = User
 type AA = ParamType<string>; // string
 ```
 
+#### 4.8、修饰符
+
+**TypeScript** 中的修饰符主要有：
+
+1. **`public`**：默认修饰符，成员可以在类的内部和外部访问
+2. **`private`**：仅能在类的内部访问
+3. **`protected`**：可以在类内部和子类中访问
+4. **`readonly`**：声明后不能修改的只读属性
+5. **`static`**：静态成员，属于类本身，通过类名访问
+6. **`abstract`**：用于抽象类或方法，必须由子类实现
+
 ### 5、TS中的内置类型
 
 #### 5.1、`Required<T>` 

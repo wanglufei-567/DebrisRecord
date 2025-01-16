@@ -1,8 +1,8 @@
-## 类式组件中的setState
+## setState 的异步与同步
 
-### 一、不同状态下的setState
+### 一、类式组件中的setState
 
-#### 1.1、同步下的this.setState({newstate})
+#### 1.1、生命周期中的同步this.setState({newstate})
 
 ```js
 import React, { Component } from "react";
@@ -48,7 +48,11 @@ export default class BatchedUpdatesUsage extends Component {
    */
 ```
 
-#### 1.2、同步下的this.setState(updater)
+结果表现是异步执行，this.state 上还是旧值  
+
+<!--其实是批量更新，每次 setState 时， React 内部会将本次更新收集起来，但没有立刻 rerender，等生命周期函数执行完了才进行 rerender-->
+
+#### 1.2、生命周期中的同步this.setState(updater)
 
 ```js
 import React, { Component } from "react";
@@ -113,7 +117,9 @@ export default class BatchedUpdatesUsage extends Component {
      */
 ```
 
-#### 1.3、异步下的this.setState({newstate})
+结果表现是异步执行，this.state 上是旧值，但 updater 上的入参是新值
+
+#### 1.3、异步逻辑中的this.setState({newstate})
 
 ```js
 import React, { Component } from "react";
@@ -161,7 +167,103 @@ export default class BatchedUpdatesUsage extends Component {
      */
 ```
 
-### 二、React合成事件和生命周期中的批量更新流程
+结果表现是同步执行，每次 this.setState 之后，会立刻进入 rerender 流程，rerender 之后才继续执行后续逻辑
+
+<!--符合直观感受，更新state，立刻 rerender -->
+
+### 二、函数式组件中的setState
+
+#### 2.1、useEffect 中的同步setState
+
+```jsx
+import React, { useState, useEffect } from "react";
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  const [flag, setFlag] = useState(false);
+  useEffect(() => {
+    console.log("aaaa", count);
+    setCount(count + 1);
+
+    console.log("bbbb", count);
+    setCount(count + 1);
+
+    console.log("cccc", count);
+
+    setFlag((f) => !f);
+  }, []);
+
+  console.log("render");
+  return (
+    <div>
+      <button>Next</button>
+      <h1 style={{ color: flag ? "blue" : "black" }}>{count}</h1>
+    </div>
+  );
+}
+
+```
+
+打印结果：
+
+```
+render
+aaaa 0
+bbbb 0
+cccc 0
+render
+```
+
+结果表现是异步执行，state 还是旧值  
+
+#### 2.2、useEffect 中的异步setState
+
+```jsx
+import React, { useState } from "react";
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  const [flag, setFlag] = useState(false);
+
+  async function handleClick() {
+    Promise.resolve().then(() => {
+      console.log("aaaa", count);
+      setCount(count + 1);
+
+      console.log("bbbb", count);
+      setCount(count + 1);
+
+      console.log("cccc", count);
+
+      setFlag((f) => !f);
+    });
+  }
+
+  console.log("render");
+  return (
+    <div>
+      <button onClick={handleClick}>Next</button>
+      <h1 style={{ color: flag ? "blue" : "black" }}>{count}</h1>
+    </div>
+  );
+}
+```
+
+打印结果：
+
+```
+render
+aaaa 0
+render
+bbbb 0
+render
+cccc 0
+render
+```
+
+结果表现是同步执行，state 还是旧值是因为闭包导致
+
+### 三、React合成事件和生命周期中的批量更新流程
 
 ![image-20211217130015211](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20220410135754524.png)
 
@@ -204,4 +306,6 @@ _processPendingState: function(props, context) {
 
 ```
 
+#### 四、React 18 之后的 setState 的批量更新
 
+setState 创建的更新任务是微任务，Scheduler 中会将所有更新收集到更新队列中，宏任务中所有的 setState 的更新都会被收集起来，在宏任务完成之后拿出来进行更新

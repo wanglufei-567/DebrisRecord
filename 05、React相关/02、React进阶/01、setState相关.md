@@ -308,4 +308,4 @@ _processPendingState: function(props, context) {
 
 #### 四、React 18 之后的 setState 的批量更新
 
-setState 创建的更新任务是微任务，Scheduler 中会将所有更新收集到更新队列中，宏任务中所有的 setState 的更新都会被收集起来，在宏任务完成之后拿出来进行更新
+setState 创建的更新任务是宏任务，Scheduler 中会将所有更新收集到更新队列中，宏任务中所有的 setState 的更新都会被收集起来，在宏任务完成之后拿出来进行更新

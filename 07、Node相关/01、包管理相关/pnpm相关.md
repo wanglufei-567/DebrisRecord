@@ -107,20 +107,26 @@ pnpm-workspace.yaml
   pnpm remove axios --filter  @monorepo/http // 单个package
   ```
 
-- 查看依赖树
+- 查看依赖树 <!--无法指定版本-->
 
   ```shell
-  pnpm list [package]// 查看全局公共依赖
-  pnpm list [package] -r // 查看每个package的依赖
-  pnpm list [package] -r --filter pkg1 // 查看pkg1的依赖
+  pnpm lis #列出当前项目的所有依赖（默认仅显示直接依赖
+  pnpm list [package] # 查看全局公共依赖
+  pnpm list [package] -r # 查看每个package的依赖
+  pnpm list [package] -r --filter pkg1 # 查看pkg1的依赖
+  
+  # 默认情况下，pnpm list 只会显示直接依赖的列表。如果想查看间接依赖（即依赖的依赖），可以通过指定 --depth 参数来调整显示的层级深度
+  pnpm list --depth 1 # 显示直接依赖以及一级的间接依赖
+  pnpm list --depth Infinity # 显示所有层级的依赖（全部展开）
   ```
 
-- 查看某个包的依赖树
+- 解释某个特定依赖为什么会被安装，以及哪些包依赖它<!--可以指定版本-->
 
   ```shell
-  pnpm why react -r // 显示依赖于指定 package的所有 package
+  # --recursive `-r` 参数表示执行该命令于子目录所有package中，或者如果执行在一个工作空间时，在工作空间的所有package执行
+  pnpm why react -r 
   
-  #`--recursive` `-r` 参数表示执行该命令于子目录所有`package` 中，或者如果执行在一个工作空间时，在工作空间的所有`package`执行
+  pnpm why react@18.2.0 -r 
   ```
 
 - 执行子包中的命令

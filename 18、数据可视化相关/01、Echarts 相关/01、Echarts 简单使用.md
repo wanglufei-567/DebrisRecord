@@ -520,7 +520,10 @@ option = {
 - **`type`**：指定映射类型，通常有两种类型：
   - `continuous`：连续型映射，适用于数值范围较广的数据
   - `piecewise`：分段型映射，适用于将数据分为多个区间进行映射
-- **`dimension`**：指定映射的维度，通常是数据集中某一列的索引（从 0 开始）
+- **`dimension`**：指定映射的维度，通常是数据集中某一列的索引（从 0 开始）<!--使用哪一个维度作为映射的数据源-->
+- **`seriesIndex`**：指定哪些 `series` 会受到视觉映射的影响，是一个数组包含一个或多个系列的索引 
+  - 不设置（默认情况）或设置为 `null`，表示影响所有 `series`
+
 - **`min` 和 `max`**：定义映射的数值范围
 - **`inRange`**：定义数值范围内的视觉属性（如颜色、大小等）
 - **`outOfRange`**：定义数值超出范围时的视觉属性
@@ -532,69 +535,158 @@ option = {
 适用于数据值范围比较连续的情况，如温度、销售额等
 
 ```javascript
-option = {
-  visualMap: {
-    type: 'continuous',
-    dimension: 1,  // 映射第 2 列（如 'sales'）的数据
-    min: 0,
-    max: 200,
-    inRange: {
-      color: ['#ffcccc', '#ff0000']  // 数值从 0 到 200 映射为从浅红到深红的颜色
+var option = {
+  title: {
+    text: '销售数据统计',
+    left: 'center'
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
     }
+  },
+  legend: {
+    data: ['销量', '库存'],
+    top: '5%'
   },
   dataset: {
     source: [
-      ['product', 'sales'],
-      ['A', 120],
-      ['B', 200],
-      ['C', 150]
+      ['product', '销量', '库存'],
+      ['衬衫', 120, 150],
+      ['羊毛衫', 200, 280],
+      ['雪纺衫', 350, 400],
+      ['裤子', 80, 120],
+      ['高跟鞋', 470, 430],
+      ['袜子', 110, 180]
     ]
   },
-  series: [{
-    type: 'bar',
-    encode: {
-      x: 'product',
-      y: 'sales',
+  visualMap: {
+    type: 'continuous', // 连续型视觉映射组件（默认值）
+    dimension: 1, // 指定用数据的第几个维度（即series中的data数组的索引）来映射
+    min: 0,
+    max: 500,
+    left: 'right',
+    top: 'bottom',
+    text: ['高', '低'],
+    calculable: true,
+    inRange: {
+      color: ['#50a3ba', '#eac736', '#d94e5d']
+    },
+    outOfRange: {
+      color: '#999'
+    },
+    show: true,
+    seriesIndex: [0]  // 仅影响第一个系列（销量）
+  },
+  xAxis: {
+    type: 'category'
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      name: '销量',
+      type: 'bar',
+      encode: { x: 'product', y: '销量' },  // 指定使用的维度
       itemStyle: {
-        color: 'sales'  // 使用 visualMap 映射的颜色
+        // 根据visualMap自动设置颜色
+      }
+    },
+    {
+      name: '库存',
+      type: 'bar',
+      encode: { x: 'product', y: '库存' },  // 指定使用的维度
+      itemStyle: {
+        color: '#999'  // 固定颜色，不受visualMap影响
       }
     }
-  }]
+  ]
 };
 ```
+
+效果如下👇
+
+<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202502131547797.png" alt="image-20250213154755738" style="zoom:40%;" />
 
 - #### **分段型映射（`piecewise`）**
 
 适用于数据值需要被分段处理的情况，如风险等级、分数等
 
 ```javascript
-option = {
-  visualMap: {
-    type: 'piecewise',
-    dimension: 1,  // 映射第 2 列（如 'sales'）的数据
-    pieces: [
-      { gt: 0, lte: 100, color: '#ffcccc' },  // 小于等于 100 映射为浅红
-      { gt: 100, lte: 200, color: '#ff0000' }  // 大于 100 小于等于 200 映射为红色
-    ]
+var option = {
+  title: {
+    text: '销售数据统计 - 分段视觉映射',
+    left: 'center'
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    }
+  },
+  legend: {
+    data: ['销量', '库存'],
+    top: '5%'
   },
   dataset: {
     source: [
-      ['product', 'sales'],
-      ['A', 120],
-      ['B', 200],
-      ['C', 150]
+      ['product', '销量', '库存'],
+      ['衬衫', 120, 150],
+      ['羊毛衫', 200, 280],
+      ['雪纺衫', 350, 400],
+      ['裤子', 80, 120],
+      ['高跟鞋', 470, 430],
+      ['袜子', 110, 180]
     ]
   },
-  series: [{
-    type: 'bar',
-    encode: {
-      x: 'product',
-      y: 'sales',
+  visualMap: {
+    type: 'piecewise',  // 分段型视觉映射组件
+    dimension: 1,
+    min: 0,
+    max: 500,
+    left: 'right',
+    top: 'bottom',
+    text: ['高','低'],
+    calculable: true,
+    pieces: [
+      {min: 400, label: '非常高', color: '#d94e5d'},
+      {min: 300, max: 400, label: '高', color: '#eac736'},
+      {min: 200, max: 300, label: '中', color: '#50a3ba'},
+      {min: 100, max: 200, label: '低', color: '#50a3ba'},
+      {max: 100, label: '非常低', color: '#999'}
+    ],
+    show: true,
+    seriesIndex: [0]  // 仅影响第一个系列（销量）
+  },
+  xAxis: {
+    type: 'category'
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      name: '销量',
+      type: 'bar',
+      encode: { x: 'product', y: '销量' },
       itemStyle: {
-        color: 'sales'  // 使用 visualMap 映射的颜色
+        // 根据visualMap自动设置颜色
+      }
+    },
+    {
+      name: '库存',
+      type: 'bar',
+      encode: { x: 'product', y: '库存' },
+      itemStyle: {
+        color: '#999'  // 固定颜色，不受visualMap影响
       }
     }
-  }]
+  ]
 };
 ```
 
+效果如下👇 
+
+<img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/202502131549558.png" alt="image-20250213154937444" style="zoom:40%;" />

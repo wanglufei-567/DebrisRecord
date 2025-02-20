@@ -1,14 +1,21 @@
-## React18源码解析（七）实现fiber调和更新
+## React18 源码解析（七）实现 fiber 调和更新
 
 ### 一、前言
 
 #### 1.1、调和更新
 
-**React**的调和更新采用了**双缓冲**的思想，维护了两棵**fiber**树，一棵**fiber**树用于渲染展示，另一棵**fiber**树用于计算更新；计算更新是以单个**fiber**节点为工作单元，完成更新队列中更新内容处理、生成新的**VDom**、根据**VDom**调和子**fiber**等工作
+**React** 的调和更新采用了**双缓冲**的思想，维护了两棵 **fiber** 树：
+- 一棵 **fiber** 树用于渲染展示
+- 另一棵 **fiber** 树用于计算更新
+
+计算更新是以单个 **fiber** 节点为工作单元，完成:
+- 更新队列中更新内容处理
+- 生成新的 **VDom**
+- 根据 **VDom** 调和子 **fiber** 等工作
 
 #### 1.2、实现一个日志工具
 
-为了方便调试代码，在src/shared/logger.js中实现一个日志工具
+为了方便调试代码，在 `src/shared/logger.js` 中实现一个日志工具
 
 ```js
 import * as ReactWorkTags from "react-reconciler/src/ReactWorkTags";
@@ -51,7 +58,7 @@ export const HostText = 6; //纯文件节点
 
 ### 二、fiber的调和更新
 
-在在`src\react-reconciler\src\ReactFiberReconciler.js`的**更新容器**的方法`updateContainer`中调用`fiber`的**调度更新**的方法`scheduleUpdateOnFiber`
+在 `src\react-reconciler\src\ReactFiberReconciler.js` 的**更新容器**的方法 `updateContainer` 中调用 `fiber` 的**调度更新**的方法 `scheduleUpdateOnFiber`
 
 ```js
 // src/react-reconciler/src/ReactFiberReconciler.js
@@ -64,7 +71,7 @@ export const HostText = 6; //纯文件节点
  * container.current 指向 HostRootFiber
  */
 export function updateContainer(element, container) {
-  
+
   // ...
 
   // 在fiber上调度更新
@@ -74,7 +81,7 @@ export function updateContainer(element, container) {
 
 ------
 
-在`src/react-reconciler/src/ReactFiberWorkLoop.js`中实现`scheduleUpdateOnFiber`
+在 `src/react-reconciler/src/ReactFiberWorkLoop.js` 中实现 `scheduleUpdateOnFiber`
 
 ```js
 // src/react-reconciler/src/ReactFiberWorkLoop.js
@@ -143,8 +150,8 @@ function workLoopSync() {
 
 上面👆这段实现中没有什么具体逻辑，主要逻辑在下面👇这两个方法中
 
-- `prepareFreshStack(root)` 
-  - 根据老的`fiber`树创建一个全新的`fiber`树，两棵树通过`alternate`属性互相指向 <!--这里使用的是双缓冲思想，并且初次渲染时，老的fiber树是空的-->
+- `prepareFreshStack(root)`
+  - 根据老的`fiber`树创建一个全新的`fiber`树，后续用于替换掉老的`fiber`树
   - 将新的`fiber`树赋值给`workInProgress`用作于后续工作循环中的计算
 - `workLoopSync()`
   - 开启工作循环中执行工作单元`performUnitOfWork(workInProgress)`
@@ -157,24 +164,24 @@ function workLoopSync() {
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/renderFiber1_1664076149659.jpg" alt="img" style="zoom:50%;" />
 
-可以发现有两个`HostRootFiber`，并且两个`HostRootfiber`通过`alternate`属性互相指向；
+可以发现有两个 `HostRootFiber`，并且两个 `HostRootfiber` 通过 `alternate` 属性互相指向；
 
-`HostRootFiber`是根`fiber`，就是最顶端的那个`fiber`，既然`HostRootFiber`有两个，那就意味着`fiber`树应当也有两个，另外也可以发现`FiberRootNode`是和其中的一个`HostRootFiber`是互相指向的；
+`HostRootFiber` 是根 `fiber`，就是最顶端的那个 `fiber`，既然 `HostRootFiber` 有两个，那就意味着 `fiber` 树应当也有两个，另外也可以发现 `FiberRootNode` 是和其中的一个 `HostRootFiber` 是互相指向的；
 
-这里是应用了双缓冲技术，也就是有两个`fibe`r树，
+这里是应用了双缓冲技术，也就是有两个 `fiber` 树，
 
-- 一个用于展示（与`FiberRootNode`互相指向的）
-  - 对应页面上的真实DOM元素，代表当前已经渲染渲染完成`fiber`
+- 一个用于展示（与 `FiberRootNode` 互相指向的）
+  - 对应页面上的真实DOM元素，代表当前已经渲染渲染完成 `fiber`
 - 一个用于渲染计算
-  - ==对应的是正在构建中的新的`fiber`树，表示还没有生效，没有更新到DOM上`fiber`树==
+  - ==对应的是正在构建中的新的 `fiber` 树，表示还没有生效，没有更新到DOM上 `fiber` 树==
 
-两个`fiber`树互相进行交替，`FiberRootNode`会在两个fiber树上来回进行切换
+两个 `fiber` 树互相进行交替，`FiberRootNode` 会在两个fiber树上来回进行切换
 
 这么做的好处在于类似于屏幕渲染时，下一帧在渲染到屏幕上前就已经绘制好了
 
 ------
 
-在`src/react-reconciler/src/ReactFiber.js`中实现`createWorkInProgress`
+在 `src/react-reconciler/src/ReactFiber.js` 中实现 `createWorkInProgress`
 
 ```js
 /**
@@ -211,13 +218,13 @@ export function createWorkInProgress(current, pendingProps) {
 
 ```
 
-`createWorkInProgress`就是基于老的`fiber`和新的属性创建新的`fiber`
+`createWorkInProgress` 就是基于老的 `fiber` 和新的属性创建新的 `fiber`
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/prepareFreshStack_1664040902497.png" alt="img" style="zoom:50%;" />
 
 ### 四、实现工作循环
 
-在`src/react-reconciler/src/ReactFiberWorkLoop.js`中实现`performUnitOfWork`
+在 `src/react-reconciler/src/ReactFiberWorkLoop.js` 中实现 `performUnitOfWork`
 
 ```js
 // src/react-reconciler/src/ReactFiberWorkLoop.js
@@ -245,9 +252,9 @@ function performUnitOfWork(unitOfWork) {
 }
 ```
 
-上面👆这段实现中的核心逻辑在于`beginWork`和`completeUnitOfWork`，==执行单个`fiber`节点对应的执行任务单元并返回下一个执行单元，若没有返回下一个执行单元，则说明当前`fiber`节点已经全部完成了==；
+上面👆这段实现中的核心逻辑在于 `beginWork` 和 `completeUnitOfWork`，==执行单个 `fiber` 节点对应的执行任务单元并返回下一个执行单元，若没有返回下一个执行单元，则说明当前 `fiber` 节点已经全部完成了==；
 
-工作循环的目的就是深度遍历整个`fiber`树，将每个`fiber`节点都当作是一个工作单元；
+工作循环的目的就是深度遍历整个 `fiber` 树，将每个 `fiber` 节点都当作是一个工作单元；
 
 看下下面👇整个工作循环的示意图，可以先简单了解下整个工作循环的步骤
 
@@ -259,7 +266,7 @@ function performUnitOfWork(unitOfWork) {
 
 ### 五、实现beginWork
 
-在`src/react-reconciler/src/ReactFiberBeginWork.js`中实现`beginWork`
+在 `src/react-reconciler/src/ReactFiberBeginWork.js` 中实现 `beginWork`
 
 ```js
 // src/react-reconciler/src/ReactFiberBeginWork.js
@@ -295,9 +302,9 @@ export function beginWork(current, workInProgress) {
 
 另外需要注意⚠️的是，`beginWork`中构建并返回的是子`fiber`；
 
-工作循环的目的就是深度遍历整个`fiber`树，所以`beginWork`首先处理的便是`HostRootfiber`（`tag`为`3`），那么接下来首先实现**根`fiber`类型**的更新方法`updateHostRoot`👇
+工作循环的目的就是深度遍历整个 `fiber` 树，所以`beginWork`首先处理的便是`HostRootfiber`（`tag`为`3`），那么接下来首先实现**根`fiber`类型**的更新方法`updateHostRoot`👇
 
-#### 5.1、实现==**根`fiber`类型**==的更新方法`updateHostRoot`
+#### 5.1、实现**根`fiber`类型**的更新方法`updateHostRoot`
 
 ```js
 // src/react-reconciler/src/ReactFiberBeginWork.js
@@ -318,7 +325,7 @@ function updateHostRoot(current, workInProgress) {
 
   // nextChildren就是新的子虚拟DOM
   const nextChildren = nextState.element; //h1
- 
+
   // 根据新的虚拟DOM生成子fiber链表 DOM diff就在这里做的
   reconcileChildren(current, workInProgress, nextChildren);
 
@@ -336,7 +343,7 @@ function updateHostRoot(current, workInProgress) {
 
 ------
 
-首先在`src/react-reconciler/src/ReactFiberClassUpdateQueue.js`中实现更新单个`fiber`上的更新队列的处理方法 `processUpdateQueue`
+首先在 `src/react-reconciler/src/ReactFiberClassUpdateQueue.js` 中实现更新单个 `fiber` 上的更新队列的处理方法 `processUpdateQueue`
 
 ```js
 /**
@@ -394,7 +401,7 @@ function getStateFromUpdate(update, prevState) {
 
 ```
 
-上面👆这段实现的逻辑简单理解就是将当前`fiber`节点上的更新队列中==所有的更新对象（`update`）进行合并==得到一个最终的更新状态并挂到当前`fiber`节点的`memoizedState`属性上
+上面👆这段实现的逻辑简单理解就是将当前`fiber`节点上的更新队列中==所有的更新对象（update）进行合并==得到一个最终的更新状态并挂到当前`fiber`节点的`memoizedState`属性上
 
 再看下更新队列的示意图：
 
@@ -402,7 +409,7 @@ function getStateFromUpdate(update, prevState) {
 
 ------
 
-然后再在`src/react-reconciler/src/ReactFiberBeginWork.js`中实现根据VDom生成`fiber`的方法`reconcileChildren`	
+然后再在 `src/react-reconciler/src/ReactFiberBeginWork.js` 中实现根据VDom生成 `fiber` 的方法 `reconcileChildren`
 
 ```js
 // src/react-reconciler/src/ReactFiberBeginWork.js
@@ -559,7 +566,7 @@ export const reconcileChildFibers = createChildReconciler(true);
       const created = createFiberFromElement(element);
       created.return = returnFiber;
       return created;
-    } 
+    }
   ```
 
   将该==子`fiber`的`return`属性指向其父`fiber`==，到这里就完成了父`fiber`和子`fiber`的相互指向了
@@ -708,7 +715,7 @@ export function beginWork(current, workInProgress) {
 
 ------
 
-在`src/react-reconciler/src/ReactFiberBeginWork.js`中创建`updateHostComponent`
+在 `src/react-reconciler/src/ReactFiberBeginWork.js` 中创建`updateHostComponent`
 
 ```jsx
 /**
@@ -734,7 +741,7 @@ function updateHostComponent(current, workInProgress) {
 ```
 
 ```jsx
-// src/react-dom-bindings/src/ReactDOMHostConfig.js
+// src/react-dom-bindings/src/client/ReactDOMHostConfig.js
 
 export function shouldSetTextContent(type, props) {
   return typeof props.children === "string" || typeof props.children === "number";
@@ -794,7 +801,7 @@ function reconcileChildren(current, workInProgress, nextChildren) {
 
 ------
 
-在`src/react-reconciler/src/ReactChildFiber.js`中实现`mountChildFibers`
+在 `src/react-reconciler/src/ReactChildFiber.js` 中实现 `mountChildFibers`
 
 ```jsx
 import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols';
@@ -984,7 +991,7 @@ function reconcileChildren(current, workInProgress, nextChildren) {
         nextChildren
       );
   } else {
-    // 
+    //
   }
 }
 ```
@@ -1128,7 +1135,7 @@ function completeUnitOfWork(unitOfWork) {
 
 ------
 
-在`src/react-reconciler/src/ReactFiberCompleteWork.js`中实现并导出`completeWork`
+在 `src/react-reconciler/src/ReactFiberCompleteWork.js` 中实现并导出`completeWork`
 
 ```jsx
 import logger, { indent } from "shared/logger";
@@ -1155,36 +1162,36 @@ export function completeWork(current, workInProgress) {
   switch (workInProgress.tag) {
     // 根fiber
     case HostRoot:
-      //向上冒泡属性
+      // 向上冒泡属性
       bubbleProperties(workInProgress);
       break;
     // 原生节点的fiber
     case HostComponent:
-      //现在只是在处理创建或者说挂载新节点的逻辑，后面此处分进行区分是初次挂载还是更新
+      // 现在只是在处理创建或者说挂载新节点的逻辑，后面此处分进行区分是初次挂载还是更新
 
-      //创建真实的DOM节点
+      // 创建真实的DOM节点
       const { type } = workInProgress;
       const instance = createInstance(type, newProps, workInProgress);
 
-      //把自己所有的儿子都添加到自己的身上
+      // 把自己所有的儿子都添加到自己的身上
       appendAllChildren(instance, workInProgress);
 
-      // 将真实DOM挂到当前fiber的stateNode上
+      // 将真实DOM挂到当前 fiber 的 stateNode 上
       workInProgress.stateNode = instance;
 
       // 完成真实DOM的构建
       finalizeInitialChildren(instance, type, newProps);
 
-      //向上冒泡属性
+      // 向上冒泡属性
       bubbleProperties(workInProgress);
       break;
     // 文本节点的fiber
     case HostText:
-      //如果完成的fiber是文本节点，那就创建真实的文本节点
+      // 如果完成的 fiber 是文本节点，那就创建真实的文本节点
       const newText = newProps;
-      //创建真实的DOM节点并传入stateNode
+      // 创建真实的DOM节点并传入 stateNode
       workInProgress.stateNode = createTextInstance(newText);
-      //向上冒泡属性
+      // 向上冒泡属性
       bubbleProperties(workInProgress);
       break;
   }
@@ -1202,7 +1209,7 @@ export function completeWork(current, workInProgress) {
 
 ------
 
-在`src/react-dom-bindings/src/client/ReactDOMHostConfig.js`中实现并导出创建**真实Dom**的方法
+在 `src/react-dom-bindings/src/client/ReactDOMHostConfig.js` 中实现并导出创建**真实Dom**的方法
 
 ```jsx
 export function createTextInstance(content) {
@@ -1271,7 +1278,7 @@ export function appendInitialChild(parent, child) {
 
 ------
 
-实现`finalizeInitialChildren`
+实现 `finalizeInitialChildren`
 
 ```jsx
 // src/react-dom-bindings/src/client/ReactDOMHostConfig.js
@@ -1318,7 +1325,7 @@ export function setInitialProperties(domElement, tag, props) {
 
 ------
 
-实现`bubbleProperties`
+实现 `bubbleProperties`
 
 ```jsx
 // src/react-reconciler/src/ReactFiberCompleteWork.js

@@ -23,8 +23,8 @@ function performConcurrentWorkOnRoot(root) {
 
 这个方法主要完成了以下工作：
 
-- 根据虚拟DOM构建`fiber`树,要创建真实的DOM节点（也就是调和更新，已完成）
-- 还需要把真实的DOM节点插入容器（也就是提交更新，未完成）
+- 根据 **VirtualDOM** 构建 `fiber` 树，创建「**真实 Dom 节点**」（也就是调和更新，已完成）
+- 还需要把「**真实 Dom 节点**」插入容器（也就是提交更新，未完成）
 
 那么接下来就是先提交更新的部分👇
 
@@ -46,12 +46,12 @@ function performConcurrentWorkOnRoot(root) {
 }
 ```
 
-- 首先从`root`上拿到负责计算的`fiber`树`root.current.alternate`并挂到`root`的`finishedWork`属性上
-- 再进行提交`commitRoot(root)`
+- 首先从 `root` 上拿到负责计算的 `fiber` 树 `root.current.alternate` 并挂到 `root` 的 `finishedWork` 属性上
+- 再进行提交 `commitRoot(root)`
 
 ------
 
-实现`commitRoot`
+实现 `commitRoot`
 
 ```jsx
 // src/react-reconciler/src/ReactFiberWorkLoop.js
@@ -67,7 +67,7 @@ function commitRoot(root) {
     (finishedWork.subtreeFlags & MutationMask) !== NoFlags;
   const rootHasEffect =
     (finishedWork.flags & MutationMask) !== NoFlags;
-  //如果自己的副作用或者子节点有副作用就进行提交DOM操作
+  //如果自己有副作用或者子节点有副作用就进行提交DOM操作
   if (subtreeHasEffects || rootHasEffect) {
     commitMutationEffectsOnFiber(finishedWork, root);
   }
@@ -77,11 +77,11 @@ function commitRoot(root) {
 }
 ```
 
-上面这段实现主要是判断`HostRootFiber`上是否有副作用，如有副作用则进行DOM的提交操作 <!--这里的副作用就是指DOM的增删改-->，具体的提交逻辑在`commitMutationEffectsOnFiber`中
+上面这段实现主要是判断 `HostRootFiber` 上是否有副作用，如有副作用则进行 **DOM** 的提交操作 <!--这里的副作用就是指DOM的增删改-->，具体的提交逻辑在 `commitMutationEffectsOnFiber` 中
 
 ------
 
-在`src/react-reconciler/src/ReactFiberCommitWork.js`中实现并导出`commitMutationEffectsOnFiber`
+在 `src/react-reconciler/src/ReactFiberCommitWork.js` 中实现并导出 `commitMutationEffectsOnFiber`
 
 ```js
 /**
@@ -106,19 +106,19 @@ export function commitMutationEffectsOnFiber(finishedWork, root) {
 }
 ```
 
-`commitMutationEffectsOnFiber`是根据fiber的类型来选择何种执行副作用的方法
+`commitMutationEffectsOnFiber` 是根据 `fiber` 的类型来选择何种执行副作用的方法
 
-根`fiber`、原生组件`fiber`、原生文本`fiber`：
+根 `fiber`、原生组件 `fiber`、原生文本 `fiber`：
 
-- 先遍历当前`fiber`的子`fiber`，完成它们的副作用 `recursivelyTraverseMutationEffects`，这里递归调用了`commitReconciliationEffects`
+- 先遍历当前 `fiber` 的子 `fiber`，完成它们的副作用 `recursivelyTraverseMutationEffects`，这里递归调用了 `commitReconciliationEffects`
 
-- 再完成当前`fiber`节点自己的副作用`commitReconciliationEffects`
+- 再完成当前 `fiber` 节点自己的副作用 `commitReconciliationEffects`
 
   <!--也就是先从上往下找到最下面的子fiber，再从下往上完成提交，和工作循环中完成阶段的顺序一致-->
 
 ------
 
-首先实现`recursivelyTraverseMutationEffects`
+首先实现 `recursivelyTraverseMutationEffects`
 
 ```jsx
 /**
@@ -144,9 +144,9 @@ export const Update = 0b00000000000000000000000100;
 export const MutationMask = Placement | Update;
 ```
 
-处理子`fiber`的逻辑本身并不复杂，找到第一个子fiber节点再递归调用`commitMutationEffectsOnFiber`，然后再通过第一个子`fiber`节点找到后面的`sibling fiber`递归调用`commitMutationEffectsOnFiber`
+处理子 `fiber` 的逻辑本身并不复杂，找到第一个子 `fiber` 节点再递归调用 `commitMutationEffectsOnFiber`，然后再通过第一个子 `fiber` 节点找到后面的 `sibling fiber` 递归调用 `commitMutationEffectsOnFiber`
 
-但需要注意⚠️的是这个判断条件 `if (parentFiber.subtreeFlags & MutationMask)`，这个**很重要**，子`fiber`链上有更新或插入的副作用才会进行递归 <!--一个fiber节点初次挂载时，它的subtreeFlags为0，也就是它的所有子fiber都没有副作用，所有子fiber对应的真实DOM都在 工作循环的完成阶段 追加到了该fiber自己的真实DOM上了, 所以后续递归执行`commitMutationEffectsOnFibe到该fiber的子fiber时，在recursivelyTraverseMutationEffects这里便不会继续下去-->
+但需要注意⚠️的是这个判断条件 `if (parentFiber.subtreeFlags & MutationMask)`，这个**很重要**，子`fiber`链上有更新或插入的副作用才会进行递归 <!--一个 fiber 节点初次挂载时，它的 subtreeFlags 为0，也就是它的所有子 fiber 都没有副作用，所有子 fiber 对应的真实DOM都在「工作循环」的「完成阶段」追加到了该 fiber 自己的真实DOM上了, 所以后续递归执行 commitMutationEffectsOnFibe 到该 fiber 的子fiber 时，在 recursivelyTraverseMutationEffects 这里便不会继续下去-->
 
 ------
 
@@ -169,7 +169,7 @@ export const MutationMask = Placement | Update;
 }
 ```
 
-注意⚠️这个判断条件`if (flags & Placement)`，这个很重要，`fiber`有插入副作用才会执行`commitPlacement`完成真实DOM的添加 <!--初次渲染时HostRootFiber上便没有flags-->
+注意⚠️这个判断条件 `if (flags & Placement)`，这个很重要，`fiber` 有插入副作用才会执行 `commitPlacement` 完成「**真实 DOM**」的添加  <!--初次渲染时HostRootFiber上便没有flags-->
 
 ------
 
@@ -203,12 +203,12 @@ function commitPlacement(finishedWork) {
 }
 ```
 
-真实DOM的添加主要包含以下几部分：
+「**真实 DOM**」的添加主要包含以下几部分：
 
-- 根据当前`fiber`向上寻找，直到找到原生节点`fiber`或者根`fiber` `getHostParentFiber`
+- 根据当前 `fiber` 向上寻找，直到找到原生节点 `fiber` 或者根`fiber`  （`getHostParentFiber`）
 
-- 找到要插入真实DOM的锚点（不一定有）`getHostSibling`
-- 完成真实DOM的添加`insertOrAppendPlacementNode`，有锚点就插入到锚点前，没有就直接添加到父节点上
+- 找到要插入「**真实 DOM**」的锚点（不一定有）（`getHostSibling`）
+- 完成「**真实 DOM**」的添加 `insertOrAppendPlacementNode`，有锚点就插入到锚点前，没有就直接添加到父节点上
 
 ------
 
@@ -268,7 +268,7 @@ function getHostSibling(fiber) {
 }
 ```
 
-找锚点的目的是找到一个没有**插入副作用**的原生节点的`fiber`，先从自己的兄弟中找，自己的兄弟中没有则往上在父节点的兄弟中找，若是找到原生节点`fiber`或者根`fiber`都没找到便直接返回`null`
+找锚点的目的是找到一个没有**插入副作用**的原生节点的 `fiber`，先从自己的兄弟中找，自己的兄弟中没有则往上在父节点的兄弟中找，若是找到原生节点 `fiber` 或者根 `fiber` 都没找到便直接返回 `null`
 
 ------
 
@@ -311,13 +311,13 @@ function insertOrAppendPlacementNode(node, before, parent) {
 }
 ```
 
-真实DOM的添加包含了以下的内容
+「**真实 DOM**」的添加包含了以下的内容
 
-- 当前`fiber`是原生节点或者原生文本
-  - 有锚点则执行插入`insertBefore`
-  - 没有锚点则执行追加`appendChild`
-- 当前`fiber`不是是原生节点或者原生文本
-  - 递归执行当前`fiber`的子`fiber`们`insertOrAppendPlacementNode`
+- 当前 `fiber` 是原生节点或者原生文本
+  - 有锚点则执行插入 `insertBefore`
+  - 没有锚点则执行追加 `appendChild`
+- 当前 `fiber` 不是是原生节点或者原生文本
+  - 递归执行当前 `fiber` 的子 `fiber` 们 `insertOrAppendPlacementNode`
 
 ------
 

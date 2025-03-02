@@ -311,20 +311,20 @@ export const Placement = 0b00000000000000000000000010;
 export const Update = 0b00000000000000000000000100;
 ```
 
-到这里 `ReactDOMRoot` 的整体结构已经搭建好了，其实没什么具体的逻辑，主要是创建了 3 个全局对象，只是文件比较多，链路有些长，创建了很多中间的构造函数，看起来让人头大；
+到这里 `ReactDOMRoot` 的整体结构已经搭建好了，其实没什么具体的逻辑，主要是创建了 3 个「**全局对象**」，只是文件比较多，链路有些长，创建了很多中间的构造函数，看起来让人头大；
 
-- **ReactDOMRoot** 对象
+- **ReactDOMRoot** 对象 <!-- react-dom/client 中 createRoot 创建的 root 对象，用户创建-->
   - 该对象属于 `react-dom` 包，这个对象就是 `root`
-- **FiberRoot** 对象（也可称其为 **FiberRootNode** 对象）
-  - 该对象属于 `react-reconciler` 包，在 `createFiberRoot` 函数中创建，作为 `react-reconciler` 在运行过程中的全局上下文，保存着 `fiber` 构建过程中所依赖的全局状态
-- **HostRootFiber** 对象
+- **FiberRoot** 对象（也可称其为 **FiberRootNode** 对象）<!--fiber 根节点，fiber 树挂载的地方-->
+  - 该对象属于 `react-reconciler` 包，在 `createFiberRoot` 函数中创建，作为 `react-reconciler` 在运行过程中的「**全局上下文**」，保存着 `fiber` 构建过程中所依赖的全局状态
+- **HostRootFiber** 对象 <!--根 fiber，fiber 树的起始 fiber-->
   - 该对象属于 `react-reconciler` 包，在 `createHostRootFiber` 函数中创建，这是 React 应用中的第一个 `fiber` 对象, 是 `fiber` 树的根节点。
 
 下面👇是整个 `ReactDOMRoot` 创建的流程图
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/2ecc028b2af04fe1ba9ef71f426ae064%7Etplv-k3u1fbpfcp-zoom-in-crop-mark%3A4536%3A0%3A0%3A0.image)
 
-下面👇这个是 `ReactDOMRoot`、`FiberRoot`、`HostFiberRoot` 三个对象内存中的引用关系
+下面👇这个是 **ReactDOMRoot**、**FiberRoot**、**HostFiberRoot** 三个对象内存中的引用关系，可以发现 **FiberRoot**（**fiber 根节点**）上保存了真实的 **DOM** 节点（**root** 节点），并且与 **HostFiberRoot**（**根 fiber** ）互相指向
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/8a4c50e65357451d8d1410e2ceef95ff%7Etplv-k3u1fbpfcp-zoom-in-crop-mark%3A4536%3A0%3A0%3A0.image)
 

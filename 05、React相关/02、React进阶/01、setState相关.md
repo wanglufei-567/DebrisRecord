@@ -219,7 +219,7 @@ render
 #### 2.2、useEffect 中的异步setState
 
 ```jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function App() {
   const [count, setCount] = useState(0);
@@ -238,6 +238,10 @@ export default function App() {
       setFlag((f) => !f);
     });
   }
+  
+  useEffect(() => {
+    handleClick();
+  }, []);
 
   console.log("render");
   return (

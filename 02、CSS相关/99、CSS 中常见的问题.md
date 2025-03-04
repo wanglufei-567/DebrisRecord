@@ -46,6 +46,12 @@
     </div>
     ```
 
+6. **flex** 布局中设置 `min-width`、`min-height` 为 0
+
+    - 在 **flex** 布局中，默认情况下 **flex** 子项的  `min-width`、`min-height` 值为 `auto`，即会==根据内容决定最小宽度、高度==
+
+    - 如果手动设置为 0，则子项允许缩小，但如果内部内容不支持折行，就会超出容器范围
+
 **解决方案**
 
 1. **使用`overflow`属性**：可以设置`overflow: hidden;`，`overflow: auto;`或`overflow: scroll;`来控制溢出的内容

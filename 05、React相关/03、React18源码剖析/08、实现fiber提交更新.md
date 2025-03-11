@@ -2,11 +2,11 @@
 
 ### 一、前言
 
-提交更新就是将`fiber`上的真实DOM进行处理最后挂到页面上
+提交更新就是将 `fiber`上的真实 **DOM** 进行处理最后挂到页面上
 
 ### 二、提交更新
 
-首先回顾下`src/react-reconciler/src/ReactFiberWorkLoop.js`中的`performConcurrentWorkOnRoot`方法
+首先回顾下 `src/react-reconciler/src/ReactFiberWorkLoop.js` 中的 `performConcurrentWorkOnRoot` 方法
 
 ```jsx
 /**
@@ -23,8 +23,8 @@ function performConcurrentWorkOnRoot(root) {
 
 这个方法主要完成了以下工作：
 
-- 根据 **VirtualDOM** 构建 `fiber` 树，创建「**真实 Dom 节点**」（也就是调和更新，已完成）
-- 还需要把「**真实 Dom 节点**」插入容器（也就是提交更新，未完成）
+- 根据 **VirtualDOM** 构建 `fiber` 树，创建「**真实 Dom 节点**」（也就是「**调和更新**」，已完成）
+- 还需要把「**真实 Dom 节点**」插入容器（也就是「**提交更新**」，未完成）
 
 那么接下来就是先提交更新的部分👇
 
@@ -46,7 +46,12 @@ function performConcurrentWorkOnRoot(root) {
 }
 ```
 
-- 首先从 `root` 上拿到负责计算的 `fiber` 树 `root.current.alternate` 并挂到 `root` 的 `finishedWork` 属性上
+- 先从 `root` 上拿到负责计算的 `fiber` 树 `root.current.alternate` 并挂到 `root` 的 `finishedWork` 属性上
+  
+  <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/renderFiber1_1664076149659.jpg" alt="img" style="zoom:30%;" />
+  
+  - 此时 `root.current.alternate` 指向的 `fiber` 树 已经计算完成，**HostRootFiber** 上已经保存了完整的 **DOM** 树
+  
 - 再进行提交 `commitRoot(root)`
 
 ------
@@ -77,7 +82,9 @@ function commitRoot(root) {
 }
 ```
 
-上面这段实现主要是判断 `HostRootFiber` 上是否有副作用，如有副作用则进行 **DOM** 的提交操作 <!--这里的副作用就是指DOM的增删改-->，具体的提交逻辑在 `commitMutationEffectsOnFiber` 中
+上面这段实现主要是判断 `HostRootFiber` 上是否有**副作用**，如有**副作用**则进行 **DOM** 的提交操作 <!--这里的副作用就是指 DOM 的增删改，也就是需要进行 DOM 操作-->
+
+具体的提交逻辑在 `commitMutationEffectsOnFiber` 中实现，完成 **DOM** 操作并将 **DOM 树**挂载到**根节点**（`div#root`）上
 
 ------
 
@@ -144,9 +151,20 @@ export const Update = 0b00000000000000000000000100;
 export const MutationMask = Placement | Update;
 ```
 
-处理子 `fiber` 的逻辑本身并不复杂，找到第一个子 `fiber` 节点再递归调用 `commitMutationEffectsOnFiber`，然后再通过第一个子 `fiber` 节点找到后面的 `sibling fiber` 递归调用 `commitMutationEffectsOnFiber`
+处理子 `fiber` 的逻辑本身并不复杂，找到第一个子 `fiber` 节点再递归调用 `commitMutationEffectsOnFiber` ，然后再通过第一个子 `fiber` 节点找到后面的 `sibling fiber` 递归调用 `commitMutationEffectsOnFiber`，从而完成所有子 `fiber` 的副作用处理<!--从下往上处理的子 `fiber`-->
 
-但需要注意⚠️的是这个判断条件 `if (parentFiber.subtreeFlags & MutationMask)`，这个**很重要**，子`fiber`链上有更新或插入的副作用才会进行递归 <!--一个 fiber 节点初次挂载时，它的 subtreeFlags 为0，也就是它的所有子 fiber 都没有副作用，所有子 fiber 对应的真实DOM都在「工作循环」的「完成阶段」追加到了该 fiber 自己的真实DOM上了, 所以后续递归执行 commitMutationEffectsOnFibe 到该 fiber 的子fiber 时，在 recursivelyTraverseMutationEffects 这里便不会继续下去-->
+⚠️ 需要注意的是这个判断条件 `if (parentFiber.subtreeFlags & MutationMask)` 这个**很重要**，子 `fiber` 树上有「**更新**」或「**插入**」的副作用才会进行递归 
+
+这里有两种情况：
+
+- 当前 `fiber` 节点是初次挂载
+  - 它的 `subtreeFlags` 为 0，也就是它的所有子 `fiber` 都没有副作用，所有子 `fiber` 对应的 **真实DOM** 都在「**工作循环**」的 **completeWork** 中追加到了该 `fiber` 自己的 **真实DOM** 上了,
+  - 所以在执行 `recursivelyTraverseMutationEffects(root, finishedWork)` 处理子 `fiber` 的副作用时，并不会执行任何逻辑
+  - 而当前 `fiber` 的 **真实DOM ** 会在 `commitReconciliationEffects(finishedWork)` 处理自己的副作用时被挂载到父 `fiber` 的**真实DOM **节点上
+    - 初次渲染时，HostRoot （根 fiber）上的
+- 当前 `fiber` 节点是更新渲染
+
+<!--一个 fiber 节点初次挂载时，它的 subtreeFlags 为0，也就是它的所有子 fiber 都没有副作用，所有子 fiber 对应的真实DOM都在「工作循环」的「完成阶段」追加到了该 fiber 自己的真实DOM上了, 所以后续递归执行 commitMutationEffectsOnFibe 到该 fiber 的子fiber 时，在 recursivelyTraverseMutationEffects 这里便不会继续下去-->
 
 ------
 
@@ -169,7 +187,7 @@ export const MutationMask = Placement | Update;
 }
 ```
 
-注意⚠️这个判断条件 `if (flags & Placement)`，这个很重要，`fiber` 有插入副作用才会执行 `commitPlacement` 完成「**真实 DOM**」的添加  <!--初次渲染时HostRootFiber上便没有flags-->
+注意⚠️这个判断条件 `if (flags & Placement)`，这个很重要，`fiber` 有插入副作用才会执行 `commitPlacement` 完成「**真实 DOM**」的添加  <!--初次渲染时 HostRootFiber 上并没有 flags，也就是说不会走到这段逻辑-->
 
 ------
 
@@ -268,7 +286,7 @@ function getHostSibling(fiber) {
 }
 ```
 
-找锚点的目的是找到一个没有**插入副作用**的原生节点的 `fiber`，先从自己的兄弟中找，自己的兄弟中没有则往上在父节点的兄弟中找，若是找到原生节点 `fiber` 或者根 `fiber` 都没找到便直接返回 `null`
+找锚点的目的是==找到一个没有**插入副作用**的原生节点的 `fiber`==，先从自己的兄弟中找，自己的兄弟中没有则往上在父节点的兄弟中找，若是找到原生节点 `fiber` 或者根 `fiber` 都没找到便直接返回 `null`
 
 ------
 
@@ -298,12 +316,12 @@ function insertOrAppendPlacementNode(node, before, parent) {
     const { child } = node;
     if (child !== null) {
       //递归执行，把第一个子fiber也添加到父亲DOM节点里面去
-      insertOrAppendPlacementNode(child, parent);
+      insertOrAppendPlacementNode(child, before, parent);
 
       //把其余子fiber添加到父亲DOM节点里面去
       let { sibling } = child;
       while (sibling !== null) {
-        insertOrAppendPlacementNode(sibling, parent);
+        insertOrAppendPlacementNode(sibling, before, parent);
         sibling = sibling.sibling;
       }
     }

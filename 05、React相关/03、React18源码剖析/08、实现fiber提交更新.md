@@ -47,11 +47,11 @@ function performConcurrentWorkOnRoot(root) {
 ```
 
 - 先从 `root` 上拿到负责计算的 `fiber` 树 `root.current.alternate` 并挂到 `root` 的 `finishedWork` 属性上
-  
+
   <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/renderFiber1_1664076149659.jpg" alt="img" style="zoom:30%;" />
-  
-  - 此时 `root.current.alternate` 指向的 `fiber` 树 已经计算完成，**HostRootFiber** 上已经保存了完整的 **DOM** 树
-  
+
+  - 此时 `root.current.alternate` 指向的 `fiber` 树 已经计算完成，**HostRootFiber** 上已经保存了完整的 **DOM** 树 <!--stateNode 属性上-->
+
 - 再进行提交 `commitRoot(root)`
 
 ------
@@ -153,7 +153,7 @@ export const MutationMask = Placement | Update;
 
 处理子 `fiber` 的逻辑本身并不复杂，找到第一个子 `fiber` 节点再递归调用 `commitMutationEffectsOnFiber` ，然后再通过第一个子 `fiber` 节点找到后面的 `sibling fiber` 递归调用 `commitMutationEffectsOnFiber`，从而完成所有子 `fiber` 的副作用处理<!--从下往上处理的子 `fiber`-->
 
-⚠️ 需要注意的是这个判断条件 `if (parentFiber.subtreeFlags & MutationMask)` 这个**很重要**，子 `fiber` 树上有「**更新**」或「**插入**」的副作用才会进行递归 
+⚠️ 需要注意的是这个判断条件 `if (parentFiber.subtreeFlags & MutationMask)` 这个**很重要**，子 `fiber` 树上有「**更新**」或「**插入**」的副作用才会进行递归
 
 这里有两种情况：
 
@@ -161,10 +161,10 @@ export const MutationMask = Placement | Update;
   - 它的 `subtreeFlags` 为 0，也就是它的所有子 `fiber` 都没有副作用，所有子 `fiber` 对应的 **真实DOM** 都在「**工作循环**」的 **completeWork** 中追加到了该 `fiber` 自己的 **真实DOM** 上了,
   - 所以在执行 `recursivelyTraverseMutationEffects(root, finishedWork)` 处理子 `fiber` 的副作用时，并不会执行任何逻辑
   - 而当前 `fiber` 的 **真实DOM ** 会在 `commitReconciliationEffects(finishedWork)` 处理自己的副作用时被挂载到父 `fiber` 的**真实DOM **节点上
-    - 初次渲染时，HostRoot （根 fiber）上的
 - 当前 `fiber` 节点是更新渲染
+  - 它的 `subtreeFlags` 不为 0，所以在执行 `recursivelyTraverseMutationEffects(root, finishedWork)` 处理子 `fiber` 的副作用时，会对子 `fiber`  执行 `commitMutationEffectsOnFiber` 方法，完成子 `fiber` 的 **commit** 操作
+  - 初次渲染时，由于 `HostRootFiber` 是有旧 `fiber` 的，在 `beginwork` 流程中，其创建子 fiber 时，其子 `fiber` 会被添加上 `Placement` 副作用标识，所以其子 `fiber` <!--其实就是 render 方法传入的根 VirtualDOM 对应的 fiber--> 会执行 `commitMutationEffectsOnFiber`，将完整的真实 **DOM** 树挂载到**根节点**（`div#root`）上
 
-<!--一个 fiber 节点初次挂载时，它的 subtreeFlags 为0，也就是它的所有子 fiber 都没有副作用，所有子 fiber 对应的真实DOM都在「工作循环」的「完成阶段」追加到了该 fiber 自己的真实DOM上了, 所以后续递归执行 commitMutationEffectsOnFibe 到该 fiber 的子fiber 时，在 recursivelyTraverseMutationEffects 这里便不会继续下去-->
 
 ------
 
@@ -182,12 +182,12 @@ export const MutationMask = Placement | Update;
     //进行插入操作，也就是把此fiber对应的真实DOM节点添加到父真实DOM节点上
     commitPlacement(finishedWork);
     //把flags里的Placement删除
-    finishedWork.flags & ~Placement;
+    finishedWork.flags &= ~Placement;
   }
 }
 ```
 
-注意⚠️这个判断条件 `if (flags & Placement)`，这个很重要，`fiber` 有插入副作用才会执行 `commitPlacement` 完成「**真实 DOM**」的添加  <!--初次渲染时 HostRootFiber 上并没有 flags，也就是说不会走到这段逻辑-->
+注意⚠️这个判断条件 `if (flags & Placement)`，这个很重要，`fiber` 有插入副作用才会执行 `commitPlacement` 完成「**真实 DOM**」的添加  <!--初次渲染时 HostRootFiber 上并没有 flags，也就是说不会走到这段逻辑，但 HostRootFiber 的子 fiber 却是有 Placement 的 flags 的，所以便是在这里将完整的真实 DOM 树挂载到根节点（div#root）上-->
 
 ------
 
@@ -360,4 +360,25 @@ let element = (
 页面挂载
 
 ![image-20230213152726258](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230213152726258.png)
+
+### 四、总结
+
+本文详细介绍了 **React** 中 `fiber` **Commit** 流程的实现，主要包括以下几个关键步骤：
+
+1. **提交阶段的入口**：在`performConcurrentWorkOnRoot`函数中，完成 `fiber` 树的构建后，调用 `commitRoot` 开始提交阶段
+2. **提交过程的三个主要函数**：
+   - `commitRoot`：判断是否有副作用需要处理，并调用相应的处理函数
+   - `commitMutationEffectsOnFiber`：根据 `fiber` 类型选择处理副作用的方法
+   - `recursivelyTraverseMutationEffects`：递归处理子 `fiber` 的副作用
+3. **DOM操作的核心逻辑**：
+   - `commitReconciliationEffects`：处理当前 `fiber` 的副作用
+   - `commitPlacement`：将 `fiber` 对应的**真实DOM** 插入到**父DOM** 中
+   - `getHostParentFiber`：寻找宿主父 `fiber`
+   - `getHostSibling`：寻找插入锚点
+   - `insertOrAppendPlacementNode`：执行实际的 **DOM** 插入操作
+4. **处理顺序的特点**：
+   - 先处理子节点的副作用，再处理父节点的副作用
+   - 从下往上完成提交，与工作循环中完成阶段的顺序一致
+
+通过这一系列精心设计的步骤，**React** 能够高效地将计算好的 `fiber` 树转换为实际的 **DOM** 操作，完成页面的渲染和更新，这种分层设计不仅使代码结构清晰，也为 `React` 的并发渲染模式奠定了基础
 

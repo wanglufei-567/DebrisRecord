@@ -135,9 +135,9 @@ const SyncBatchedLane = 0b10;
 
 /**
  * 判断subset是不是set的子集
- * @param {*} set 
- * @param {*} subset 
- * @returns 
+ * @param {*} set
+ * @param {*} subset
+ * @returns
  */
 function isSubsetOfLanes(set, subset) {
     return (set & subset) === subset;
@@ -145,9 +145,9 @@ function isSubsetOfLanes(set, subset) {
 
 /**
  * 合并两个车道
- * @param {*} a 
- * @param {*} b 
- * @returns 
+ * @param {*} a
+ * @param {*} b
+ * @returns
  */
 function mergeLanes(a, b) {
     return a | b;
@@ -218,8 +218,8 @@ function enqueueUpdate(fiber, update) {
 ```js
 /**
  * 处理更新队列
- * @param {*} fiber 
- * @param {*} renderLanes 
+ * @param {*} fiber
+ * @param {*} renderLanes
  */
 function processUpdateQueue(fiber, renderLanes) {
   //获取此fiber上的更新队列
@@ -227,16 +227,16 @@ function processUpdateQueue(fiber, renderLanes) {
   //获取第一个更新
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
-  
+
   //判断一下是否在等待生效的的更新，如果有，变成base队列
   let pendingQueue = queue.shared.pending;
   //合并新老链表为单链表
   if (pendingQueue !== null) {
     //清空pending
     queue.shared.pending = null;
-    //最后一个等待的更新 
+    //最后一个等待的更新
     const lastPendingUpdate = pendingQueue;
-    //第一个等待的更新 
+    //第一个等待的更新
     const firstPendingUpdate = lastPendingUpdate.next;
     //把环剪断，最后一个不再指向第一个
     lastPendingUpdate.next = null;
@@ -250,7 +250,7 @@ function processUpdateQueue(fiber, renderLanes) {
     //尾部也接上
     lastBaseUpdate = lastPendingUpdate;
   }
-  
+
   //开始计算新的状态
   if (firstBaseUpdate !== null) {
     //先获取老的值
@@ -259,7 +259,7 @@ function processUpdateQueue(fiber, renderLanes) {
     let newBaseState = null;//新的基础状态
     let newFirstBaseUpdate = null;//第一个跳过的更新
     let newLastBaseUpdate = null;//新的最后一个基本更新
-    
+
     let update = firstBaseUpdate;//指向第一个更新
     do {
       //获取更新车道
@@ -298,7 +298,7 @@ function processUpdateQueue(fiber, renderLanes) {
         break;
       }
     } while (true);
-    
+
     // 如果没有跳过的更新的话，将计算得出的状态更新为基础状态
     if (!newLastBaseUpdate) {
       newBaseState = newState;
@@ -336,9 +336,9 @@ function getStateFromUpdate(update, prevState) {
   if (pendingQueue !== null) {
     //清空pending
     queue.shared.pending = null;
-    //最后一个等待的更新 
+    //最后一个等待的更新
     const lastPendingUpdate = pendingQueue;
-    //第一个等待的更新 
+    //第一个等待的更新
     const firstPendingUpdate = lastPendingUpdate.next;
     //把环剪断，最后一个不再指向第一个
     lastPendingUpdate.next = null;
@@ -481,7 +481,7 @@ function printUpdateQueue(updateQueue) {
 ```js
 let fiber = { memoizedState: '' };
 initializeUpdateQueue(fiber);
-console.log('fiber', fiber) 
+console.log('fiber', fiber)
 ```
 
 打印`fiber`，看下初始状态的`fiebr`
@@ -540,7 +540,7 @@ enqueueUpdate(fiber, updateD);
 
 ```js
 processUpdateQueue(fiber, SyncLane);
-console.log('fiber', fiber) 
+console.log('fiber', fiber)
 console.log('updateQueue', printUpdateQueue(fiber.updateQueue));
 ```
 
@@ -665,14 +665,14 @@ root.render(element);
    //创建更新对象
 -  const update = createUpdate();
 +  const update = createUpdate(lane);
- 
+
    //给更新对象上添加要更新的虚拟DOM
    update.payload = { element };
- 
+
    //把此更新对象添加到HostRootFiber的更新队列上，返回根节点
 -  const root = enqueueUpdate(current, update);
 +  const root = enqueueUpdate(current, update, lane);
- 
+
    // 在fiber上调度更新
 -  scheduleUpdateOnFiber(root);
 +  scheduleUpdateOnFiber(root, current, lane);
@@ -692,7 +692,7 @@ root.render(element);
 ```
 
 ```js
-// src/react-reconciler/src/ReactFiberWorkLoop.js
+// src/react-reconciler/src/ReactWorkLoop.js
 
 /**
  * @description 请求一个更新车道
@@ -804,10 +804,10 @@ export function getCurrentEventPriority() {
 
 ```js
 // src/react-dom-bindings/src/events/ReactDOMEventListener.js
-import { 
-  ContinuousEventPriority, 
-  DefaultEventPriority, 
-  DiscreteEventPriority 
+import {
+  ContinuousEventPriority,
+  DefaultEventPriority,
+  DiscreteEventPriority
 } from 'react-reconciler/src/ReactEventPriorities';
 /**
  * 获取事件优先级
@@ -1098,7 +1098,7 @@ export function markRootUpdated(root, updateLane) {
 >   this.containerInfo = containerInfo;
 >   this.pendingLanes = NoLanes;
 > }
-> 
+>
 > ```
 
 ------
@@ -1206,7 +1206,7 @@ function ensureRootIsScheduled(root) {
    export function getHighestPriorityLanes(lanes) {
      return getHighestPriorityLane(lanes);
    }
-   
+
    //找到最右边的1 只能返回一个车道
    export function getHighestPriorityLane(lanes) {
      return lanes & -lanes;
@@ -1243,8 +1243,8 @@ function ensureRootIsScheduled(root) {
      >   scheduleCallback(NormalSchedulerPriority, performConcurrentWorkOnRoot.bind(null, root));
      > }
      > ```
-
-     `scheduleCallback`的逻辑再**15、实现scheduler**中已经改造完成，接下来继续改造`scheduleCallback(priorityLevel, callback)`中的`callback`逻辑，也就是`performConcurrentWorkOnRoot`
+     >
+     > `scheduleCallback`的逻辑再**15、实现scheduler**中已经改造完成，接下来继续改造`scheduleCallback(priorityLevel, callback)`中的`callback`逻辑，也就是`performConcurrentWorkOnRoot`
 
      <!--这里需要明确的一点‼️ scheduleCallback会创建一个宏任务来执行调度更新，后面将要实现的同步更新创建的则是一个微任务-->
 
@@ -1359,3 +1359,18 @@ root.render(element);
 ```
 
 ![image-20230303000053173](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230303000053173.png)
+
+### 三、总结
+
+Lane模型是React内部用于表示任务优先级的机制，它通过位运算高效地管理不同优先级的更新。Lane模型的核心特点包括：
+
+1. **优先级表示**：使用31条车道（Lane）表示不同的优先级，数字越小优先级越高
+2. **双缓存机制**：包含当前Lane（正在执行的任务）和挂起Lane（等待执行的任务）
+3. **批处理能力**：可以同时处理多个相同优先级的更新
+4. **优先级调度**：根据任务优先级动态调整执行顺序，优先响应用户交互
+
+Lane模型与Scheduler调度器紧密配合，共同实现了React的高效更新机制。在初次渲染时，React会根据当前任务的优先级和是否超时来决定是采用同步渲染还是并发渲染。
+
+Lane模型的引入使React能够更精细地控制更新过程，提高应用的响应性和用户体验。通过优先处理高优先级任务（如用户交互），React可以在保持应用流畅的同时处理低优先级的后台工作。
+
+总的来说，Lane模型是React并发渲染能力的核心基础，它让React能够智能地决定什么时候执行什么任务，从而提供更好的用户体验。

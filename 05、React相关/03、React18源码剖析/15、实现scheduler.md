@@ -4,19 +4,21 @@
 
 #### 1.1、scheduler
 
-**==React Scheduler==** 是 React 内部使用的一种**==调度器==**，用于在**==不同的优先级==**任务之间进行调度。
+**==React Scheduler==** 是 **React** 内部使用的一种**==调度器==**，用于在**==不同的优先级==**任务之间进行调度
 
-在 React Scheduler 中，**==最小堆==**是一种用于**==存储任务的数据结构==**，它根据**==任务的优先级排序==**，优先级越高的任务排在堆的前面。
+在 **React Scheduler** 中，**==最小堆==**是一种用于**==存储任务的数据结构==**，它根据**==任务的优先级排序==**，优先级越高的任务排在堆的前面
 
-React Scheduler 的最小堆是**==基于数组实现==**的。每个元素包含了一个任务的信息，包括任务的**==优先级==**、**==过期时间==**、**==回调函数==**等等。堆中的每个元素都有一个唯一的序号，用于在堆中快速定位该元素的位置。
+**React Scheduler** 的最小堆是**==基于数组实现==**的。每个元素包含了一个任务的信息，包括任务的**==优先级==**、**==过期时间==**、**==回调函数==**等等。堆中的每个元素都有一个唯一的序号，用于在堆中快速定位该元素的位置
 
-React Scheduler 的最小堆是调度器的核心数据结构之一，它通过**==对任务进行排序和管理==**，实现了**==高效==**的任务调度和执行。
+**React Scheduler** 的最小堆是调度器的核心数据结构之一，它通过**==对任务进行排序和管理==**，实现了**==高效==**的任务调度和执行
 
-<!--Scheduler负责对任务进行排序管理并调度执行，所谓调度执行，就是从最小堆中按照优先级从高到低的顺序取出任务，并根据时间切片的剩余时间和任务过期时间，来决定是否将任务在当前帧中完成执行-->
+<!--Scheduler 负责对任务进行排序管理并调度执行，所谓调度执行，就是从最小堆中按照优先级从高到低的顺序取出任务，并根据时间切片的剩余时间和任务过期时间，来决定是否将任务在当前帧中完成执行-->
 
 #### 1.2、最小堆
 
-最小堆（Min Heap）是一种常见的数据结构，它是一棵经过排序的**==完全二叉树==**，其中**==任一非终端节点的数据值均不大于其左子节点和右子节点的值==**==，====**根结点值是所有堆结点值中最小者**==。最小堆常常用来实现优先队列，也可以用来解决一些特定的算法问题。
+最小堆（**Min Heap**）是一种常见的数据结构，它是一棵经过排序的**==完全二叉树==**，其中**任一非终端节点的数据值均不大于其左子节点和右子节点的值**，**根结点值是所有堆结点值中最小者**
+
+最小堆常常用来实现优先队列，也可以用来解决一些特定的算法问题
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/zui_xiao_dui_1_1643275468911.jpg)
 
@@ -28,7 +30,7 @@ React Scheduler 的最小堆是调度器的核心数据结构之一，它通过*
 
 #### 1.3、完全二叉树
 
-**完全二叉树**（Complete Binary Tree）是一种特殊的二叉树，它除了最后一层节点可能不满外，其他层的节点数都达到了最大值，同时最后一层的节点都集中在树的左侧。
+**完全二叉树**（**Complete Binary Tree**）是一种特殊的二叉树，它除了最后一层节点可能不满外，其他层的节点数都达到了最大值，同时最后一层的节点都集中在树的左侧。
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/wan_quan_er_cha_shu_1643274486956.jpg" alt="img" style="zoom:50%;" />
 
@@ -37,7 +39,7 @@ React Scheduler 的最小堆是调度器的核心数据结构之一，它通过*
 
 #### 1.4、SchedulerMinHeap
 
-接下来完成一个最小堆的js实现
+接下来完成一个最小堆的 js 实现
 
 - **`peek` 查看堆的顶点**
 
@@ -58,7 +60,7 @@ React Scheduler 的最小堆是调度器的核心数据结构之一，它通过*
       const leftIndex = (index + 1) * 2 - 1;
       const left = heap[leftIndex];
       const rightIndex = leftIndex + 1;
-      const right = heap[rightIndex]; 
+      const right = heap[rightIndex];
       if (left !== undefined && compare(left, node) < 0) {
         if (right !== undefined && compare(right, left) < 0) {
           heap[index] = right;
@@ -100,14 +102,14 @@ React Scheduler 的最小堆是调度器的核心数据结构之一，它通过*
         heap[index] = parent;
         index = parentIndex;
       } else {
-  
+
         return;
       }
     }
   }
   ```
 
-- **`pop` 弹出堆的顶点后需要调用`siftDown`函数向下调整堆**
+- **`pop` 弹出堆的顶点后需要调用 `siftDown` 函数向下调整堆**
 
   ```js
   export function pop(heap) {
@@ -127,7 +129,7 @@ React Scheduler 的最小堆是调度器的核心数据结构之一，它通过*
 
   将堆顶元素删除并将最后一个元素移动到堆顶位置，然后将这个元素与它的子节点比较，将它与较小的子节点交换位置，直到它比它的子节点都小或已经到达叶子节点为止。
 
-- **`push` 添加新节点后需要调用`siftUp`函数向上调整堆**
+- **`push` 添加新节点后需要调用 `siftUp` 函数向上调整堆**
 
   ```js
   export function push(heap, node) {
@@ -166,8 +168,8 @@ console.log(peek(heap));
 // { sortIndex: 1, id: 1 }
 
 //[
-   //{ sortIndex: 1, id: 1 },
-   //{ sortIndex: 2, id: 2 },
+  //{ sortIndex: 1, id: 1 },
+  //{ sortIndex: 2, id: 2 },
   //{ sortIndex: 3, id: 3 },
   //{ sortIndex: 4, id: 4 },
   //{ sortIndex: 5, id: 5 },
@@ -178,25 +180,25 @@ console.log(peek(heap));
 //{ sortIndex: 2, id: 2 }
 ```
 
-可以看到`heap`中的数据经过**`push`插入元素**、**`pop`删除最小元素**之后仍然维持最小堆的数据结构
+可以看到 `heap` 中的数据经过**`push` 插入元素**、**`pop` 删除最小元素**之后仍然维持最小堆的数据结构
 
-<!--React scheduler中的最小堆就是这样实现的-->
+<!--React scheduler 中的最小堆就是这样实现的-->
 
 #### 1.5、MessageChannel
 
-在前面的笔记中，简易版的React的事件切片是通过浏览器提供的`requestIdleCallback`来实现的，但是目前 `requestIdleCallback` 目前只有Chrome支持，所以目前 React利用 [MessageChannel](https://developer.mozilla.org/zh-CN/docs/Web/API/MessageChannel)模拟了`requestIdleCallback`，==**将回调延迟到绘制操作之后执行**==
+在前面的笔记中，简易版的 **React** 的事件切片是通过浏览器提供的 `requestIdleCallback` 来实现的，但是目前 `requestIdleCallback` 目前只有 **Chrome** 支持，所以目前 **React** 利用 [MessageChannel](https://developer.mozilla.org/zh-CN/docs/Web/API/MessageChannel) 模拟了 `requestIdleCallback`，**==将回调延迟到绘制操作之后执行==**
 
-> React 不使用 `requestIdleCallback` 实现时间切片的原因：
+> **React** 不使用 `requestIdleCallback` 实现时间切片的原因：
 >
-> 1. **==不同浏览器支持不同==**：虽然 `requestIdleCallback` API 在现代浏览器中得到广泛支持，但在一些旧版本的浏览器中并不支持，这就需要 React 在不同浏览器之间进行兼容性处理。
-> 2. **==无法控制任务执行时间==**：由于 `requestIdleCallback` API 依赖于浏览器的空闲时间，因此无法保证任务会在指定时间内完成。如果任务需要比较长时间才能完成，就可能会对页面的性能产生负面影响。
-> 3. **不稳定**：在某些情况下，`requestIdleCallback` 的回调函数可能会在浏览器准备绘制下一帧之前被调用，这就可能会导致页面的渲染出现问题。
+> 1. **==不同浏览器支持不同==**：虽然 `requestIdleCallback` **API** 在现代浏览器中得到广泛支持，但在一些旧版本的浏览器中并不支持，这就需要 **React** 在不同浏览器之间进行兼容性处理
+> 2. **==无法控制任务执行时间==**：由于 `requestIdleCallback` **API** 依赖于浏览器的空闲时间，因此无法保证任务会在指定时间内完成。如果任务需要比较长时间才能完成，就可能会对页面的性能产生负面影响
+> 3. **不稳定**：在某些情况下，`requestIdleCallback` 的回调函数可能会在浏览器准备绘制下一帧之前被调用，这就可能会导致页面的渲染出现问题
 
-**MessageChannel API**允许我们创建一个新的**==消息通道==**，并通过它的两个`MessagePort`属性发送数据
+**MessageChannel API** 允许我们创建一个新的**==消息通道==**，并通过它的两个 `MessagePort` 属性发送数据
 
-**MessageChannel**创建了一个通信的管道，这个管道有两个端口，每个端口都可以通过`postMessage`发送数据，而一个端口只要绑定了`onmessage`回调方法，就可以接收从另一个端口传过来的数据
+**MessageChannel** 创建了一个通信的管道，这个管道有==两个端口==，每个端口都可以通过 `postMessage` 发送数据，而一个端口只要绑定了 `onmessage` 回调方法，就可以接收从另一个端口传过来的数据
 
-**MessageChannel是一个==宏任务==**
+**MessageChannel 是一个==宏任务==**
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/liu_lan_qi_zhen_1643277067067.jpg)
 
@@ -217,6 +219,8 @@ port2.onmessage = function(event) {
 port1.postMessage("发送给port2");
 port2.postMessage("发送给port1");
 ```
+
+可以看到，一个端口（`port1`）调用 `postMessage` 方法发送数据，另一个端口（`port2`）的回调（`onmessage`）便会执行并接受到数据
 
 ### 二、实现scheduler
 
@@ -249,7 +253,7 @@ export function scheduleCallback(callback) {
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/shi_jian_qie_pian_diao_du_1643278352662.jpg" alt="img" />
 
-<!--整个流程并不复杂，就是每次执行任务`callBack`之前计算Deadline，时间没到Deadline就不断的从任务队列中取任务执行，Deadline到了之后检查任务队列中是否还有任务，有就开始新的一轮，没有就结束-->
+整个流程并不复杂，就是每次执行任务 `callBack` 之前计算 **Deadline**，时间没到 **Deadline** 就不断的从任务队列中取任务执行，**Deadline** 到了之后检查任务队列中是否还有任务，有就开始新的一轮，没有就结束
 
 ------
 
@@ -346,7 +350,7 @@ export const LowPriority = 4;
 export const IdlePriority = 5;
 ```
 
-> React Scheduler 中一共有五个不同的优先级，按照**==从高到低==**的顺序分别是：
+> **React Scheduler** 中一共有五个不同的优先级，按照**==从高到低==**的顺序分别是：
 >
 > 1. **==Immediate（立即）==**：该优先级用于紧急情况，如**==事件处理==**、**==动画==**等需要立即响应的任务，这些任务需要尽快得到执行，以保证用户体验。
 > 2. ==**User-blocking（用户阻塞）**==：该优先级用于**==处理用户操作，如用户输入、界面交互==**等，这些任务需要快速得到响应，以让用户感觉到界面的流畅和即时性。
@@ -354,7 +358,7 @@ export const IdlePriority = 5;
 > 4. ==**Low（低）**==：该优先级用于处理一些较为次要的任务，如后台数据更新、网络请求等，这些任务的优先级最低，可以等待较长时间再执行，以避免影响其他任务的执行。
 > 5. **==Idle（空闲）==**：该优先级用于处理一些非必要的任务，如统计、分析、预加载等，这些任务的优先级最低，可以在系统空闲时执行，以避免影响其他任务的执行。
 >
-> 这些优先级的划分，是为了让 React 在不同的场景下能够==根据任务的重要程度和紧急程度进行灵活的调度和执行==。
+> 这些优先级的划分，是为了让 React 在不同的场景下能够==根据任务的重要程度和紧急程度进行灵活的调度和执行==
 >
 > 在实际使用中，**==React 会根据任务的优先级和当前系统的负载情况等因素==**，**==自动地进行任务的调度和执行==**，以达到更好的用户体验和系统性能。
 
@@ -408,6 +412,8 @@ function getCurrentTime() {
   return performance.now();
 }
 ```
+
+上面的这些全局变量中 `scheduleHostCallback` 需要重点注意，这个变量保存的是时间切片中具体执行的任务，有值表示任务还没执行完
 
 ------
 
@@ -470,7 +476,7 @@ return newTask;
 
 `scheduleCallback`中主要完成了以下几件事
 
-- **根据调用`scheduleCallback`时传入的任务优先级`priorityLevel`确定==任务过期时间==**
+- **根据调用 `scheduleCallback` 时传入的任务优先级 `priorityLevel` 确定==任务过期时间==**
 
   ```js
   switch (priorityLevel) {
@@ -493,9 +499,9 @@ return newTask;
   }
   ```
 
-  <!--任务的优先级最终是通过任务过期时间来进行表示的，任务优先级越高，任务过期时间越短-->
+  - ==任务的优先级最终是通过任务「**过期时间**」来进行表示的，**任务优先级越高**，**任务过期时间越短**==
 
-- **根据调用`scheduleCallback`时传入的任务回调`callback`，创建新任务`newTask`**
+- **根据调用 `scheduleCallback` 时传入的任务回调 `callback`，创建新任务 `newTask`**
 
   ```js
   //计算此任务的过期时间
@@ -511,7 +517,7 @@ return newTask;
   };
   ```
 
-  <!--⚠️注意任务的排序依赖sortIndex也就是任务的过期时间，这个排序依赖决定了后续任务再最小堆中处于何位置-->
+  ⚠️注意：任务的「**排序依赖**」 `sortIndex` 也就是任务的「**过期时间**」，这个排序依赖决定了后续任务再最小堆中处于何位置
 
 -   **向任务最小堆里添加任务，排序的依据是过期时间**
 
@@ -525,7 +531,10 @@ return newTask;
   requestHostCallback(workLoop);
   ```
 
-  从最小堆中获取任务，调度执行任务就是这里进行的；调度执行就是==将任务提交到浏览器的宏任务队列中，并在下一个浏览器帧中执行== <!--这一点很重要-->
+  - 从最小堆中获取任务，调度执行任务就是这里进行的
+
+  - 调度执行就是==将任务提交到浏览器的「**宏任务队列**」中，并在下一个浏览器帧中执行== <!--这一点很重要-->
+    - 「**宏任务**」是通过 **MessageChannel** 创建的
 
 - **将创建的任务`newTask`返回出去**
 
@@ -570,9 +579,9 @@ function schedulePerformWorkUntilDeadline() {
 
 `requestHostCallback`中做了两件事
 
-- **将==调度执行任务==的回调函数`workLoop`缓存在一个==全局变量`scheduleHostCallback`==上**
+- **将==调度执行任务==的回调函数 `workLoop` 缓存在一个==全局变量 `scheduleHostCallback`==上**
 
-  <!--调度执行任务的逻辑在wookLoop中, workLoop稍后实现-->
+  <!--这个全局变量保存的就是宏任务里要执行的具体逻辑，也就是调度任务，调度执行任务的逻辑在wookLoop中, workLoop稍后实现-->
 
 - **创建一个==宏任务==，待浏览器完成渲染之后，执行==调度执行任务==的回调函数`workLoop`**
 
@@ -580,7 +589,7 @@ function schedulePerformWorkUntilDeadline() {
   schedulePerformWorkUntilDeadline()
   ```
 
-   `port2.postMessage`发送消息，`port1`的监听函数 `performWorkUntilDeadline`便会被放到宏任务队列中，`workLoop`的执行在`performWorkUntilDeadline`中
+   `port2.postMessage` 发送消息，`port1` 的监听函数 `performWorkUntilDeadline `便会被放到「**宏任务队列**」中，`workLoop` 的执行在 `performWorkUntilDeadline `中
 
   <!--这里就是利用了MessageChannel来进行宏任务的创建，React中是通过MessageChannel或者setTimeOut（没有MessageChannel的情况）来实现自己的requestIdleCallback，来保证每次时间切片为5ms-->
 
@@ -614,9 +623,10 @@ function performWorkUntilDeadline() {
 }
 ```
 
-<!--一个`performWorkUntilDeadline`就是一个时间切片执行单元，这个单元中执行多少任务取决于`scheduleHostCallback`（也就是`requestHostCallback(workLoop)中的workLoop`）中能完成多少任务；-->
+- 一个`performWorkUntilDeadline` 就是一个时间切片执行单元，这个单元中执行多少任务取决于全局变量 `scheduleHostCallback`（也就是`requestHostCallback(workLoop)中的workLoop`）中能完成多少任务；
 
-当一个时间切片结束后，若`scheduleHostCallback`没有将最小堆中的所有任务执行完，也就是`hasMoreWork`为`true`，那么会再次`schedulePerformWorkUntilDeadline`，**==再创建一个宏任务==**，也就是**==一个新的时间切片==**
+- 当一个时间切片结束后，若 `scheduleHostCallback` 没有将最小堆中的所有任务执行完，也就是`hasMoreWork` 为 `true`，那么会再次 `schedulePerformWorkUntilDeadline`，**==再创建一个宏任务==**，也就是**==一个新的时间切片==**
+
 
 ------
 
@@ -633,7 +643,7 @@ function workLoop(startTime) {
   //取出优先级最高的任务
   currentTask = peek(taskQueue);
   while (currentTask !== null) {
-    //如果此任务的过期时间小于当前时间，也就是说没有过期,并且需要放弃执行 时间片到期
+    //如果此任务的过期时间小于当前时间，也就是说没有过期,并且时间片到期
     if (
       currentTask.expirationTime > currentTime &&
       shouldYieldToHost()
@@ -698,16 +708,16 @@ function shouldYieldToHost() {
    currentTask = peek(taskQueue);
   ```
 
-- **执行当前任务`currentTask`**
+- ❗❗**执行当前任务`currentTask`**
 
   ```js
   // 先清空任务上的回调
   currentTask.callback = null;
-  
+
   //执行工作，如果返回新的函数，则表示当前的工作没有完成
   const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
   const continuationCallback = callback(didUserCallbackTimeout);
-  
+
   if (typeof continuationCallback === 'function') {
     currentTask.callback = continuationCallback;
     return true; //还有任务要执行
@@ -716,16 +726,16 @@ function shouldYieldToHost() {
 
   ⚠️**==这里有两点需要注意：==**
 
-  - 执行当前任务的回调时传入的参数`didUserCallbackTimeout`
+  - 执行当前任务的回调时传入的参数 `didUserCallbackTimeout`
 
     ```js
     const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
     const continuationCallback = callback(didUserCallbackTimeout);
     ```
 
-    `didUserCallbackTimeout`表示**==当前任务已经超时==**，后面的**==并发渲染==**中需要用到这个参数
+    - `didUserCallbackTimeout` ：表示**==当前任务已经超时==**，后面的**==并发渲染==**中需要用到这个参数
 
-  - 执行当前任务的回调，若返回值`continuationCallback`是个函数，则表明**==当前任务还没有执行完==**
+  - 执行当前任务的回调，若返回值 `continuationCallback` 是个函数，则表明**==当前任务还没有执行完==**
 
     ```js
     if (typeof continuationCallback === 'function') {
@@ -734,7 +744,8 @@ function shouldYieldToHost() {
     }
     ```
 
-    这里将当前任务`currentTask`的`callback`重置为返回值`continuationCallback`，并且直接`return true`退出了`workLoop`，但是==当前任务`currentTask`并没有从最小堆中请出，只是更新了`callback`，也就是说在下一个时间切片将仍然执行这个任务==
+    - 这里将当前任务 `currentTask` 的 `callback` 重置为返回值 `continuationCallback`，并且直接`return true` 退出了 `workLoop`
+    - 但是==当前任务 `currentTask` 并没有从最小堆中清出，只**是更新了`callback`**，也就是说**在下一个时间切片将仍然执行这个任务**== <!--很重要-->
 
     > `schedulePerformWorkUntilDeadline`中会走到这里
     >
@@ -755,7 +766,7 @@ function shouldYieldToHost() {
     >
     > 重新创建一个宏任务，也就是一个新的时间切片
     >
-    > <!--这也就是一个任务可以中断后再继续执行的原理，后面并发渲染中scheduleCallback传过来的callback的返回值便是一个函数，一个任务分若干个时间切片来完成，有点断点续传的意思-->
+    > 这也就是一个任务可以中断后再继续执行的原理，后面并发渲染中 `scheduleCallback` 传过来的`callback` 的返回值便是一个函数，一个任务分若干个时间切片来完成，有点断点续传的意思
 
 - **判断是否要继续工作循环，执行任务**
 
@@ -771,49 +782,51 @@ function shouldYieldToHost() {
 
   ⚠️**==注意这里判断要不要继续执行任务的逻辑==**
 
-  跳出`workLoop`需要同时满足这两个条件：**==1、任务没过期；2、时间切片到期==**
+  - 跳出 `workLoop` 需要同时满足这两个条件：**==1、任务没过期；2、时间切片到期==**
 
-  - 此任务的==过期时间小于当前时间==，也就是说**==没有过期==**
+    - 此任务的==过期时间小于当前时间==，也就是说**==没有过期==**
+
+      ```js
+      currentTask.expirationTime > currentTime
+      ```
+
+
+    - **==时间切片到期==**  <!--经过的时间大于5毫秒5ms-->
+    
+      ```js
+      shouldYieldToHost() // true
+      ```
+    
+      ```js
+      function shouldYieldToHost() {
+        //用当前时间减去开始的时间就是过去的时间
+        const timeElapsed = getCurrentTime() - startTime;
+        //如果流逝或者说经过的时间小于5毫秒，那就不需要放弃执行
+        if (timeElapsed < frameInterval) {
+          return false;
+        } //否则就是表示5毫秒用完了，需要放弃执行
+        return true;
+      }
+      ```
+    
+      - 所以当一个任务过期之后，不管时间切片时候到期都要将该任务执行完，因为任务过期之后，优先级会提升
+
+  - **==跳出工作循环workLoop之后，当前任务如何切换到下个时间切片执行？==**
 
     ```js
-    currentTask.expirationTime > currentTime
-    ```
-
-  - **==时间切片到期==**  <!--经过的时间大于5毫秒5ms-->
-
-    ```js
-    shouldYieldToHost() // true
-    ```
-
-    ```js
-    function shouldYieldToHost() {
-      //用当前时间减去开始的时间就是过去的时间
-      const timeElapsed = getCurrentTime() - startTime;
-      //如果流逝或者说经过的时间小于5毫秒，那就不需要放弃执行
-      if (timeElapsed < frameInterval) {
-        return false;
-      } //否则就是表示5毫秒用完了，需要放弃执行
+    while (currentTask !== null) {
+      //....
+    }
+    //如果循环结束还有未完成的任务，那就表示hasMoreWork=true
+    if (currentTask !== null) {
       return true;
     }
     ```
 
-    <!--所以当一个任务过期之后，不管时间切片时候到期都要将该任务执行完，因为任务过期之后，优先级会提升-->
+    - 退出`workLoop`之后，若是还有任务，则直接`return true`，切换下一个时间切片
 
-  **==跳出工作循环workLoop之后，当前任务如何切换到下个时间切片执行？==**
+  - **任务执行完，将该任务从最小堆中删除**
 
-  ```js
-  while (currentTask !== null) {
-    //....
-  }
-  //如果循环结束还有未完成的任务，那就表示hasMoreWork=true
-  if (currentTask !== null) {
-    return true;
-  }
-  ```
-
-  退出`workLoop`之后，若是还有任务，则直接`return true`，切换下一个时间切片
-
-- **任务执行完，将该任务从最小堆中删除**
 
   ```js
   if (currentTask === peek(taskQueue)) {
@@ -821,16 +834,18 @@ function shouldYieldToHost() {
     }
   ```
 
-- **从最小堆中取出新的任务，继续`workLoop`**
+  - **从最小堆中取出新的任务，继续`workLoop`**
+
 
   ```js
   while (currentTask !== null) {
     //....
-    
+
     //如果当前的任务执行完了，或者当前任务不合法，取出下一个任务执行
     currentTask = peek(taskQueue);
   }
   ```
+
 
 ------
 
@@ -838,11 +853,15 @@ function shouldYieldToHost() {
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/duo_ge_ren_wu_1643279818108.jpg)
 
-`scheduleCallback`的核心任务就是在`Deadline`之前从`taskQueue`按照优先级取出任务进行执行，复杂的逻辑在`workLoop`中，1、**一个完整任务的分段执行**；2、**检查任务过期时间和时间切片剩余时间**
+`scheduleCallback` 的核心任务就是在 `Deadline` 之前从 `taskQueue` 按照优先级取出任务进行执行，复杂的逻辑在 `workLoop` 中：
+
+1、**一个完整任务的分段执行**
+
+2、**检查任务过期时间和时间切片剩余时间**
 
 ------
 
-接下来在`ReactFiberWorkLoop.js`中使用`scheduleCallback`
+接下来在 `ReactFiberWorkLoop.js` 中使用 `scheduleCallback`
 
 ```js
 import {
@@ -886,5 +905,39 @@ function commitRoot(root) {
 }
 ```
 
-由于**Lane模型**还没实现，同步渲染和并发渲染也都没有完整实现，所以这里的新`scheduleCallback`暂时和之前的`scheduleCallback`就表现上没有什么差别，页面可以正常渲染即可
+由于**Lane模型**还没实现，同步渲染和并发渲染也都没有完整实现，所以这里的新 `scheduleCallback` 暂时和之前的 `scheduleCallback` 就表现上没有什么差别，页面可以正常渲染即可
+
+### 三、总结
+
+**Scheduler** 是 **React 18** 中实现任务调度的核心模块，主要包含以下几个关键部分：
+
+1. **数据结构**：
+   - 使用**最小堆**实现任务队列
+   - 基于**完全二叉树**，保证任务按优先级排序
+   - 支持任务的动态插入和删除
+
+2. **优先级机制**：
+   - 定义了 5 个优先级级别（**Immediate**、**UserBlocking**、**Normal**、**Low**、**Idle**）
+   - 通过**过期时间**控制任务优先级
+   - 优先级越高，过期时间越短
+
+3. ❗❗**时间切片**：
+   - ==使用 **MessageChannel** 创建宏任务==
+   - ==每个时间切片为 5ms==
+   - 支持任务的断点续传
+   - **任务拆分机制**：
+     - 通过 `workLoop` 函数在时间切片内执行任务
+     - 任务执行过程中通过 `shouldYieldToHost` 检查时间切片是否到期
+     - 当时间切片到期时，通过 `continuationCallback` 机制保存任务状态
+     - 任务状态保存后，通过 `schedulePerformWorkUntilDeadline` 创建新的宏任务
+     - 新的宏任务触发时，从保存的状态继续执行任务
+     - 这种机制确保了长任务不会阻塞主线程，同时保证了任务的连续性
+
+4. **调度流程**：
+   - 任务创建：根据优先级设置过期时间
+   - 任务入队：按优先级加入最小堆
+   - 任务执行：在时间切片内执行任务
+   - 任务中断：时间切片到期或任务过期
+
+通过这种设计，**Scheduler** 实现了高效的任务调度，既保证了用户交互的及时响应，又避免了长时间任务阻塞主线程
 

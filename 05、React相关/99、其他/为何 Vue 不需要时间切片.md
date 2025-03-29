@@ -211,7 +211,7 @@ export function render(_ctx) {
 
 
 3. **AOT优化**
-- **React**：使用 JSX，无需编译
+- **React**：使用 **JSX**，无需编译
    
 - **Vue**：使用模板，可以进行模板编译优化
 

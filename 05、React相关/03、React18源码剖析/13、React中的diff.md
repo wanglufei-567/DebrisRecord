@@ -1,27 +1,27 @@
-## React18源码解析（十三）React中的diff
+## **React18** 源码解析（十三）**React** 中的 diff
 
 ### 一、前言
 
-#### 1.1、DOM diff
+#### 1.1、**DOM** diff
 
-虚拟DOM使得组件更新时不需要直接操作真实DOM，只需要找出新旧虚拟 DOM 中需要更新的部分，并仅更新这些部分，做到**==最小化 DOM 操作次数==**，从而**==提高页面的渲染效率==**，这个找到需要更新部分的计算过程就是 React 的 `DOM diff` 。
+虚拟 **DOM** 使得组件更新时不需要直接操作真实 **DOM**，只需要找出新旧虚拟 **DOM** 中需要更新的部分，并仅更新这些部分，做到**最小化 DOM 操作次数**，从而**提高页面的渲染效率**，这个找到需要更新部分的计算过程就是 **React** 的 `DOM diff`
 
-React组件更新过程可以分为两个阶段：
+**React** 组件更新过程可以分为两个阶段：
 
 - **==增量更新阶段==**
   - 在增量更新阶段，React 会通过`diff`找到新旧虚拟 DOM 中差异的部分，并完成新`fiber`树的构建，但并不会对真实 DOM 进行任何修改 <!-- 主要在beginWork的reconcileChildFibers阶段-->
 - ==**提交阶段**==
   - 在增量更新阶段结束后，React 会进入提交阶段，将变更应用到真实 DOM 上。在提交阶段中，React 会根据增量更新阶段生成的更新指令（每个`fiber`节点上的副作用标识`flag`、待删除的子`fiber`列表`deletions`）来对真实 DOM 进行修改，完成组件的更新 <!--commit阶段-->
 
-`React diff` 算法的核心思想是**==基于同层比较==**。对于两棵不同的`fiber`树，`React diff` 会首先比较它们的根节点，如果两棵树的根节点不同，则 React 会直接替换整个节点及其子树。如果根节点相同，则 React 会依次比较子节点<!--也是同层比较-->
+`React diff` 算法的核心思想是**基于同层比较**。对于两棵不同的 `fiber` 树，`React diff` 会首先比较它们的根节点，如果两棵树的根节点不同，则 **React** 会直接替换整个节点及其子树。如果根节点相同，则 **React** 会依次比较子节点 <!--也是同层比较-->
 
-按照新的VDom节点是否只有一个，React中的`diff`可以分为==单节点`diff`==和==多节点`diff`==
+按照新的 **VDom** 节点是否只有一个，**React** 中的 `diff` 可以分为**单节点 `diff`** 和**多节点 `diff`**
 
 #### 1.2、打印副作用
 
-为了直观的观察到`DOM diff`过程中的副作用信息，实现一个打印副作用的方法
+为了直观的观察到 `DOM diff` 过程中的副作用信息，实现一个打印副作用的方法
 
-在提交阶段打印新`fiber`树上的副作用
+在提交阶段打印新 `fiber` 树上的副作用
 
 ```js
 function commitRoot(root) {
@@ -89,19 +89,19 @@ function getTag(tag) {
 }
 ```
 
-### 二、单节点diff
+### 二、单节点 diff
 
-若新的节点只有一个的情况，`diff`的流程如下图所示
+若新的节点只有一个的情况，`diff` 的流程如下图所示
 
 ![image-20230220223009926](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230220223009926.png)
 
-核心思想就是通过`key`和`type`来判断是否有老`fiber`可以复用，有就直接复用老`fiber`，没有就创建新`fiber`
+核心思想就是通过 `key` 和 `type` 来判断是否有老 `fiber` 可以复用，有就直接复用老 `fiber`，没有就创建新 `fiber`
 
-接下来就实现单节点的`diff`
+接下来就实现单节点的 `diff`
 
 ------
 
-改造`main.jsx`
+改造 `main.jsx`
 
 ```jsx
 import * as React from 'react';
@@ -137,9 +137,9 @@ root.render(element);
 
 ------
 
-完善`src/react-reconciler/src/ReactChildFiber.js`中的`reconcileChildFibers`
+完善 `src/react-reconciler/src/ReactChildFiber.js` 中的 `reconcileChildFibers`
 
-首先回顾下`reconcileChildFibers`方法
+首先回顾下 `reconcileChildFibers` 方法
 
 ```js
 /**
@@ -665,18 +665,18 @@ function reconcileChildFibers(
 }
 ```
 
-当新的VDom是多个节点时，会走到`reconcileChildrenArray`中，所以接下来完善`reconcileChildrenArray`
+当新的 VDom 是多个节点时，会走到 `reconcileChildrenArray` 中，所以接下来完善 `reconcileChildrenArray`
 
 ------
 
-回顾下`reconcileChildrenArray`
+回顾下 `reconcileChildrenArray`
 
 ```js
 /**
    * @description 根据虚拟DOM创建fiber（新的子节点有多个，是个数组的情况）
    * @param {*} returnFiber 新的父Fiber
    * @param {*} currentFirstFiber 老的父fiber第一个子fiber
-   * @param {*} newChild 新的子虚拟DOM
+   * @param {*} newChildren 新的子虚拟DOM
    */
   function reconcileChildrenArray(
     returnFiber,
@@ -684,7 +684,7 @@ function reconcileChildFibers(
     newChildren
   ) {
     let resultingFirstChild = null; //返回的第一个新儿子
-    let previousNewFiber = null; //上一个的一个新的fiber
+    let previousNewFiber = null; //上一个新子fiber
     let newIdx = 0;
     for (; newIdx < newChildren.length; newIdx++) {
       const newFiber = createChild(returnFiber, newChildren[newIdx]);
@@ -705,9 +705,9 @@ function reconcileChildFibers(
 
 ```
 
-这是初次挂载时的逻辑👆，只是根据新的VDom创建`fiber`<!--老`fiber` `currentFirstFiber`没有使用到-->
+这是初次挂载时的逻辑👆，只是根据新的 VDom 创建 `fiber` <!--老 `fiber` `currentFirstFiber` 没有使用到-->
 
-那么接下来便增加diff的逻辑，首先是第一轮循环
+那么接下来便增加 diff 的逻辑，首先是第一轮循环
 
 #### 3.1、第一轮遍历
 
@@ -757,28 +757,28 @@ function reconcileChildFibers(
       //指定新fiber的位置
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
       if (previousNewFiber === null) {
-        resultingFirstChild = newFiber; 
+        resultingFirstChild = newFiber;
       } else {
         previousNewFiber.sibling = newFiber;
       }
       previousNewFiber = newFiber;
       oldFiber = nextOldFiber;
     }
-      
+
       //...
-      
+
     return resultingFirstChild;
   }
 ```
 
 以上就是第一轮循环的逻辑，这里面的几个变量很重要
 
-- `resultingFirstChild` ： 新`fiber` 第一个子`fiber`（父`fiber`的`child`） `reconcileChildrenArray`返回值就是这个
-- `previousNewFiber` ：上一个新子`fiber`，用于追加`sibling fiber`
+- `resultingFirstChild` ： 新 `fiber` 第一个子 `fiber`（父 `fiber` 的 `child`） `reconcileChildrenArray` 返回值就是这个
+- `previousNewFiber` ：上一个新子 `fiber`，用于追加 `sibling fiber`
 - `newIdx` ：用来遍历新的虚拟DOM的索引
-- `oldFiber = currentFirstFiber` ：老子`fiber` ，默认值是第一个老子`fiber`
-- `nextOldFiber` ：下一个老子`fiber`，用于提前缓存
-- `lastPlacedIndex`：上一个不需要移动的老节点的索引，用于记录可以直接复用不用移动位置的老`fiber`的索引 <!--后面第三轮循环：移动节点 使用-->
+- `oldFiber = currentFirstFiber` ：老子 `fiber` ，默认值是第一个老子 `fiber`
+- `nextOldFiber` ：下一个老子 `fiber`，用于提前缓存
+- `lastPlacedIndex`：上一个不需要移动的老节点的索引，用于记录可以直接复用不用移动位置的老 `fiber` 的索引 <!--后面第三轮循环：移动节点 使用-->
 
 ------
 
@@ -786,18 +786,18 @@ function reconcileChildFibers(
 
 **第 1 轮遍历**
 
-新VDom和老VDom按照索引，==一一进行比较==
+新 VDom 和老 VDom 按照索引，==一一进行比较==
 
-- 如果 `key` 不同则==直接结束本轮循环==  
-- 如果`key` 相同而 `type` 不同，则直接==创建新`fiber`节点==，标记老`fiber`为删除，==继续循环==
-- 如果`key` 相同且 `type` 也相同，则直接==复用老节 `fiber` 节点==，==继续循环==
-- 如果`newChildren` 或 `oldFiber` 遍历完，==结束本轮循环==
+- 如果 `key` 不同则==直接结束本轮循环==
+- 如果 `key` 相同而 `type` 不同，则直接==创建新 `fiber` 节点==，标记老 `fiber` 为删除，==继续循环==
+- 如果 `key` 相同且 `type` 也相同，则直接==复用老节 `fiber` 节点==，==继续循环==
+- 如果 `newChildren` 或 `oldFiber` 遍历完，==结束本轮循环==
 
 下面具体说明
 
 ------
 
-具体比较新老子`fiber`并复用老`fiber`的逻辑在`updateSlot`中
+具体比较新老子 `fiber` 并复用老 `fiber` 的逻辑在 `updateSlot` 中
 
 ```js
 /**
@@ -850,11 +850,11 @@ function updateElement(returnFiber, current, element) {
 
 上面👆增加的逻辑主要做了以下几件事：
 
-- `updateSlot`中比较新老子`fiber`的`key` <!--第一轮遍历是否继续，取决于`updateSlot`的返回值-->
+- `updateSlot`中比较新老子 `fiber` 的 `key` <!--第一轮遍历是否继续，取决于 `updateSlot` 的返回值-->
 
-  - `key`一致则调用`updateElement`复用老`fiber`或者创建新的`fiber`
+  - `key`一致则调用 `updateElement` 复用老 `fiber` 或者创建新的 `fiber`
 
-  - `key`不一致则直接`return null`，则直接退出第一轮遍历
+  - `key`不一致则直接 `return null`，则直接退出第一轮遍历
 
     ```js
     if (newFiber === null) {
@@ -863,14 +863,14 @@ function updateElement(returnFiber, current, element) {
     }
     ```
 
-- `updateElement`中比较新老子`fiber`的`type`
+- `updateElement`中比较新老子 `fiber` 的 `type`
 
-  - `type`一致则直接复用老`fiber`，`useFiber(current, element.props)`，新`fiber`的`alternate`指向老`fiber`
-  - `type`不一致则直接创建新`fiber`，`createFiberFromElement(element)`，需要将老`fiber`标记删除
+  - `type`一致则直接复用老 `fiber`，`useFiber(current, element.props)`，新 `fiber` 的 `alternate` 指向老 `fiber`
+  - `type`不一致则直接创建新 `fiber`，`createFiberFromElement(element)`，需要将老 `fiber` 标记删除
 
 ------
 
-老`fiber`的删除逻辑是下面这段
+老 `fiber` 的删除逻辑是下面这段
 
 ```js
 if (shouldTrackSideEffects) {
@@ -881,11 +881,11 @@ if (shouldTrackSideEffects) {
 }
 ```
 
-若是新`fiber`复用了老`fiber`，则其`alternate`属性会指向老`fiber`；没有指向的话，就直接将老`fiber`标记删除`deleteChild(returnFiber, oldFiber)`
+若是新 `fiber` 复用了老 `fiber`，则其 `alternate` 属性会指向老 `fiber`；没有指向的话，就直接将老 `fiber` 标记删除 `deleteChild(returnFiber, oldFiber)`
 
 ------
 
-第一轮循环的实现中有一点需要注意👇就是指定新fiber位置的逻辑中关于`lastPlacedIndex`的部分
+第一轮循环的实现中有一点需要注意👇就是指定新fiber位置的逻辑中关于 `lastPlacedIndex` 的部分
 
 ```js
 //指定新fiber的位置
@@ -924,7 +924,7 @@ function placeChild(newFiber, lastPlacedIndex, newIdx) {
 }
 ```
 
-关于记录直接复用且不用移动位置老`fiber`的索引`lastPlacedIndex`的逻辑
+关于记录直接复用且不用移动位置老 `fiber` 的索引 `lastPlacedIndex` 的逻辑
 
 ```js
 if (oldIndex < lastPlacedIndex) {
@@ -937,8 +937,8 @@ if (oldIndex < lastPlacedIndex) {
 
 这里的逻辑是
 
-- 若老`fiber`的索引小于上一个不需要移动的老节点的索引，则说明这个老`fiber`需要移动，仍然返回`lastPlacedIndex`，保持`lastPlacedIndex`不变
-- 若是老`fiber`的索引大于上一个不需要移动的老节点的索引，则说明这个老`fiber`不需要移动，返回这个老`fiber`的索引，作为新的`lastPlacedIndex`
+- 若老 `fiber` 的索引小于上一个不需要移动的老节点的索引，则说明这个老 `fiber` 需要移动，仍然返回 `lastPlacedIndex`，保持 `lastPlacedIndex` 不变
+- 若是老 `fiber` 的索引大于上一个不需要移动的老节点的索引，则说明这个老 `fiber` 不需要移动，返回这个老 `fiber` 的索引，作为新的 `lastPlacedIndex`
 
 <!--lastPlacedIndex在后面移动节点中有用-->
 
@@ -1110,7 +1110,7 @@ function FunctionComponent() {
 
 上面这段实现中主要做了以下几件事
 
-- 将第一轮遍历剩下的老`fiber`放入到一个Map对象中缓存下来
+- 将第一轮遍历剩下的老 `fiber` 放入到一个Map对象中缓存下来
 
   ```js
   const existingChildren = mapRemainingChildren(
@@ -1119,11 +1119,11 @@ function FunctionComponent() {
   );
   ```
 
-- 遍历剩下的虚拟DOM子节点，从存储老`fiber`的Map对象中寻找能复用的老fiber
+- 遍历剩下的虚拟DOM子节点，从存储老 `fiber` 的Map对象中寻找能复用的老fiber
 
-  - 找到则直接复用老`fiber`
+  - 找到则直接复用老 `fiber`
 
-  - 找不到则新建`fiber`
+  - 找不到则新建 `fiber`
 
     ```js
     const newFiber = updateFromMap(
@@ -1136,7 +1136,7 @@ function FunctionComponent() {
 
 ------
 
-实现`mapRemainingChildren`
+实现 `mapRemainingChildren`
 
 ```js
 function mapRemainingChildren(returnFiber, currentFirstChild) {
@@ -1157,7 +1157,7 @@ return existingChildren;
 
 ------
 
-实现`updateFromMap`
+实现 `updateFromMap`
 
 ```js
 function updateFromMap(
@@ -1189,7 +1189,7 @@ function updateFromMap(
 
 到这里移动节点的部分已经实现完成，但是应当会有这样一个疑问：`lastlastPlacedIndex`怎么用的？
 
-答案还是在`placeChild`中
+答案还是在 `placeChild` 中
 
 ```js
 /**
@@ -1262,5 +1262,5 @@ newFiber.flags |= Placement;
 
 ![image-20230223162947583](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230223162947583.png)
 
-<!--React的DOM diff没有Vue那么复杂，Vue中做了很多优化，所以React的性能不如Vue是不是和这个有关-->
+<!--**React** 的 **DOM** diff 没有 **Vue** 那么复杂，**Vue** 中做了很多优化，所以 **React** 的性能不如 **Vue** 是不是和这个有关-->
 

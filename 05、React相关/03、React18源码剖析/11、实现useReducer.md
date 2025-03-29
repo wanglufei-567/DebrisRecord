@@ -1,16 +1,22 @@
-## React18源码解析（十一）实现useReducer
+## **React18** 源码解析（十一）实现 `useReducer`
 
 ### 一、前言
 
-#### 1.1、React Hooks
+#### 1.1、**React Hooks**
 
-React Hooks 是 React 16.8 引入的一项新特性，它可以==让函数组件具有类组件的一些特性==，例如状态管理、生命周期函数等。通过使用 Hooks，可以将状态管理逻辑从组件中提取出来，使组件更加简洁、易于理解和维护。**==每个 Hook 都是一个函数，接收一些参数，返回一个数组或对象，用于在组件中进行状态管理和操作==**。
+**React Hooks** 是 **React 16.8** 引入的一项新特性，它可以让函数组件具有类组件的一些特性，例如状态管理、生命周期函数等
 
-#### 1.2、useReducer
+通过使用 **Hooks**，可以将状态管理逻辑从组件中提取出来，使组件更加简洁、易于理解和维护
 
-`useReducer` 是 React Hooks 中的一个**==函数==**，使用 `useReducer` 可以**==在组件内部管理一个复杂的状态，并将更新逻辑集中到一个地方。==**
+**每个 Hook 都是一个函数，接收一些参数，返回一个数组或对象，用于在组件中进行状态管理和操作。*
 
-使用 `useReducer` 需要传入一个 `reducer` 函数和一个初始状态对象。`reducer` 函数接收两个参数：当前的 `state` 和 `action`，它返回一个新的 `state` 对象，这个新的 `state` 对象会替代原来的 `state`。根据 `action` 的类型和数据，`reducer` 函数会计算出一个新的 `state` 对象。在组件中，可以通过 `dispatch` 函数来触发一个 `action`，从而改变 `state` 的值。
+#### 1.2、`useReducer`
+
+`useReducer` 是 **React Hooks** 中的一个函数，使用 `useReducer` 可以在组件内部管理一个复杂的状态，并将更新逻辑集中到一个地方
+
+使用 `useReducer` 需要传入一个 `reducer` 函数和一个初始状态对象，`reducer` 函数接收两个参数：当前的 `state` 和 `action`，它返回一个新的 `state` 对象，这个新的 `state` 对象会替代原来的 `state`
+
+根据 `action` 的类型和数据，`reducer` 函数会计算出一个新的 `state` 对象，在组件中，可以通过 `dispatch` 函数来触发一个 `action`，从而改变 `state` 的值
 
 下面是一个示例：
 
@@ -41,17 +47,19 @@ function Counter() {
 }
 ```
 
-在这个示例中，使用了 `useReducer` 来管理一个计数器的状态。`reducer` 函数根据不同的 `action` 来计算新的 `state` 值。在组件中，可以通过调用 `dispatch` 函数来触发一个 `action`，从而改变 `state` 的值。在这个例子中，点击加号或减号会触发对应的 `action`，从而更新 `state` 的值，并重新渲染组件。
+在这个示例中，使用了 `useReducer` 来管理一个计数器的状态，`reducer` 函数根据不同的 `action` 来计算新的 `state` 值
 
-使用 `useReducer` 可以实现复杂的逻辑，比如处理表单数据、管理多个状态等。它可以帮助我们更好地组织代码，让组件的逻辑更加清晰易懂。
+在这个例子中，点击加号或减号会触发对应的 `action`，从而更新 `state` 的值，并重新渲染组件
 
-那么接下来就实现`useReducer`这个`hook`
+使用 `useReducer` 可以实现复杂的逻辑，比如处理表单数据、管理多个状态等，它可以帮助我们更好地组织代码，让组件的逻辑更加清晰易懂
 
-### 二、useReducer的实现
+那么接下来就实现 `useReducer` 这个 `hook`
 
-#### 2.1、dispatchReducerAction
+### 二、`useReducer` 的实现
 
-首先改造下`main.jsx`，增加`useReducer`的使用
+#### 2.1、`dispatchReducerAction`
+
+首先改造下 `main.jsx`，增加 `useReducer` 的使用
 
 ```jsx
 import * as React from "react";
@@ -65,9 +73,9 @@ function FunctionComponent() {
     return (
     <button
       onClick={() => {
-        setNumber({ type: 'add', payload: 1 }); 
-        setNumber({ type: 'add', payload: 2 }); 
-        setNumber({ type: 'add', payload: 3 }); 
+        setNumber({ type: 'add', payload: 1 });
+        setNumber({ type: 'add', payload: 2 });
+        setNumber({ type: 'add', payload: 3 });
       }}
     >
       {number}
@@ -79,16 +87,16 @@ const root = createRoot(document.getElementById("root"));
 root.render(element);
 ```
 
-再回顾下函数组件挂载时的`renderWithHooks`方法
+再回顾下函数组件挂载时的 `renderWithHooks` 方法
 
 ```js
 /**
  * 渲染函数组件
- * @param {*} current 老fiber
- * @param {*} workInProgress 新fiber
+ * @param {*} current 老 fiber
+ * @param {*} workInProgress 新 fiber
  * @param {*} Component 组件定义
  * @param {*} props 组件属性
- * @returns 虚拟DOM或者说React元素
+ * @returns 虚拟 **DOM** 或者说 **React** 元素
  */
 export function renderWithHooks(
   current,
@@ -101,21 +109,23 @@ export function renderWithHooks(
 }
 ```
 
-`Component(props)`是==执行函数组件获取其返回的VDom==，而Hooks是Component内部进行调用的，所以在`Component(props)`执行之前应当有一部分处理Hooks的逻辑
+`Component(props)` 是执行函数组件获取其返回的 **VirtualDom**，而 **Hooks** 是 **Component** 内部进行调用的，所以在 `Component(props)` 执行之前应当有一部分处理 **Hooks** 的逻辑
 
-注意⚠️`useReducer`的调用方式
+注意⚠️ `useReducer` 的调用方式
 
 ```js
 const [number, setNumber] = React.useReducer(reducer, 0);
 ```
 
-`useReducer`是从React中获取的 <!--所有的Hooks都是--> ，而且每个Component中的Hooks都是用户自己选择的，可能有许多不同的Hooks <!--每个函数组件都会记录下自己用的是什么Hooks-->，并且Hooks是区分挂载时和更新时，所以在函数组件执行前，需要为每个函数组件进行Hooks的派发
+`useReducer` 是从 **React** 中获取的 <!--所有的 Hooks 都是--> 而且每个 **Component** 中的 **Hooks** 都是用户自己选择的，可能有许多不同的 **Hooks** <!--每个函数组件都会记录下自己用的是什么 Hooks-->
+
+并且 **Hooks** 是区分挂载时和更新时，所以在函数组件执行前，需要为每个函数组件进行 **Hooks** 的派发
 
 ------
 
-实现Hooks的派发器`ReactCurrentDispatcher`
+实现 **Hooks** 的派发器 `ReactCurrentDispatcher`
 
-首先在`src/react/index.js`完成React的导出
+首先在 `src/react/index.js` 完成 **React** 的导出
 
 ```js
 // src/react/index.js
@@ -136,11 +146,22 @@ export {
 }
 ```
 
-其中 `__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED`是一个内部变量，用于React不同的内部模块之间共享 <!--ReactCurrentDispatcher就是在这个内部变量上，后面renderWithHooks就是从它这里获取ReactCurrentDispatcher-->
+```javascript
+// src/react/src/ReactSharedInternals.js
+
+import ReactCurrentDispatcher from './ReactCurrentDispatcher';
+
+const ReactSharedInternals = {
+  ReactCurrentDispatcher
+}
+export default ReactSharedInternals;
+```
+
+其中 `__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED`（`ReactSharedInternals`） 是一个内部变量，用于 **React** 不同的内部模块之间共享 <!-- ReactCurrentDispatcher 就是在这个内部变量上，后面 renderWithHooks 就是从它这里获取 ReactCurrentDispatcher-->
 
 那么是如何共享的呢？
 
-在`src/shared/ReactSharedInternals.js`中引入`__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED`
+在 **shared** 包的 `src/shared/ReactSharedInternals.js` 中引入 **react** 包中的全局变量`__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED` （`ReactSharedInternals`）
 
 ```js
 import * as React from 'react';
@@ -149,11 +170,11 @@ export default ReactSharedInternals
 
 ```
 
-React中各个模块中最后使用的都是`shared`包中的`ReactSharedInternals`，没有直接从`react`包中引入
+**React** 中各个模块中最后使用的都是 `shared` 包中的 `ReactSharedInternals`没有直接从 `react` 包中引入
 
 ------
 
-在`src/react/src/ReactHooks.js`中实现`useReducer`
+在 `src/react/src/ReactHooks.js` 中实现 `useReducer`
 
 ```js
 import ReactCurrentDispatcher from './ReactCurrentDispatcher';
@@ -163,7 +184,7 @@ function resolveDispatcher() {
 }
 
 /**
- * 
+ *
  * @param {*} reducer 处理函数，用于根据老状态和动作计算新状态
  * @param {*} initialArg 初始状态
  */
@@ -173,11 +194,11 @@ export function useReducer(reducer, initialArg) {
 }
 ```
 
-==这里的`useReducer`就是最终我们在函数组件中使用的`React.useReducer`==，但这里并没有具体逻辑，只是封装了下
+这里的 `useReducer` 就是最终我们在函数组件中使用的 `React.useReducer`，但这里并没有具体逻辑，只是封装了下
 
-可以注意到最后的返回值是`dispatcher.useReducer(reducer, initialArg)`，也就是说具体逻辑应当在`dispatcher.useReducer`上
+可以注意到最后的返回值是 `dispatcher.useReducer(reducer, initialArg)`，也就是说具体逻辑应当在 `dispatcher.useReducer` 上
 
-看下`dispatcher`
+看下 `dispatcher`
 
 ```js
 function resolveDispatcher() {
@@ -187,11 +208,11 @@ function resolveDispatcher() {
 const dispatcher = resolveDispatcher();
 ```
 
-可以发现这里的`dispatcher`就是`ReactCurrentDispatcher.current`，也就是Hooks的派发器
+可以发现这里的 `dispatcher` 就是 `ReactCurrentDispatcher.current`，也就是 **Hooks** 的派发器
 
 ------
 
-在`src/react/src/ReactCurrentDispatcher.js`中实现并导出`ReactCurrentDispatcher`
+在 `src/react/src/ReactCurrentDispatcher.js` 中实现并导出 **Hooks** 的派发器 `ReactCurrentDispatcher`
 
 ```js
 const ReactCurrentDispatcher = {
@@ -200,19 +221,32 @@ const ReactCurrentDispatcher = {
 export default ReactCurrentDispatcher;
 ```
 
-`ReactCurrentDispatcher`只是个对象，它的`current`属性初始是`null`，后续在`renderWithHooks`中会为其进行赋值，也就是说函数组件中的`React.useReducer`是什么样的，完全取决于派发器上的`current.useReducer`属性挂载了什么方法 <!--所有的Hooks都是这样-->
+`ReactCurrentDispatcher` 只是个对象，它的 `current` 属性初始是 `null`，后续在 `renderWithHooks` 中会为其进行赋值，也就是说函数组件中的 `React.useReducer` 是什么样的，完全取决于派发器上的 `current.useReducer` 属性挂载了什么方法 <!--所有的 Hooks 都是这样-->
 
-<!--只是这样看，可能会觉得有点绕，一个变量导出来引进去的，但是React中模块众多，需要将相同的逻辑抽离出来，所以这样的文件结构也是难免的-->
+> ```javascript
+> // src/react/src/ReactSharedInternals.js
+>
+> import ReactCurrentDispatcher from './ReactCurrentDispatcher';
+>
+> const ReactSharedInternals = {
+>   ReactCurrentDispatcher
+> }
+> export default ReactSharedInternals;
+> ```
+>
+>  `ReactCurrentDispatcher` 通过 **react** 包的 `ReactSharedInternals`，也就是全局变量 `__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED` 被共享至其他模块，后续 `renderWithHooks` 就是从它这里获取 `ReactCurrentDispatcher`并完成挂载
+
+  <!--只是这样看，可能会觉得有点绕，一个变量导出来引进去的，但是 React 中模块众多，需要将相同的逻辑抽离出来，所以这样的文件结构也是难免的-->
 
 ------
 
-接下来在`renderWithHooks`中实现具体的`useReducer`逻辑，并将其挂到派发器`ReactCurrentDispatcher`上
+接下来在 `renderWithHooks` 中实现具体的 `useReducer` 逻辑，并将其挂到派发器 `ReactCurrentDispatcher` 上
 
-在具体实现之前可以先看下这张**==挂载时==**Hooks派发的流程图，可以先了解下整个流程和组件上的`hooks`链<!--链表结构，类似于fiber链-->
+在具体实现之前可以先看下这张挂载时 **Hooks** 派发的流程图，可以先了解下整个流程和组件上的 `hooks` 链<!--链表结构，类似于 fiber 链-->
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230219120847198.png" alt="image-20230219120847198" style="zoom:50%;" />
 
- 完善`renderWithHooks`
+ 完善 `renderWithHooks`
 
 ```js
 // src/react-reconciler/src/ReactFiberHooks.js
@@ -220,9 +254,9 @@ import ReactSharedInternals from "shared/ReactSharedInternals";
 
 const { ReactCurrentDispatcher } = ReactSharedInternals;
 
-// 当前正在渲染的fiber
+// 当前正在渲染的 fiber
 let currentlyRenderingFiber = null;
-// 当前正在工作的hook
+// 当前正在工作的 hook
 let workInProgressHook = null;
 
 const HooksDispatcherOnMount = {
@@ -231,17 +265,17 @@ const HooksDispatcherOnMount = {
 
 /**
  * 渲染函数组件
- * @param {*} current 老fiber
- * @param {*} workInProgress 新fiber
+ * @param {*} current 老 fiber
+ * @param {*} workInProgress 新 fiber
  * @param {*} Component 组件定义
  * @param {*} props 组件属性
- * @returns 虚拟DOM或者说React元素
+ * @returns 虚拟 **DOM** 或者说 **React** 元素
  */
 export function renderWithHooks(current, workInProgress, Component, props) {
-  currentlyRenderingFiber = workInProgress;//Function组件对应的fiber
+  currentlyRenderingFiber = workInProgress;//Function 组件对应的 fiber
   ReactCurrentDispatcher.current = HooksDispatcherOnMount;
 
-  //需要要函数组件执行前给ReactCurrentDispatcher.current赋值
+  //需要要函数组件执行前给 ReactCurrentDispatcher.current 赋值
   const children = Component(props);
   return children;
 }
@@ -249,8 +283,8 @@ export function renderWithHooks(current, workInProgress, Component, props) {
 
 增加的部分
 
-- 用全局变量`currentlyRenderingFiber`记录当前函数组件对应的`fiber`（新的，正在计算的）
-- 给派发器`ReactCurrentDispatcher`的`current`属性上挂上`Hooks`  <!--就是在这里给派发器上添加的Hooks，后面Component(props)执行时，函数组件中的useReducer就是现在挂上去的-->
+- 用全局变量 `currentlyRenderingFiber` 记录当前函数组件对应的 `fiber`（新的，正在计算的）
+- 给派发器 `ReactCurrentDispatcher` 的 `current` 属性上挂上 **Hooks**  <!--就是在这里给派发器上添加的 Hooks，后面 Component(props) 执行时，函数组件中的 useReducer 就是现在挂上去的-->
 
 ```js
 ReactCurrentDispatcher.current = HooksDispatcherOnMount;
@@ -260,24 +294,24 @@ const HooksDispatcherOnMount = {
 }
 ```
 
-<!--通过变量名`HooksDispatcherOnMount`（挂载时的`Hooks`），不难推断出后面还有更新时的`Hooks`，-->
+<!--通过变量名 HooksDispatcherOnMount 挂载时的 Hooks）不难推断出后面还有更新时的 Hooks-->
 
-那么现在先实现挂载时的`useReducer` ： `mountReducer`
+那么现在先实现挂载时的 `useReducer` ： `mountReducer`
 
 ------
 
-**实现挂载时的`useReducer` ：`mountReducer`**
+**实现挂载时的 `useReducer` ：`mountReducer`**
 
 ```js
 // src/react-reconciler/src/ReactFiberHooks.js
 /**
- * @description 挂载Reducer这个hook
- * @param reducer 用户创建的reducer方法，useReducer(reducer, initialArg)
+ * @description 挂载 Reducer 这个 hook
+ * @param reducer 用户创建的 reducer 方法，useReducer(reducer, initialArg)
  * @param initialArg 初始值
  */
 function mountReducer(reducer, initialArg) {
   const hook = mountWorkInProgressHook();
-  // hook对象上的memoizedState存的就是组件中用的状态
+  // hook 对象上的 memoizedState 存的就是组件中用的状态
   hook.memoizedState = initialArg;
   const queue = {
     pending: null,
@@ -289,11 +323,11 @@ function mountReducer(reducer, initialArg) {
 }
 ```
 
-<!--首先需要注意⚠️的一点时，这里的两个入参`reducer`和`initialArg`，是在组件中用户自定义的-->
+<!--首先需要注意⚠️的一点时，这里的两个入参 `reducer` 和 `initialArg`，是在组件中用户自定义的-->
 
-`mountReducer`中主要完成了以下几部分内容
+`mountReducer` 中主要完成了以下几部分内容
 
-- **创建`hook`对象**：调用`mountWorkInProgressHook`
+- **创建 `hook` 对象**：调用 `mountWorkInProgressHook`
 
   ```js
   const hook = mountWorkInProgressHook();
@@ -304,46 +338,46 @@ function mountReducer(reducer, initialArg) {
     hook.queue = queue;
   ```
 
-  `fiber`节点上的**==memoizedState==**是用来存储==自己的状态==，每一种`fiber`的状态存的类型是不一样的
+  `fiber` 节点上的 **memoizedState** 是用来存储自己的状态，每一种 `fiber` 的状态存的类型是不一样的
 
-  - **HostRootFiber**上存的就是要渲染的元素
-  - 而函数组件`fiber`上的`memoizedState`属性上存储的就是它自己的**Hooks**
-    - 函数组件`fiber`上的`memoizedState`属性上存储的Hooks，采用了单向链表结构，形成了一个 `hooks`链<!--可以参考下面的结构示意图帮助理解-->
+  - **HostRootFiber** 上存的就是要渲染的元素
+  - 而函数组件 `fiber` 上的 `memoizedState` 属性上存储的就是它自己的 **Hooks**
+    - 函数组件 `fiber` 上的 `memoizedState` 属性上存储的 **Hooks**，采用了单向链表结构，形成了一个 `hooks` 链 <!--可以参考下面的结构示意图帮助理解-->
 
-  <!--为何有hooks链，这是因为一个函数组件上可能不止用了一个useReducer方法，后面其他Hooks方法也会调用这个方法，同样会挂到fiber的memoizedState上-->
+  <!--为何有 hooks 链，这是因为一个函数组件上可能不止用了一个 useReducer 方法，后面其他 Hooks 方法也会调用这个方法，同样会挂到 fiber 的 memoizedState 上-->
 
   <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230219142629269.png" alt="image-20230219142629269" style="zoom:50%;" />
 
-- **创建`useReducer`的`dispatch`**：调用`dispatchReducerAction.bind(null, currentRenderingFiber, queue)`
+- **创建 `useReducer` 的 `dispatch`**：调用 `dispatchReducerAction.bind(null, currentRenderingFiber, queue)`
 
-  注意⚠️这里给`dispatchReducerAction`传递的入参
+  注意⚠️这里给 `dispatchReducerAction` 传递的入参
 
-  - `currentRenderingFiber`：当前组件对应的`fiber`
+  - `currentRenderingFiber`：当前组件对应的 `fiber`
 
-  - `queue`：`hook`对象上的更新队列，这个`queue`是每个`ReducerHook`对象**==独有的==**，不能混淆 <!--存在一个组件中，多个useReducer的情况-->，也是为了后面`dispatch`时可以正确取到更新内
+  - `queue`：`hook` 对象上的更新队列，这个 `queue` 是每个 `ReducerHook` 对象独有的，不能混淆 <!--存在一个组件中，多个 useReducer 的情况-->，也是为了后面 `dispatch` 时可以正确取到更新内
 
-    ==同一个`ReducerHook`不管`dispatch`多少次，用的都是同一个`queue`== <!--这里的更新队列queue，和之前fiber上的更新队列是一样的-->
+    同一个 `ReducerHook` 不管 `dispatch` 多少次，用的都是同一个 `queue`  <!--这里的更新队列 queue，和之前 fiber 上的更新队列是一样的-->
 
-- **返回`[state, dispatch]`** : `[hook.memoizedState, dispatch]` <!--最后用户拿到的就是这个-->
+- **返回 `[state, dispatch]`** : `[hook.memoizedState, dispatch]` <!--最后用户拿到的就是这个-->
 
 ------
 
-**实现创建`hook`对象的方法：`mountWorkInProgressHook`**
+**实现创建 `hook` 对象的方法：`mountWorkInProgressHook`**
 
 ```js
 // src/react-reconciler/src/ReactFiberHooks.js
 /**
- * @description 挂载构建中的hook
- * hook是个对象
+ * @description 挂载构建中的 hook
+ * hook 是个对象
  */
  function mountWorkInProgressHook() {
   const hook = {
-    memoizedState: null,//hook的状态 0
-    queue: null,//存放本hook的更新队列 queue.pending=update的循环链表
-    next: null //指向下一个hook,一个函数里可以会有多个hook,它们会组成一个单向链表
+    memoizedState: null,//hook 的状态 0
+    queue: null,//存放本 hook 的更新队列 queue.pending=update 的循环链表
+    next: null //指向下一个 hook, 一个函数里可以会有多个 hook, 它们会组成一个单向链表
   };
   if (workInProgressHook === null) {
-    //当前函数对应的fiber的状态等于第一个hook对象
+    //当前函数对应的 fiber 的状态等于第一个 hook 对象
     currentlyRenderingFiber.memoizedState = workInProgressHook = hook;
   } else {
     workInProgressHook = workInProgressHook.next = hook;
@@ -354,19 +388,19 @@ function mountReducer(reducer, initialArg) {
 
 这里的逻辑可以分为两部分
 
-- 若是第一个`hook`对象，则直接挂到函数组件`fiber`的`memoizedState`属性上，并记录到全局变量`workInProgressHook`上
-- 若不是第一个`hook`对象，则挂到上一个`hook`的`next`属性上 
+- 若是第一个 `hook` 对象，则直接挂到函数组件 `fiber` 的 `memoizedState` 属性上，并记录到全局变量 `workInProgressHook` 上
+- 若不是第一个 `hook` 对象，则挂到上一个 `hook` 的 `next` 属性上
 
 ------
 
-**实现创建dispatch的方法：`dispatchReducerAction`**
+**实现创建 dispatch 的方法：`dispatchReducerAction`**
 
 ```js
 // src/react-reconciler/src/ReactFiberHooks.js
 /**
  * 执行派发动作的方法，它要更新状态，并且让界面重新更新
- * @param {*} fiber function对应的fiber
- * @param {*} queue hook对应的更新队列
+ * @param {*} fiber function 对应的 fiber
+ * @param {*} queue hook 对应的更新队列
  * @param {*} action 派发的动作
  */
 function dispatchReducerAction(fiber, queue, action) {
@@ -376,7 +410,7 @@ function dispatchReducerAction(fiber, queue, action) {
 
 暂时不添加具体逻辑，先打印看下实现效果👇
 
-JSX
+**JSX**
 
 ```jsx
 function FunctionComponent() {
@@ -396,57 +430,57 @@ function FunctionComponent() {
 }
 ```
 
-`onClick`之后打印结果
+`onClick` 之后打印结果
 
 ![image-20230219150112226](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230219150112226.png)
 
-可以看到**FunctionComponent**上的`memoizedState`属性成功挂上`hooks`链
+可以看到 **FunctionComponent** 上的 `memoizedState` 属性成功挂上 `hooks` 链
 
-下面👇这个是`useReducer`挂载时创建的示意图
+下面👇这个是 `useReducer` 挂载时创建的示意图
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230219120847198.png" alt="image-20230219120847198" style="zoom:50%;" />
 
-整个**==挂载时==**Hooks派发过程，就是根据用户在组件内使用到的Hooks创建`hooks`链
+整个挂载时 **Hooks** 派发过程，就是根据用户在组件内使用到的 **Hooks** 创建 `hooks` 链
 
-接下来继续实现`useReducer`的更新：`dispatch`
+接下来继续实现 `useReducer` 的更新：`dispatch`
 
-#### 3.2、diapatch
+#### 3.2、`diapatch`
 
-**完善创建dispatch的方法:`dispatchReducerAction`**
+**完善创建 dispatch 的方法:`dispatchReducerAction`**
 
 ```js
 // src/react-reconciler/src/ReactFiberHooks.js
 /**
  * 执行派发动作的方法，它要更新状态，并且让界面重新更新
- * @param {*} fiber function对应的fiber
- * @param {*} queue hook对应的更新队列
+ * @param {*} fiber function 对应的 fiber
+ * @param {*} queue hook 对应的更新队列
  * @param {*} action 派发的动作
  */
 function dispatchReducerAction(fiber, queue, action) {
-  //在每个hook里会存放一个更新队列
-  //更新队列是一个更新对象的循环链表update1.next=update2.next=update1
+  //在每个 hook 里会存放一个更新队列
+  //更新队列是一个更新对象的循环链表 update1.next=update2.next=update1
   const update = {
     action, //{ type: 'add', payload: 1 } 派发的动作
     next: null //指向下一个更新对象
   };
-  //把当前的最新的更新添加更新队列中，并且返回当前的根fiber
+  //把当前的最新的更新添加更新队列中，并且返回当前的根 fiber
   const root = enqueueConcurrentHookUpdate(fiber, queue, update);
-  // 调度更新，重新渲染 需要注意这个是宏任务，所以多次dispatch会批量更新
+  // 调度更新，重新渲染 需要注意这个是宏任务，所以多次 dispatch 会批量更新
   scheduleUpdateOnFiber(root);
 }
 ```
 
 增加了以下内容：
 
-- **创建更新对象 `update`** <!--每次dispatch都会创建一个update-->
+- **创建更新对象 `update`** <!--每次 dispatch 都会创建一个 update-->
 
-- **把当前的最新的更新添加到更新队列中，并且返回当前的根`fiber`**： `enqueueConcurrentHookUpdate` 
+- **把当前的最新的更新添加到更新队列中，并且返回当前的根 `fiber`**： `enqueueConcurrentHookUpdate`
 
-  每次用户调用`dispatch`，就会传入`action`，这里需要将更新内容包装成更新对象`update`
+  每次用户调用 `dispatch`，就会传入 `action`，这里需要将更新内容包装成更新对象 `update`
 
-  <!--注意这个方法的名字enqueueConcurrentHookUpdate（入队并发更新Hook更新），为何是并发更新（批量更新）？这个在后面的调度模块（schedule）中会有详细说明-->
+  <!--注意这个方法的名字 enqueueConcurrentHookUpdate（入队并发更新 Hook 更新），为何是并发更新（批量更新）？这个在后面的调度模块（schedule）中会有详细说明-->
 
-- **拿到根`fiber`进行调度更新，重新渲染**：`scheduleUpdateOnFiber(root)` <!--ReactFiberWorkLoop中的方法，初次渲染时就是调用的这个方法完成的挂载-->
+- **拿到根 `fiber` 进行调度更新，重新渲染**：`scheduleUpdateOnFiber(root)` <!--ReactFiberWorkLoop 中的方法，初次渲染时就是调用的这个方法完成的挂载-->
 
 ------
 
@@ -459,15 +493,15 @@ const concurrentQueue = [];
 let concurrentQueuesIndex = 0;
 
 /**
- * 把更新先缓存到concurrentQueue数组中
+ * 把更新先缓存到 concurrentQueue 数组中
  * @param {*} fiber
  * @param {*} queue
  * @param {*} update
  */
 function enqueueUpdate(fiber, queue, update) {
   //012 setNumber1 345 setNumber2 678 setNumber3
-  concurrentQueue[concurrentQueuesIndex++] = fiber; //函数组件对应的fiber
-  concurrentQueue[concurrentQueuesIndex++] = queue; //要更新的hook对应的更新队列
+  concurrentQueue[concurrentQueuesIndex++] = fiber; //函数组件对应的 fiber
+  concurrentQueue[concurrentQueuesIndex++] = queue; //要更新的 hook 对应的更新队列
   concurrentQueue[concurrentQueuesIndex++] = update; //更新对象
 }
 
@@ -486,8 +520,8 @@ function getRootForUpdatedFiber(sourceFiber) {
 
 /**
  * @description 把更新队列添加到更新队列中
- * @param {*} fiber 函数组件对应的fiber
- * @param {*} queue 要更新的hook对应的更新队列
+ * @param {*} fiber 函数组件对应的 fiber
+ * @param {*} queue 要更新的 hook 对应的更新队列
  * @param {*} update 更新对象
  */
  export function enqueueConcurrentHookUpdate(fiber, queue, update) {
@@ -496,19 +530,19 @@ function getRootForUpdatedFiber(sourceFiber) {
 }
 ```
 
-`enqueueConcurrentHookUpdate`中主要做了两件事
+`enqueueConcurrentHookUpdate` 中主要做了两件事
 
-- **把更新先缓存到全局变量`concurrentQueue`数组中**：`enqueueUpdate` 
+- **把更新先缓存到全局变量 `concurrentQueue` 数组中**：`enqueueUpdate`
 
-  - `concurrentQueue`是一个一维数组，一次`dispatch`存入三个元素 <!--不理解为何这样设计-->
+  - `concurrentQueue` 是一个一维数组，一次 `dispatch` 存入三个元素 <!--不理解为何这样设计-->
 
-    <!--⚠️需要注意的一点，由于`concurrentQueue`是全局变量，所以其中存的更新内容可能是不同的`useReducerHook`的更新内容-->
+    <!--⚠️需要注意的一点，由于 `concurrentQueue` 是全局变量，所以其中存的更新内容可能是不同的 `useReducerHook` 的更新内容-->
 
 - **返回根（`root`）**: `return getRootForUpdatedFiber(fiber)`
 
 ------
 
-`concurrentQueue`的数据结构肯定不适合计算更新内容，所以还是要将更新内容放到`hook`对象上的`queue`上，如何将更新内容入队呢？看下面👇
+`concurrentQueue` 的数据结构肯定不适合计算更新内容，所以还是要将更新内容放到 `hook` 对象上的 `queue` 上，如何将更新内容入队呢？看下面👇
 
 ```js
 // src/react-reconciler/src/ReactFiberConcurrentUpdates.js
@@ -538,37 +572,37 @@ export function finishQueueingConcurrentUpdates() {
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/queuepending_1644750048819.png" alt="img" style="zoom:50%;" />
 
-<!--和之前的更新队列不同的是，由于`concurrentQueue`中可能缓存了不同`useReducerHook`的更新内容，所以这里的入队操作的可能不止一个`queue`。但是由于同一个`useReducerHook`不管`dispatch`几次都是用的同一个`queue`，再加上`concurrentQueue`特殊的缓存方式👇-->
+<!--和之前的更新队列不同的是，由于 `concurrentQueue` 中可能缓存了不同 `useReducerHook` 的更新内容，所以这里的入队操作的可能不止一个 `queue`。但是由于同一个 `useReducerHook` 不管 `dispatch` 几次都是用的同一个 `queue`，再加上 `concurrentQueue` 特殊的缓存方式👇-->
 
 > ```js
 > function enqueueUpdate(fiber, queue, update) {
 >   //012 setNumber1 345 setNumber2 678 setNumber3
->   concurrentQueue[concurrentQueuesIndex++] = fiber; //函数组件对应的fiber
->   concurrentQueue[concurrentQueuesIndex++] = queue; //要更新的hook对应的更新队列
+>   concurrentQueue[concurrentQueuesIndex++] = fiber; //函数组件对应的 fiber
+>   concurrentQueue[concurrentQueuesIndex++] = queue; //要更新的 hook 对应的更新队列
 >   concurrentQueue[concurrentQueuesIndex++] = update; //更新对象
 > }
 > ```
 
-<!--所以可以保证同一个`useReducerHook`的更新内容只会保存到自己的`queue`上-->
+<!--所以可以保证同一个 `useReducerHook` 的更新内容只会保存到自己的 `queue` 上-->
 
-更新内容的入队方法`finishQueueingConcurrentUpdates`已经实现，但是在哪里调用呢？
+更新内容的入队方法 `finishQueueingConcurrentUpdates` 已经实现，但是在哪里调用呢？
 
-是在`ReactFiberWorkLoop`中的`prepareFreshStack`中调用的
+是在 `ReactFiberWorkLoop` 中的 `prepareFreshStack` 中调用的
 
 ```js
 /**
- * @description 根据老的fiber树创建一个全新的fiber树，后续用于替换掉老的fiber树
+ * @description 根据老的 fiber 树创建一个全新的 fiber 树，后续用于替换掉老的 fiber 树
  */
 function prepareFreshStack(root) {
-  // 创建一个workInProgress（执行中的工作）
+  // 创建一个 workInProgress（执行中的工作）
   workInProgress = createWorkInProgress(root.current, null);
   finishQueueingConcurrentUpdates();
 }
 ```
 
-`prepareFreshStack`是在`scheduleUpdateOnFiber`中被调用的，而`dispatchReducerAction`最后会调用`scheduleUpdateOnFiber`进行调度更新重新渲染。
+`prepareFreshStack` 是在 `scheduleUpdateOnFiber` 中被调用的，而 `dispatchReducerAction` 最后会调用 `scheduleUpdateOnFiber` 进行调度更新重新渲染。
 
-所以`useReducerHook` `dispatch`时更新内容的处理顺序是 `dispatch` ——》`enqueueConcurrentHookUpdate`将更新内容缓存在`concurrentQueue`中 ——》`scheduleUpdateOnFiber`调度更新——》`finishQueueingConcurrentUpdates`将更新内容进行入列操作放到`useReducerHook`的`queue`上
+所以 `useReducerHook` `dispatch` 时更新内容的处理顺序是 `dispatch` ——》`enqueueConcurrentHookUpdate` 将更新内容缓存在 `concurrentQueue` 中 ——》`scheduleUpdateOnFiber` 调度更新——》`finishQueueingConcurrentUpdates` 将更新内容进行入列操作放到 `useReducerHook` 的 `queue` 上
 
 最后看下实现效果
 
@@ -576,9 +610,9 @@ function prepareFreshStack(root) {
 
 更新内容已经添加到更新队列上了，那么接下来便是计算更新内容从而更新状态最终重新渲染
 
-#### 2.3、HooksDispatcherOnUpdateInDEV
+#### 2.3、`HooksDispatcherOnUpdateInDEV`
 
-在实现更新内容的计算前先看下👇这个示意图，其实整个过程不复杂就是通过`action`和`queue`计算出`newState`，再将其挂到新的`useReducerHook`上
+在实现更新内容的计算前先看下👇这个示意图，其实整个过程不复杂就是通过 `action` 和 `queue` 计算出 `newState`，再将其挂到新的 `useReducerHook` 上
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230219160059944.png" alt="image-20230219160059944" style="zoom:50%;" />
 
@@ -586,26 +620,26 @@ function prepareFreshStack(root) {
 
 接下来具体实现
 
-首先在2.2实现的`dispatch`中，最后会调用`scheduleUpdateOnFiber`，而`scheduleUpdateOnFiber`中会执行**工作循环**计算一颗新的`fiber`树，所以接下来从`beginWork`这里开始完善
+首先在 2.2 实现的 `dispatch` 中，最后会调用 `scheduleUpdateOnFiber`，而 `scheduleUpdateOnFiber` 中会执行**工作循环**计算一颗新的 `fiber` 树，所以接下来从 `beginWork` 这里开始完善
 
-##### 2.3.1、beginWork
+##### 2.3.1、`beginWork`
 
-先回顾下`beginWork`
+先回顾下 `beginWork`
 
 ```js
 // src/react-reconciler/src/ReactFiberBeginWork.js
 
 /**
- * @description 目标是根据新虚拟DOM构建新的fiber子链表 .child .sibling
- * @param current 老fiber
- * @param workInProgress 新的fiber h1
+ * @description 目标是根据新虚拟 **DOM** 构建新的 fiber 子链表 .child .sibling
+ * @param current 老 fiber
+ * @param workInProgress 新的 fiber h1
  */
 export function beginWork(current, workInProgress) {
   switch (workInProgress.tag) {
     case IndeterminateComponent:
       /*
-      React里组件有两种，一种是函数组件，一种是类组件，但是它们都是都是函数
-      组件fiber的tag最开始便是IndeterminateComponent
+      **React** 里组件有两种，一种是函数组件，一种是类组件，但是它们都是都是函数
+      组件 fiber 的 tag 最开始便是 IndeterminateComponent
       */
       return mountIndeterminateComponent(
         current,
@@ -624,22 +658,22 @@ export function beginWork(current, workInProgress) {
 }
 ```
 
-工作循环从`HostRootFiber`开始，也就是`updateHostRoot`
+工作循环从 `HostRootFiber` 开始，也就是 `updateHostRoot`
 
-再回顾下`updateHostRoot`中的`reconcileChildren`逻辑
+再回顾下 `updateHostRoot` 中的 `reconcileChildren` 逻辑
 
 ```js
 /**
- * @description 返回协调子fiber的方法
+ * @description 返回协调子 fiber 的方法
  * @param shouldTrackSideEffects 是否跟踪副作用
  */
 function createChildReconciler(shouldTrackSideEffects) {
 
   /**
-   * @description 根据虚拟DOM创建fiber（只有单个元素的情况下）
-   * @param {*} returnFiber 新的父Fiber
-   * @param {*} currentFirstChild 老的父fiber第一个子fiber
-   * @param {*} newChild 新的子虚拟DOM
+   * @description 根据虚拟 **DOM** 创建 fiber（只有单个元素的情况下）
+   * @param {*} returnFiber 新的父 Fiber
+   * @param {*} currentFirstChild 老的父 fiber 第一个子 fiber
+   * @param {*} newChild 新的子虚拟 **DOM**
    */
   function reconcileSingleElement(
     returnFiber,
@@ -647,28 +681,28 @@ function createChildReconciler(shouldTrackSideEffects) {
     element
   ) {
     /*
-      初次挂载时，老fiber节点currentFirstChild肯定是没有的
-      所以可以直接根据虚拟DOM创建新的Fiber节点
+      初次挂载时，老 fiber 节点 currentFirstChild 肯定是没有的
+      所以可以直接根据虚拟 **DOM** 创建新的 Fiber 节点
     */
     const created = createFiberFromElement(element);
     created.return = returnFiber;
     return created;
   }
-  
+
   // ...
 
   /**
-   * 协调比较子Fibers 就是用老的子fiber链表和新的虚拟DOM进行比较的过程
-   * @param {*} returnFiber 新的父Fiber
-   * @param {*} currentFirstFiber 老的父fiber第一个子fiber
-   * @param {*} newChild 新的子虚拟DOM
+   * 协调比较子 Fibers 就是用老的子 fiber 链表和新的虚拟 **DOM** 进行比较的过程
+   * @param {*} returnFiber 新的父 Fiber
+   * @param {*} currentFirstFiber 老的父 fiber 第一个子 fiber
+   * @param {*} newChild 新的子虚拟 **DOM**
    */
   function reconcileChildFibers(
     returnFiber,
     currentFirstFiber,
     newChild
   ) {
-    //新的子虚拟DOM只有一个节点的情况
+    //新的子虚拟 **DOM** 只有一个节点的情况
     if (typeof newChild === 'object' && newChild !== null) {
       switch (newChild.$$typeof) {
         case REACT_ELEMENT_TYPE:
@@ -690,13 +724,13 @@ function createChildReconciler(shouldTrackSideEffects) {
 }
 ```
 
-当`HostRootFiber`只有一个子节点时，走`reconcileSingleElement`，而之前`reconcileSingleElement`中只实现了老`fiber`没有子`fiber`的情况，但是现在是更新的情况，老`HostRootFiber`上是有`FunctionComponent`的，所以这里需要完善`reconcileSingleElement`
+当 `HostRootFiber` 只有一个子节点时，走 `reconcileSingleElement`，而之前 `reconcileSingleElement` 中只实现了老 `fiber` 没有子 `fiber` 的情况，但是现在是更新的情况，老 `HostRootFiber` 上是有 `FunctionComponent` 的，所以这里需要完善 `reconcileSingleElement`
 
 ```js
   /**
-   * @description 复用fiber
-   * @param fiber 老的fiber节点
-   * @param pendingProps 新虚拟DOM的props
+   * @description 复用 fiber
+   * @param fiber 老的 fiber 节点
+   * @param pendingProps 新虚拟 **DOM** 的 props
    */
   function useFiber(fiber, pendingProps) {
     const clone = createWorkInProgress(fiber, pendingProps);
@@ -706,10 +740,10 @@ function createChildReconciler(shouldTrackSideEffects) {
   }
 
   /**
-   * @description 根据虚拟DOM创建fiber（只有单个元素的情况下）
-   * @param {*} returnFiber 新的父Fiber
-   * @param {*} currentFirstChild 老的父fiber第一个子fiber
-   * @param {*} newChild 新的子虚拟DOM
+   * @description 根据虚拟 **DOM** 创建 fiber（只有单个元素的情况下）
+   * @param {*} returnFiber 新的父 Fiber
+   * @param {*} currentFirstChild 老的父 fiber 第一个子 fiber
+   * @param {*} newChild 新的子虚拟 **DOM**
    */
   function reconcileSingleElement(
     returnFiber,
@@ -720,16 +754,16 @@ function createChildReconciler(shouldTrackSideEffects) {
     let child = currentFirstChild;
 
     /*
-      若更新时新的子虚拟DOM只有一个节点，且老的父fiber存在子fiber
-      则需要从第一个子fiber开始，遍历老的父fiber的所有的子fiber
-      判断是否有老的子fiber可以直接复用
+      若更新时新的子虚拟 **DOM** 只有一个节点，且老的父 fiber 存在子 fiber
+      则需要从第一个子 fiber 开始，遍历老的父 fiber 的所有的子 fiber
+      判断是否有老的子 fiber 可以直接复用
     */
     while (child !== null) {
-      //判断此老fiber对应的key和新的虚拟DOM对象的key是否一样 null===null
+      //判断此老 fiber 对应的 key 和新的虚拟 **DOM** 对象的 key 是否一样 null===null
       if (child.key === key) {
-        //判断老fiber对应的类型和新虚拟DOM元素对应的类型是否相同
+        //判断老 fiber 对应的类型和新虚拟 **DOM** 元素对应的类型是否相同
         if (child.type === element.type) {
-          //如果key一样，类型也一样，则认为此节点可以复用
+          //如果 key 一样，类型也一样，则认为此节点可以复用
           const existing = useFiber(child, element.props);
           existing.return = returnFiber;
           return existing;
@@ -739,8 +773,8 @@ function createChildReconciler(shouldTrackSideEffects) {
     }
 
     /*
-      初次挂载时，老fiber节点currentFirstChild肯定是没有的
-      所以可以直接根据虚拟DOM创建新的Fiber节点
+      初次挂载时，老 fiber 节点 currentFirstChild 肯定是没有的
+      所以可以直接根据虚拟 **DOM** 创建新的 Fiber 节点
     */
     const created = createFiberFromElement(element);
     created.return = returnFiber;
@@ -748,9 +782,9 @@ function createChildReconciler(shouldTrackSideEffects) {
   }
 ```
 
-这里增加的逻辑是从第一个子`fiber`开始，遍历老的父`fiber`的所有的子`fiber`，根据新VDom的`key`和`type`判断是否有老的子`fiber`的可以直接复用；
+这里增加的逻辑是从第一个子 `fiber` 开始，遍历老的父 `fiber` 的所有的子 `fiber`，根据新 **VDom** 的 `key` 和 `type` 判断是否有老的子 `fiber` 的可以直接复用；
 
-若可以复用则直接复制老`fiber`
+若可以复用则直接复制老 `fiber`
 
 ```js
   function useFiber(fiber, pendingProps) {
@@ -761,13 +795,13 @@ function createChildReconciler(shouldTrackSideEffects) {
   }
 ```
 
-<!--`createWorkInProgress`是根据老`fiber`创建新`fiber`的方法-->
+<!--`createWorkInProgress` 是根据老 `fiber` 创建新 `fiber` 的方法-->
 
 ------
 
-`beginWork`处理完了`HostRootFiber`之后，便要处理`FunctionComponent`
+`beginWork` 处理完了 `HostRootFiber` 之后，便要处理 `FunctionComponent`
 
-给`beginWork`添加`FunctionComponent`的处理方式
+给 `beginWork` 添加 `FunctionComponent` 的处理方式
 
 ```js
 // src/react-reconciler/src/ReactFiberBeginWork.js
@@ -776,8 +810,8 @@ export function beginWork(current, workInProgress) {
   switch (workInProgress.tag) {
     case IndeterminateComponent:
       /*
-      React里组件有两种，一种是函数组件，一种是类组件，但是它们都是都是函数
-      组件fiber的tag最开始便是IndeterminateComponent
+      **React** 里组件有两种，一种是函数组件，一种是类组件，但是它们都是都是函数
+      组件 fiber 的 tag 最开始便是 IndeterminateComponent
       */
       return mountIndeterminateComponent(
         current,
@@ -821,21 +855,21 @@ export function beginWork(current, workInProgress) {
   }
 ```
 
-<!--注意⚠️由于是更新，此时的函数组件对应的`fiber`的`tag`不再是IndeterminateComponent而是FunctionComponent，挂载时将IndeterminateComponent改成了FunctionComponent-->
+<!--注意⚠️由于是更新，此时的函数组件对应的 `fiber` 的 `tag` 不再是 IndeterminateComponent 而是 FunctionComponent，挂载时将 IndeterminateComponent 改成了 FunctionComponent-->
 
 ------
 
-**接着实现`updateFunctionComponent`**
+**接着实现 `updateFunctionComponent`**
 
 ```js
 // src/react-reconciler/src/ReactFiberBeginWork.js
 
 /**
  * @description 更新函数组件
- * @param {*} current 老fiber
- * @param {*} workInProgress 新的fiber
+ * @param {*} current 老 fiber
+ * @param {*} workInProgress 新的 fiber
  * @param {*} Component workInProgress.type 组件类型，也就是函数组件的定义
- * @param nextProps workInProgress.pendingProps 新VDom的props
+ * @param nextProps workInProgress.pendingProps 新 **VDom** 的 props
  */
 export function updateFunctionComponent(
   current,
@@ -854,11 +888,11 @@ export function updateFunctionComponent(
 }
 ```
 
-这段逻辑也不复杂，调用`renderWithHooks`创建`FunctionComponent`新的VDom，所以接下来也要完善`renderWithHooks`方法，添加更新时的逻辑
+这段逻辑也不复杂，调用 `renderWithHooks` 创建 `FunctionComponent` 新的 **VDom**，所以接下来也要完善 `renderWithHooks` 方法，添加更新时的逻辑
 
 ------
 
-**完善`renderWithHooks`**
+**完善 `renderWithHooks`**
 
 ```js
 // src/react-reconciler/src/ReactFiberHooks.js
@@ -868,11 +902,11 @@ import { enqueueConcurrentHookUpdate } from './ReactFiberConcurrentUpdates';
 
 const { ReactCurrentDispatcher } = ReactSharedInternals;
 
-// 当前正在渲染的fiber
+// 当前正在渲染的 fiber
 let currentlyRenderingFiber = null;
-// 当前正在工作的hook
+// 当前正在工作的 hook
 let workInProgressHook = null;
-// 老hook
+// 老 hook
 let currentHook = null;
 
 const HooksDispatcherOnUpdate = {
@@ -881,11 +915,11 @@ const HooksDispatcherOnUpdate = {
 
 /**
  * 渲染函数组件
- * @param {*} current 老fiber
- * @param {*} workInProgress 新fiber
+ * @param {*} current 老 fiber
+ * @param {*} workInProgress 新 fiber
  * @param {*} Component 组件定义
  * @param {*} props 组件属性
- * @returns 虚拟DOM或者说React元素
+ * @returns 虚拟 **DOM** 或者说 **React** 元素
  */
 export function renderWithHooks(
   current,
@@ -893,14 +927,14 @@ export function renderWithHooks(
   Component,
   props
 ) {
-  currentlyRenderingFiber = workInProgress; //Function组件对应的fiber
-  //如果有老的fiber,并且有老的hook链表
+  currentlyRenderingFiber = workInProgress; //Function 组件对应的 fiber
+  //如果有老的 fiber, 并且有老的 hook 链表
   if (current !== null && current.memoizedState !== null) {
     ReactCurrentDispatcher.current = HooksDispatcherOnUpdate;
   } else {
     ReactCurrentDispatcher.current = HooksDispatcherOnMount;
   }
-  //需要要函数组件执行前给ReactCurrentDispatcher.current赋值
+  //需要要函数组件执行前给 ReactCurrentDispatcher.current 赋值
   const children = Component(props);
   currentlyRenderingFiber = null;
   workInProgressHook = null;
@@ -909,7 +943,7 @@ export function renderWithHooks(
 
 ```
 
-由于是更新，那么老`fiber` （`current`）必然有值，所以此时应该将派发器`ReactCurrentDispatcher`重新赋值为更新时的`useReducer`
+由于是更新，那么老 `fiber` （`current`）必然有值，所以此时应该将派发器 `ReactCurrentDispatcher` 重新赋值为更新时的 `useReducer`
 
 ```js
 const HooksDispatcherOnUpdate = {
@@ -921,25 +955,25 @@ ReactCurrentDispatcher.current = HooksDispatcherOnUpdate;
 
 ------
 
-**实现`updateReducer`**
+**实现 `updateReducer`**
 
 ```js
 // src/react-reconciler/src/ReactFiberHooks.js
 
 /**
- * @description 构建新的hooks
+ * @description 构建新的 hooks
  */
 function updateWorkInProgressHook() {
-  //获取将要构建的新的hook的老hook
+  //获取将要构建的新的 hook 的老 hook
   if (currentHook === null) {
-    // 获取老fiber
+    // 获取老 fiber
     const current = currentlyRenderingFiber.alternate;
-    //获取老hook
+    //获取老 hook
     currentHook = current.memoizedState;
   } else {
     currentHook = currentHook.next;
   }
-  //根据老hook创建新hook
+  //根据老 hook 创建新 hook
   const newHook = {
     memoizedState: currentHook.memoizedState,
     queue: currentHook.queue,
@@ -947,7 +981,7 @@ function updateWorkInProgressHook() {
   };
 
   if (workInProgressHook === null) {
-    // 新fiber的memoizedState挂上新hook
+    // 新 fiber 的 memoizedState 挂上新 hook
     currentlyRenderingFiber.memoizedState = workInProgressHook =
       newHook;
   } else {
@@ -957,68 +991,68 @@ function updateWorkInProgressHook() {
 }
 
 function updateReducer(reducer) {
-  //获取新的hook
+  //获取新的 hook
   const hook = updateWorkInProgressHook();
-  //获取新的hook的更新队列
+  //获取新的 hook 的更新队列
   const queue = hook.queue;
-  //获取老的hook
+  //获取老的 hook
   const current = currentHook;
   //获取将要生效的更新队列
   const pendingQueue = queue.pending;
   //初始化一个新的状态，取值为当前的状态
   let newState = current.memoizedState;
 
-  // 处理hook上的更新队列
+  // 处理 hook 上的更新队列
   if (pendingQueue !== null) {
-    // 断开pending
+    // 断开 pending
     queue.pending = null;
     // 获取更新队列上第一个更新对象
     const firstUpdate = pendingQueue.next;
     let update = firstUpdate;
-    // 使用用户自定义的reducer计算新状态
+    // 使用用户自定义的 reducer 计算新状态
     do {
       const action = update.action;
       newState = reducer(newState, action);
       update = update.next;
     } while (update !== null && update !== firstUpdate);
   }
-  // 将新状态添加到hook上，并返回给组件使用
+  // 将新状态添加到 hook 上，并返回给组件使用
   hook.memoizedState = newState;
   return [hook.memoizedState, queue.dispatch];
 }
 ```
 
-`updateReducer`中主要完成了以下内容
+`updateReducer` 中主要完成了以下内容
 
-- **根据老`hook`对象创建新`hook`对象**：`updateWorkInProgressHook`
+- **根据老 `hook` 对象创建新 `hook` 对象**：`updateWorkInProgressHook`
 
-- **计算老`hook`更新队列上的更新内容的到==新的状态==并返回给组件使用**
+- **计算老 `hook` 更新队列上的更新内容的到新的状态并返回给组件使用**
 
   ```js
-    // 处理hook上的更新队列
+    // 处理 hook 上的更新队列
     if (pendingQueue !== null) {
-      // 断开pending
+      // 断开 pending
       queue.pending = null;
       // 获取更新队列上第一个更新对象
       const firstUpdate = pendingQueue.next;
       let update = firstUpdate;
-      // 使用用户自定义的reducer计算新状态
+      // 使用用户自定义的 reducer 计算新状态
       do {
         const action = update.action;
         newState = reducer(newState, action);
         update = update.next;
       } while (update !== null && update !== firstUpdate);
     }
-    // 将新状态添加到hook上，并返回给组件使用
+    // 将新状态添加到 hook 上，并返回给组件使用
     hook.memoizedState = newState;
     return [hook.memoizedState, queue.dispatch];
   ```
 
-看下实现效果，打印下`renderWithHooks`执行的结果，看下新的VDom长什么样
+看下实现效果，打印下 `renderWithHooks` 执行的结果，看下新的 **VDom** 长什么样
 
 ![image-20230219231436050](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230219231436050.png)
 
-对比下JSX
+对比下 **JSX**
 
 ```jsx
 function FunctionComponent() {
@@ -1038,54 +1072,54 @@ function FunctionComponent() {
 }
 ```
 
-VDom中的`children`便是`{number}`这个文本节点，可以发现**更新的状态**已经添加到了新的VDom上了
+**VDom** 中的 `children` 便是 `{number}` 这个文本节点，可以发现更新的状态已经添加到了新的 **VDom** 上了
 
-总结下更新时，`beginWork`中的流程示意图👇
+总结下更新时，`beginWork` 中的流程示意图👇
 
 ![image-20230219224226538](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230219224226538.png)
 
 可以分为这几步：
 
-- 从`HostRootFiber`开始构建新的`fiber`树
-- 复用老的`FunctionComponent` `fiber`
-- 计算更新内容，并将其添加到新的`hook`对象的`memoizedState`上
+- 从 `HostRootFiber` 开始构建新的 `fiber` 树
+- 复用老的 `FunctionComponent` `fiber`
+- 计算更新内容，并将其添加到新的 `hook` 对象的 `memoizedState` 上
 
-`beginWork`的完善就到这，接下来完善`completeWork`
+`beginWork` 的完善就到这，接下来完善 `completeWork`
 
 ------
 
-##### 2.3.2、completeWork
+##### 2.3.2、`completeWork`
 
-由于更新内容是在原生节点上生效的 <!--button组件上的children为新状态-->
+由于更新内容是在原生节点上生效的 <!--button 组件上的 children 为新状态-->
 
-所以只要完善原生节点的处理方法`HostComponent`
+所以只要完善原生节点的处理方法 `HostComponent`
 
 ```js
 // src/react-reconciler/src/ReactFiberCompleteWork.js
 /**
- * 完成一个fiber节点
- * @param {*} current 老fiber
- * @param {*} workInProgress 新的构建的fiber
+ * 完成一个 fiber 节点
+ * @param {*} current 老 fiber
+ * @param {*} workInProgress 新的构建的 fiber
  */
 export function completeWork(current, workInProgress) {
   const newProps = workInProgress.pendingProps;
 
   switch (workInProgress.tag) {
-    // 根fiber
+    // 根 fiber
     case HostRoot:
       //向上冒泡属性
       bubbleProperties(workInProgress);
       break;
-    // 原生节点的fiber
+    // 原生节点的 fiber
     case HostComponent:
       const { type } = workInProgress;
       if (current !== null && workInProgress.stateNode !== null) {
-        //如果老fiber存在，并且老fiber上有真实DOM节点，要走节点更新的逻辑
+        //如果老 fiber 存在，并且老 fiber 上有真实 **DOM** 节点，要走节点更新的逻辑
         updateHostComponent(current, workInProgress, type, newProps);
       } else {
         //创建或者说挂载新节点的情况
 
-        //创建真实的DOM节点
+        //创建真实的 **DOM** 节点
         const instance = createInstance(
           type,
           newProps,
@@ -1093,19 +1127,19 @@ export function completeWork(current, workInProgress) {
         );
         //把自己所有的儿子都添加到自己的身上
         appendAllChildren(instance, workInProgress);
-        // 将真实DOM挂到当前fiber的stateNode上
+        // 将真实 **DOM** 挂到当前 fiber 的 stateNode 上
         workInProgress.stateNode = instance;
-        // 完成真实DOM的构建
+        // 完成真实 **DOM** 的构建
         finalizeInitialChildren(instance, type, newProps);
       }
       //向上冒泡属性
       bubbleProperties(workInProgress);
       break;
-    // 文本节点的fiber
+    // 文本节点的 fiber
     case HostText:
-      //如果完成的fiber是文本节点，那就创建真实的文本节点
+      //如果完成的 fiber 是文本节点，那就创建真实的文本节点
       const newText = newProps;
-      //创建真实的DOM节点并传入stateNode
+      //创建真实的 **DOM** 节点并传入 stateNode
       workInProgress.stateNode = createTextInstance(newText);
       //向上冒泡属性
       bubbleProperties(workInProgress);
@@ -1118,27 +1152,27 @@ export function completeWork(current, workInProgress) {
 
 ```js
  if (current !== null && workInProgress.stateNode !== null) {
-      //如果老fiber存在，并且老fiber上有真实DOM节点，要走节点更新的逻辑
+      //如果老 fiber 存在，并且老 fiber 上有真实 **DOM** 节点，要走节点更新的逻辑
       updateHostComponent(current, workInProgress, type, newProps);
-} 
+}
 ```
 
 ------
 
-**实现`updateHostComponent`**
+**实现 `updateHostComponent`**
 
 ```js
 /**
  * @description 标记更新
  */
 function markUpdate(workInProgress) {
-  workInProgress.flags |= Update; //给当前的fiber添加更新的副作用
+  workInProgress.flags |= Update; //给当前的 fiber 添加更新的副作用
 }
 
 /**
- * 在fiber(button)的完成阶段准备更新DOM
- * @param {*} current button老fiber
- * @param {*} workInProgress button的新fiber
+ * 在 fiber(button) 的完成阶段准备更新 **DOM**
+ * @param {*} current button 老 fiber
+ * @param {*} workInProgress button 的新 fiber
  * @param {*} type 类型
  * @param {*} newProps 新属性
  */
@@ -1149,10 +1183,10 @@ function updateHostComponent(
   newProps
 ) {
   const oldProps = current.memoizedProps; //老的属性
-  const instance = workInProgress.stateNode; //老的DOM节点
+  const instance = workInProgress.stateNode; //老的 **DOM** 节点
   //比较新老属性，收集属性的差异
   const updatePayload = prepareUpdate(instance, type, oldProps, newProps);
-  //让原生组件的新fiber更新队列等于[]
+  //让原生组件的新 fiber 更新队列等于 []
   workInProgress.updateQueue = updatePayload;
   if (updatePayload) {
     markUpdate(workInProgress);
@@ -1160,21 +1194,21 @@ function updateHostComponent(
 }
 ```
 
-`updateHostComponent`中主要完成了两部分内容
+`updateHostComponent` 中主要完成了两部分内容
 
 - **比较新老属性，收集属性的差异**：`prepareUpdate(instance, type, oldProps, newProps)`
 
-  <!--这里其实就是diff的逻辑，比较新老节点的props，还有一部分的diff逻辑在beginWork实现了，就是复用老子fiber那里，当然这只是简单的diff，后面再统一实现其他diff-->
+  <!--这里其实就是 diff 的逻辑，比较新老节点的 props，还有一部分的 diff 逻辑在 beginWork 实现了，就是复用老子 fiber 那里，当然这只是简单的 diff，后面再统一实现其他 diff-->
 
-- **==将得到差异内容放到新`fiber`的更新队列上==**：`workInProgress.updateQueue = updatePayload;`
+- **将得到差异内容放到新 `fiber` 的更新队列上**：`workInProgress.updateQueue = updatePayload;`
 
-  <!--这里将更新的内容放到新fiber的updateQueue上了-->
+  <!--这里将更新的内容放到新 fiber 的 updateQueue 上了-->
 
-- **给新`fiber`标记更新`tag`**: `markUpdate(workInProgress);`
+- **给新 `fiber` 标记更新 `tag`**: `markUpdate(workInProgress);`
 
 ------
 
-**实现比较差异的方法`updatePayload`**
+**实现比较差异的方法 `updatePayload`**
 
 ```js
 // src/react-dom-bindings/src/client/ReactDOMHostConfig.js
@@ -1188,8 +1222,8 @@ export function prepareUpdate(domElement, type, oldProps, newProps) {
 // src/react-dom-bindings/src/client/ReactDOMComponent.js
 /**
  * @description 比较新老属性，收集属性的差异
- * @param domElement 老的DOM节点
- * @param type 虚拟DOM类型
+ * @param domElement 老的 **DOM** 节点
+ * @param type 虚拟 **DOM** 类型
  * @param lastProps 老的属性
  * @param nextProps 新的属性
  */
@@ -1200,7 +1234,7 @@ export function diffProperties(domElement, tag, lastProps, nextProps) {
   let styleUpdates = null;
   //处理属性的删除 如果说一个属性在老对象里有，新对象没有的话，那就意味着删除
   for (propKey in lastProps) {
-    //如果新属性对象里有此属性，或者老的没有此属性，或者老的是个null
+    //如果新属性对象里有此属性，或者老的没有此属性，或者老的是个 null
     if (nextProps.hasOwnProperty(propKey) || !lastProps.hasOwnProperty(propKey) || lastProps[propKey] === null) {
       continue;
     }
@@ -1229,7 +1263,7 @@ export function diffProperties(domElement, tag, lastProps, nextProps) {
       if (lastProp) {
         //计算要删除的行内样式
         for (styleName in lastProp) {
-          //如果此样式对象里在的某个属性老的style里有，新的style里没有
+          //如果此样式对象里在的某个属性老的 style 里有，新的 style 里没有
           if (lastProp.hasOwnProperty(styleName) && (!nextProp || !nextProp.hasOwnProperty(styleName))) {
             if (!styleUpdates)
               styleUpdates = {};
@@ -1263,26 +1297,26 @@ export function diffProperties(domElement, tag, lastProps, nextProps) {
 }
 ```
 
-`diffProperties`主要就是对比`lastProps`和`nextProps`得到差异
+`diffProperties` 主要就是对比 `lastProps` 和 `nextProps` 得到差异
 
 看下实现效果
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230219234719845.png" alt="image-20230219234719845" style="zoom:50%;" />
 
-<!--`updatePayload`的数据结构是`[propsName1，propsValue1, propsName2，propsValue2, ...]`这种形式-->
+<!--`updatePayload` 的数据结构是 `[propsName1，propsValue1, propsName2，propsValue2, ...]` 这种形式-->
 
-好了`completeWork`的完善就到这，接下来就是完善  `commitMutationEffectsOnFiber`
+好了 `completeWork` 的完善就到这，接下来就是完善  `commitMutationEffectsOnFiber`
 
-#### 3.3、commitUpdate
+#### 3.3、`commitUpdate`
 
-**完善`commitMutationEffectsOnFiber`**
+**完善 `commitMutationEffectsOnFiber`**
 
 ```js
 // src/react-reconciler/src/ReactFiberCommitWork.js
 
 /**
- * 遍历fiber树，执行fiber上的副作用
- * @param {*} finishedWork fiber节点
+ * 遍历 fiber 树，执行 fiber 上的副作用
+ * @param {*} finishedWork fiber 节点
  * @param {*} root 根节点
  */
 export function commitMutationEffectsOnFiber(finishedWork, root) {
@@ -1303,11 +1337,11 @@ export function commitMutationEffectsOnFiber(finishedWork, root) {
       recursivelyTraverseMutationEffects(root, finishedWork);
       //再处理自己身上的副作用
       commitReconciliationEffects(finishedWork);
-      //处理DOM更新
+      //处理 **DOM** 更新
       if (flags & Update) {
-        //获取真实DOM
+        //获取真实 **DOM**
         const instance = finishedWork.stateNode;
-        //更新真实DOM
+        //更新真实 **DOM**
         if (instance !== null) {
           const newProps = finishedWork.memoizedProps;
           const oldProps =
@@ -1335,7 +1369,7 @@ export function commitMutationEffectsOnFiber(finishedWork, root) {
 }
 ```
 
-增加的内容，同样的更新内容是在原生节点上的，所以只需要完善`HostComponent`情况就好
+增加的内容，同样的更新内容是在原生节点上的，所以只需要完善 `HostComponent` 情况就好
 
 ```js
 case HostComponent: {
@@ -1343,11 +1377,11 @@ case HostComponent: {
       recursivelyTraverseMutationEffects(root, finishedWork);
       //再处理自己身上的副作用
       commitReconciliationEffects(finishedWork);
-      //处理DOM更新
+      //处理 **DOM** 更新
       if (flags & Update) {
-        //获取真实DOM
+        //获取真实 **DOM**
         const instance = finishedWork.stateNode;
-        //更新真实DOM
+        //更新真实 **DOM**
         if (instance !== null) {
           const newProps = finishedWork.memoizedProps;
           const oldProps =
@@ -1357,12 +1391,12 @@ case HostComponent: {
           finishedWork.updateQueue = null;
           if (updatePayload) {
             commitUpdate(
-              instance,
-              updatePayload,
-              type,
-              oldProps,
-              newProps,
-              finishedWork
+              instance, // 真实 **DOM**
+              updatePayload, // 更新内容
+              type, // 真实 **DOM** type
+              oldProps, // 老 props
+              newProps, // 新 Props
+              finishedWork // 当前的 fiber 节点
             );
           }
         }
@@ -1378,16 +1412,16 @@ recursivelyTraverseMutationEffects(root, finishedWork);
 commitReconciliationEffects(finishedWork);
 ```
 
-这两部分和之前初渲染一样，是完成子节点的副作用和自己的副作用 <!--也就是真实DOM的插入、删除等，这个后续实现diff时还要完善-->
+这两部分和之前初渲染一样，是完成子节点的副作用和自己的副作用 <!--也就是真实 **DOM** 的插入、删除等，这个后续实现 diff 时还要完善-->
 
 剩下的部分
 
 ```js
-  //处理DOM更新
+  //处理 **DOM** 更新
   if (flags & Update) {
-    //获取真实DOM
+    //获取真实 **DOM**
     const instance = finishedWork.stateNode;
-    //更新真实DOM
+    //更新真实 **DOM**
     if (instance !== null) {
       const newProps = finishedWork.memoizedProps;
       const oldProps =
@@ -1397,22 +1431,22 @@ commitReconciliationEffects(finishedWork);
       finishedWork.updateQueue = null;
       if (updatePayload) {
         commitUpdate(
-          instance, // 真实DOM
+          instance, // 真实 **DOM**
           updatePayload, // 更新内容
-          type, // 真实DOM type
-          oldProps, // 老props
-          newProps, // 新Props
-          finishedWork // 当前的fiber节点
+          type, // 真实 **DOM** type
+          oldProps, // 老 props
+          newProps, // 新 Props
+          finishedWork // 当前的 fiber 节点
         );
       }
     }
 ```
 
-就是完成真实DOM的更新操作，之前在`completeWork`中给`fiber`节点上增加的更新队列，就是要这里更新到真实DOM上
+就是完成真实 **DOM** 的更新操作，之前在 `completeWork` 中给 `fiber` 节点上增加的更新队列，就是要这里更新到真实 **DOM** 上
 
 ------
 
-**实现`commitUpdate`**
+**实现 `commitUpdate`**
 
 ```js
 // src/react-dom-bindings/src/client/ReactDOMHostConfig.js
@@ -1445,26 +1479,26 @@ export function updateProperties(domElement, updatePayload) {
 
 ```js
 /**
- * @description 在DOM节点保存props
- * @param node DOM节点
- * @param props 虚拟DOM上的props
+ * @description 在 **DOM** 节点保存 props
+ * @param node **DOM** 节点
+ * @param props 虚拟 **DOM** 上的 props
  */
 export function updateFiberProps(node, props) {
   node[internalPropsKey] = props;
 }
 ```
 
-这里就是将更新内容添加到真实DOM上
+这里就是将更新内容添加到真实 **DOM** 上
 
 ------
 
-到这里`commitMutationEffectsOnFiber`也完善完成
+到这里 `commitMutationEffectsOnFiber` 也完善完成
 
 看下实现效果
 
 ![image-20230220001834908](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230220001834908.png)
 
-对比下JSX
+对比下 **JSX**
 
 ```js
 function FunctionComponent() {
@@ -1484,8 +1518,8 @@ function FunctionComponent() {
 }
 ```
 
-可以看到当`onClick`时，页面重新渲染，新的状态也成功渲染到页面上了
+可以看到当 `onClick` 时，页面重新渲染，新的状态也成功渲染到页面上了
 
 ### 总结
 
-`useReducer`这个Hooks的实现就完成了，同时也实现了部分`diff`，后面其他的Hooks的实现也差不多类似
+`useReducer` 这个 **Hooks** 的实现就完成了，同时也实现了部分 `diff`，后面其他的 **Hooks** 的实现也差不多类似

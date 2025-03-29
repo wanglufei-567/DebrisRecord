@@ -2,21 +2,21 @@
 
 ### 一、前言
 
-首先回顾下`scheduleUpdateOnFiber`的流程👇
+首先回顾下 `scheduleUpdateOnFiber` 的流程👇
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/scheduleUpdateOnFiber1_1667713205987.jpg" alt="img" style="zoom:50%;" />
 
-这张图中有两个API很重要，用于在不同的渲染模式下执行更新操作：
+这张图中有两个 API 很重要，用于在不同的渲染模式下执行更新操作：
 
-- **同步更新模式下的 API：`performSyncWorkOnRoot`** 
+- **同步更新模式下的 API：`performSyncWorkOnRoot`**
 
-  它会==立即执行所有更新操作，并阻塞 UI 渲染直到更新完成==。这个 API 在以前的版本中是默认使用的，但在 React 18 中，它被视为一种备用的更新模式，仅在需要精确控制更新过程时使用
+  它会==立即执行所有更新操作，并阻塞 UI 渲染直到更新完成==。这个 API 在以前的版本中是默认使用的，但在 **React 18** 中，它被视为一种备用的更新模式，仅在需要精确控制更新过程时使用
 
-- **Concurrent Mode 下的 API： `performConcurrentWorkOnRoot`**
+- **Concurrent Mode 下的 API：`performConcurrentWorkOnRoot`**
 
   它可以==将更新任务分解为多个小任务，并将这些小任务分配到多个帧中执行==，以提高应用程序的性能和用户体验 <!--每个小任务执行完成后，会检查更新任务是否过期，过期了则不继续拆分，而是直接同步渲染一次性执行完成-->
 
-前面已经实现了**Concurrent Mode**下的同步渲染：`performConcurrentWorkOnRoot` + `renderRootSync`👇
+前面已经实现了 **Concurrent Mode** 下的同步渲染：`performConcurrentWorkOnRoot` + `renderRootSync`👇
 
 ![image-20230302215730401](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302215730401-20230305202613301.png)
 
@@ -24,7 +24,7 @@
 
 ![image-20230305203330571](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230305203330571.png)
 
-和**Concurrent Mode**下的并发渲染：`performConcurrentWorkOnRoot` + `renderRootConcurrent`👇
+和 **Concurrent Mode** 下的并发渲染：`performConcurrentWorkOnRoot` + `renderRootConcurrent`👇
 
 ![image-20230305205537793](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230305205537793.png)
 
@@ -32,7 +32,7 @@
 
 ![image-20230305203330571](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230305203330571.png)
 
-首先改造下`main.js`
+首先改造下 `main.js`
 
 ```jsx
 import * as React from 'react';
@@ -47,14 +47,13 @@ function FunctionComponent() {
 let element = <FunctionComponent />;
 const root = createRoot(document.getElementById('root'));
 root.render(element);
-
 ```
 
-再回顾下`ensureRootIsScheduled(root)`
+再回顾下 `ensureRootIsScheduled(root)`
 
 ```js
 /**
- * @description 确保执行root上的更新
+ * @description 确保执行 root 上的更新
  */
 function ensureRootIsScheduled(root) {
   //获取当前优先级最高的车道
@@ -81,13 +80,13 @@ if (newCallbackPriority === SyncLane) {
 }
 ```
 
-注意这个判断条件`if (newCallbackPriority === SyncLane)`，只有当`root`上的优先级最高的`lane`是`SyncLane`(1)，才会走同步更新的逻辑，而用户的点击操作触发的更新则正是`SyncLane`(1)
+注意这个判断条件 `if (newCallbackPriority === SyncLane)`，只有当 `root` 上的优先级最高的 `lane` 是 `SyncLane`(1)，才会走同步更新的逻辑，而用户的点击操作触发的更新则正是 `SyncLane`(1)
 
 ------
 
 所以需要先实现**事件操作时的优先级设置**👇
 
-在`src/react-dom-bindings/src/events/ReactDOMEventListener.js`中，改造合成事件中派发离散事件的的监听函数：`dispatchDiscreteEvent`
+在 `src/react-dom-bindings/src/events/ReactDOMEventListener.js` 中，改造合成事件中派发离散事件的的监听函数：`dispatchDiscreteEvent`
 
 ```js
 import {
@@ -104,8 +103,8 @@ import {
  * 派发离散的事件的的监听函数
  * @param {*} domEventName 事件名 click
  * @param {*} eventSystemFlags 阶段 0 冒泡 4 捕获
- * @param {*} container 容器div#root
- * @param {*} nativeEvent 原生的事件 浏览器给的event参数
+ * @param {*} container 容器 div#root
+ * @param {*} nativeEvent 原生的事件 浏览器给的 event 参数
  */
 function dispatchDiscreteEvent(
   domEventName,
@@ -131,9 +130,9 @@ function dispatchDiscreteEvent(
 }
 ```
 
-这里增加的逻辑是：`onClick`事件被触发后，在执行监听函数之前将当前的更新优先级设置为离散事件优先级(`DiscreteEventPriority` 1) ，待监听函数执行完成后再将当前优先级重置为之前的优先级
+这里增加的逻辑是：`onClick` 事件被触发后，在执行监听函数之前将当前的更新优先级设置为离散事件优先级(`DiscreteEventPriority` 1) ，待监听函数执行完成后再将当前优先级重置为之前的优先级
 
-看下`main.jsx`中的监听函数👇
+看下 `main.jsx` 中的监听函数👇
 
 ```jsx
  <button onClick={() => {
@@ -141,16 +140,16 @@ function dispatchDiscreteEvent(
   }}>{number}</button>
 ```
 
-点击事件发生后，先将当前优先级设置为`DiscreteEventPriority` (1)，再执行`setNumber(number + 1)`
+点击事件发生后，先将当前优先级设置为 `DiscreteEventPriority` (1)，再执行 `setNumber(number + 1)`
 
-`setNumber(number + 1)`是`useState`的`dispatch`方法👇
+`setNumber(number + 1)` 是 `useState` 的 `dispatch` 方法👇
 
 ```diff
 // src/react-reconciler/src/ReactFiberHooks.js
 /**
- * @description useState的更新方法
- * @param {*} fiber function对应的fiber
- * @param {*} queue hook对应的更新队列
+ * @description useState 的更新方法
+ * @param {*} fiber function 对应的 fiber
+ * @param {*} queue hook 对应的更新队列
  * @param {*} action 派发的动作
  */
 function dispatchSetState(fiber, queue, action) {
@@ -158,32 +157,32 @@ function dispatchSetState(fiber, queue, action) {
 + const lane = requestUpdateLane();
 
   //...
-  
+
   //下面是真正的入队更新，并调度更新逻辑
 + const root = enqueueConcurrentHookUpdate(fiber, queue, update, lane);
   scheduleUpdateOnFiber(root, fiber, lane);
 }
 ```
 
-所以在`dispatchSetState`中获取当前更新的赛道
+所以在 `dispatchSetState` 中获取当前更新的赛道
 
 ```js
 const lane = requestUpdateLane();
 ```
 
-获取到的`lane`便是`dispatchDiscreteEvent`中设置的`DiscreteEventPriority` (1)也就是`SyncLane`(1)
+获取到的 `lane` 便是 `dispatchDiscreteEvent` 中设置的 `DiscreteEventPriority` (1) 也就是 `SyncLane`(1)
 
-再将`lane`和更新内容一起入队
+再将 `lane` 和更新内容一起入队
 
 ```js
 const root = enqueueConcurrentHookUpdate(fiber, queue, update, lane);
 ```
 
-最后在调用`scheduleUpdateOnFiber`触发更新，这样就能走到
+最后在调用 `scheduleUpdateOnFiber` 触发更新，这样就能走到
 
 ```js
 /**
- * @description 确保执行root上的更新
+ * @description 确保执行 root 上的更新
  */
 function ensureRootIsScheduled(root) {
   //获取当前优先级最高的车道
@@ -201,7 +200,7 @@ function ensureRootIsScheduled(root) {
 }
 ```
 
-而且这时`newCallbackPriority === SyncLane`
+而且这时 `newCallbackPriority === SyncLane`
 
 ------
 
@@ -218,7 +217,7 @@ if (newCallbackPriority === SyncLane) {
 
 ```js
 /**
- * @description 确保执行root上的更新
+ * @description 确保执行 root 上的更新
  */
 function ensureRootIsScheduled(root) {
   //获取当前优先级最高的车道
@@ -227,10 +226,10 @@ function ensureRootIsScheduled(root) {
   let newCallbackPriority = getHighestPriorityLane(nextLanes); //16
   if (newCallbackPriority === SyncLane) {
     //如果新的优先级是同步的话
-    
-    //先把performSyncWorkOnRoot添回到同步队列中
+
+    //先把 performSyncWorkOnRoot 添回到同步队列中
     scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root));
-    //再把flushSyncCallbacks放入微任务
+    //再把 flushSyncCallbacks 放入微任务
     queueMicrotask(flushSyncCallbacks);
   } else {
     //如果不是同步，就需要调度一个新的任务
@@ -242,23 +241,23 @@ function ensureRootIsScheduled(root) {
 
 增加的逻辑：
 
-- **将同步更新的方法：`performSyncWorkOnRoot`添加到同步队列中**
+- **将同步更新的方法：`performSyncWorkOnRoot` 添加到同步队列中**
 
   ```js
   scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root));
   ```
 
-- **再将执行同步队列任务的方法：`flushSyncCallbacks`放入微任务**
+- **再将执行同步队列任务的方法：`flushSyncCallbacks` 放入微任务**
 
   ```js
   queueMicrotask(flushSyncCallbacks);
   ```
 
-**==同步更新会创建一个微任务==**，在当前宏任务同步代码执行完成后 <!--点击事件的事件监听函数-->，立刻执行`flushSyncCallbacks`，从将`performSyncWorkOnRoot`从队列中取出执行，完成更新
+**==同步更新会创建一个微任务==**，在当前宏任务同步代码执行完成后 <!--点击事件的事件监听函数-->，立刻执行 `flushSyncCallbacks`，从将 `performSyncWorkOnRoot` 从队列中取出执行，完成更新
 
 ------
 
-在`src/react-reconciler/src/ReactFiberSyncTaskQueue.js`中实现`scheduleSyncCallback`和`flushSyncCallbacks`
+在 `src/react-reconciler/src/ReactFiberSyncTaskQueue.js` 中实现 `scheduleSyncCallback` 和 `flushSyncCallbacks`
 
 ```js
 import {
@@ -304,42 +303,40 @@ export function flushSyncCallbacks() {
     }
   }
 }
-
 ```
 
-`scheduleSyncCallback`和`flushSyncCallbacks`都不复杂
+`scheduleSyncCallback` 和 `flushSyncCallbacks` 都不复杂
 
 ------
 
-再回顾下`performSyncWorkOnRoot`
+再回顾下 `performSyncWorkOnRoot`
 
 ```js
 /**
  * 在根上执行同步工作
  */
 function performSyncWorkOnRoot(root) {
-  //获得最高优的lane
+  //获得最高优的 lane
   const lanes = getNextLanes(root);
-  //渲染新的fiber树
+  //渲染新的 fiber 树
   renderRootSync(root, lanes);
-  //获取新渲染完成的fiber根节点
+  //获取新渲染完成的 fiber 根节点
   const finishedWork = root.current.alternate;
   root.finishedWork = finishedWork;
   commitRoot(root);
   return null;
 }
-
 ```
 
-最终在微任务中执行`performSyncWorkOnRoot`，完成新`fiber`树的创建，并提交更新，完成更新渲染
+最终在微任务中执行 `performSyncWorkOnRoot`，完成新 `fiber` 树的创建，并提交更新，完成更新渲染
 
 到这里同步更新模式的更新逻辑就实现完成了，看下实现效果
 
-点击事件触发`ensureRootIsScheduled`的调用栈
+点击事件触发 `ensureRootIsScheduled` 的调用栈
 
 ![image-20230305215752012](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230305215752012.png)
 
-微任务中`performSyncWorkOnRoot`的调用栈
+微任务中 `performSyncWorkOnRoot` 的调用栈
 
 ![image-20230305215841173](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230305215841173.png)
 
@@ -347,9 +344,9 @@ function performSyncWorkOnRoot(root) {
 
 ![image-20230305220002107](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230305220002107.png)
 
-### **三、Concurrent Mode**下的并发渲染
+### **三、Concurrent Mode** 下的并发渲染
 
-接下来实现并发渲染，利用`scheduler`的时间切片**==将更新任务分解为多个小任务，并将这些小任务分配到多个帧中执行==**
+接下来实现并发渲染，利用 `scheduler` 的时间切片**==将更新任务分解为多个小任务，并将这些小任务分配到多个帧中执行==**
 
 ![image-20230305205537793](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230305205537793.png)
 
@@ -358,21 +355,21 @@ function performSyncWorkOnRoot(root) {
 ```js
 //src/react-reconciler/src/ReactFiberWorkLoop.js
 
-//构建fiber树正在进行中
+//构建 fiber 树正在进行中
 const RootInProgress = 0;
-//构建fiber树已经完成
+//构建 fiber 树已经完成
 const RootCompleted = 5;
-//当渲染工作结束的时候当前的fiber树处于什么状态,默认进行中
+//当渲染工作结束的时候当前的 fiber 树处于什么状态,默认进行中
 let workInProgressRootExitStatus = RootInProgress;
 ```
 
 ------
 
-然后在`ensureRootIsScheduled`中给`root`添加`callbackNode`用来==记录当前正在执行的任务==
+然后在 `ensureRootIsScheduled` 中给 `root` 添加 `callbackNode` 用来==记录当前正在执行的任务==
 
 ```js
 /**
- * @description 确保执行root上的更新
+ * @description 确保执行 root 上的更新
  */
 function ensureRootIsScheduled(root) {
 //...
@@ -385,24 +382,23 @@ function ensureRootIsScheduled(root) {
     //...
   } else {
     //如果不是同步，就需要调度一个新的任务
-    
+
     //...
-    
+
     // 调度执行更新任务
-    // newCallbackNode是scheduleCallback创建的任务newTask
-    // newTask.callback是performConcurrentWorkOnRoot
+    // newCallbackNode 是 scheduleCallback 创建的任务 newTask
+    // newTask.callback 是 performConcurrentWorkOnRoot
     newCallbackNode = Scheduler_scheduleCallback(
       schedulerPriorityLevel,
       performConcurrentWorkOnRoot.bind(null, root)
     );
   }
-  //在根节点记录当前执行的任务是newCallbackNode
+  //在根节点记录当前执行的任务是 newCallbackNode
   root.callbackNode = newCallbackNode;
 }
-
 ```
 
-`root.callbackNode`上记录的是`Scheduler_scheduleCallback`的返回值，也就是最小堆中存放的`task`，`task.callback`是`performConcurrentWorkOnRoot`
+`root.callbackNode` 上记录的是 `Scheduler_scheduleCallback` 的返回值，也就是最小堆中存放的 `task`，`task.callback` 是 `performConcurrentWorkOnRoot`
 
 ```js
 // src/scheduler/src/forks/Scheduler.js
@@ -414,7 +410,7 @@ function ensureRootIsScheduled(root) {
  */
 function scheduleCallback(priorityLevel, callback) {
   //...
-  
+
   // 新建任务
   const newTask = {
     id: taskIdCounter++,
@@ -424,7 +420,7 @@ function scheduleCallback(priorityLevel, callback) {
     expirationTime, //任务的过期时间
     sortIndex: expirationTime //排序依赖，过期时间越短优先级越高
   };
-  
+
   //..
   return newTask;
 }
@@ -432,7 +428,7 @@ function scheduleCallback(priorityLevel, callback) {
 
 ------
 
-接着改造`performConcurrentWorkOnRoot`
+接着改造 `performConcurrentWorkOnRoot`
 
 ```js
 /**
@@ -443,7 +439,7 @@ function scheduleCallback(priorityLevel, callback) {
  */
 function performConcurrentWorkOnRoot(root, didTimeout) {
   console.log('performConcurrentWorkOnRoot', didTimeout);
-  
+
   //...
 
   //如果不包含阻塞的车道，并且没有超时，就可以并行渲染,就是启用时间分片
@@ -495,13 +491,13 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
 
   ```diff
   // src/react-reconciler/src/ReactFiberLane.js
-  
+
   export function includesBlockingLane(root, lanes) {
     //如果允许默认并行渲染
   +  if (allowConcurrentByDefault) {
   +    return false;
   +  }
-  
+
     const SyncDefaultLanes = InputContinuousLane | DefaultLane;
     return (lanes & SyncDefaultLanes) !== NoLanes;
   }
@@ -512,9 +508,9 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
   export const allowConcurrentByDefault = true;
   ```
 
-  `allowConcurrentByDefault`，React18版本中这个值为true，表示==默认开启并发渲染==
+  `allowConcurrentByDefault`，**React 18** 版本中这个值为 true，表示==默认开启并发渲染==
 
-  所以==Concurrent Mode下**初次渲染**走的是并发渲染==
+  所以==**Concurrent Mode** 下**初次渲染**走的是并发渲染==
 
 - **渲染之后返回的任务状态：`exitStatus`**
 
@@ -568,28 +564,28 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
 
        ```js
        // src/scheduler/src/forks/Scheduler.js
-       
+
        function workLoop(startTime) {
          //...
          while (currentTask !== null) {
-       
-        
+
+
            if (typeof callback === 'function') {
              // 先清空任务上的回调
              currentTask.callback = null;
              //执行工作，如果返回新的函数，则表示当前的工作没有完成
              const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
-       
+
              const continuationCallback = callback(didUserCallbackTimeout);
-       
+
              if (typeof continuationCallback === 'function') {
                currentTask.callback = continuationCallback;
                return true; //还有任务要执行
              }
-             
+
              //...
-           } 
-           
+           }
+
            //...
        }
        ```
@@ -714,7 +710,7 @@ let element = <FunctionComponent />;
 
 ![image-20230306002206899](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230306002206899.png)
 
-可以看到三个`fiber`节点，每个`fiber`节点构建时都走了一遍`performConcurrentWorkOnRoot`方法，也就是说总共有三次时间切片，这就是React的**==并发渲染==**，==将一个任务拆分为若干个小任务，在每一帧中执行（每个时间切片），保证了不会阻塞UI==
+可以看到三个`fiber`节点，每个`fiber`节点构建时都走了一遍`performConcurrentWorkOnRoot`方法，也就是说总共有三次时间切片，这就是**React**的**==并发渲染==**，==将一个任务拆分为若干个小任务，在每一帧中执行（每个时间切片），保证了不会阻塞UI==
 
 需要明确的一点，只有fiber树的构建能进行拆分，==最后的commit阶段是不能拆分的，是一气呵成的完成真实DOM的挂载==
 

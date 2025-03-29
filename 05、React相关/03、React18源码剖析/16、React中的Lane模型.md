@@ -2,11 +2,11 @@
 
 ### 一、前言
 
-#### 1.1、Lane模型
+#### 1.1、Lane 模型
 
 **==React Lane模型==**是 React 内部使用的一种**==调度器优化机制==**，用于在不同的优先级之间分配任务。
 
-<!--屁话，难以理解，简述就是React用Lane模型来表示任务的优先级，每个lane(车道)都对应一种优先级，一共有31条优先级，数字越小优先级越高，这样React便可以根据不同任务的优先级进行调度更新，优先响应用户操作等任务-->
+<!--屁话，难以理解，简述就是 React 用 Lane 模型来表示任务的优先级，每个 lane(车道)都对应一种优先级，一共有 31 条优先级，数字越小优先级越高，这样 React 便可以根据不同任务的优先级进行调度更新，优先响应用户操作等任务-->
 
 在 Lane 模型中，==每个 Lane 对应一种优先级，任务会被分配到不同的 Lane 中进行执行==。React 使用 Lane 模型来实现调度器的高效性和灵活性，从而**==提高应用程序的性能和响应能力==**。
 
@@ -28,18 +28,18 @@ Lane 模型的设计原理是基于两个重要的概念：**==优先级==**和*
 
 React Lane模型 的优点在于，它可以根据任务的优先级**==动态地调整 Lane 的划分和分配==**，从而实现**==更加高效和灵活的任务调度==**。此外，React Lane 还支持**==任务取消==**、**==任务优先级调整==**等操作，可以**==更好地管理和控制任务的执行顺序和优先级==**。
 
-#### 1.2、Lane数量
+#### 1.2、Lane 数量
 
-**React Lane模型**一共有31条Lane，数字越小优先级越高，某些Lane的优先级相同
+**React Lane 模型** 一共有 31 条 Lane，数字越小优先级越高，某些 Lane 的优先级相同
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/lanes_1645074174970.jfif" alt="img" style="zoom:50%;" />
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/che_dao_1645080741671.jpg)
 
-**16种优先级**
+**16 种优先级**
 
 ```js
-//一共有16种优先级
+//一共有 16 种优先级
 //同步优先级
 const SyncLanePriority = 15;
 const SyncBatchedLanePriority = 14;
@@ -66,14 +66,14 @@ const OffscreenLanePriority = 1;
 const NoLanePriority = 0;
 ```
 
-**31条车道**
+**31 条车道**
 
 ```js
 /**
- * 一共有31条车道
+ * 一共有 31 条车道
  */
 const TotalLanes = 31;
-//没有车道，所有位都为0
+//没有车道，所有位都为 0
 const NoLanes = 0b0000000000000000000000000000000;
 const NoLane = 0b0000000000000000000000000000000;
 //同步车道，优先级最高
@@ -91,7 +91,7 @@ const DefaultLanes = 0b0000000000000000000111000000000;
 //渐变车道
 const TransitionHydrationLane = 0b0000000000000000001000000000000;
 const TransitionLanes = 0b0000000001111111110000000000000;
-//重试06、实现更新队列车道
+//重试 06、实现更新队列车道
 const RetryLanes = 0b0000011110000000000000000000000;
 const SomeRetryLane = 0b0000010000000000000000000000000;
 //选择性水合车道
@@ -105,13 +105,13 @@ const IdleLanes = 0b0110000000000000000000000000000;
 const OffscreenLane = 0b1000000000000000000000000000000;
 ```
 
-#### 1.3、Lane模型与Scheduler调度器
+#### 1.3、Lane 模型与 Scheduler 调度器
 
-**==React Lane模型==**和 **==Scheduler调度器==**都是 React 中用于**==管理和调度任务==**的核心机制，它们之间密切相关且相互依存。
+**==React Lane 模型==** 和 **==Scheduler 调度器==** 都是 React 中用于**==管理和调度任务==** 的核心机制，它们之间密切相关且相互依存。
 
-**React Lane模型**中的Lane是一个优先级级别，每个 Lane 都对应着一组任务，这些任务的优先级都相同 <!--16种优先级，31个Lane-->，而在 **Scheduler调度器**中，任务的优先级也被划分成多个级别，不同级别的任务被分配到不同的任务队列中 <!--5种优先级-->
+**React Lane 模型** 中的 Lane 是一个优先级级别，每个 Lane 都对应着一组任务，这些任务的优先级都相同 <!--16种优先级，31个Lane-->，而在 **Scheduler 调度器**中，任务的优先级也被划分成多个级别，不同级别的任务被分配到不同的任务队列中 <!--5种优先级-->
 
-在 React 应用中，任务的执行顺序和优先级是由 Scheduler调度器来控制的，而 Scheduler 调度器的任务优先级和任务的执行顺序都与 React Lane 模型中的 Lane 有关。
+在 React 应用中，任务的执行顺序和优先级是由 Scheduler 调度器来控制的，而 Scheduler 调度器的任务优先级和任务的执行顺序都与 React Lane 模型中的 Lane 有关。
 
 ==Scheduler 调度器会将任务加入到合适的 Lane 中，并根据 Lane 之间的优先级关系和任务的执行情况，动态地调整任务的执行顺序和时间，以确保每个 Lane 中的任务能够按照正确的优先级被执行。== <!--最小堆的技术，优先执行高优任务-->
 
@@ -121,9 +121,9 @@ const OffscreenLane = 0b1000000000000000000000000000000;
 
 之前在 ***06、实现更新队列*** 中实现了一个简单的更新队列，现在对其进行改造，实现一个带优先级的更新队列
 
-<!--后面实现Lane模型时可以直接复用-->
+<!--后面实现 Lane 模型时可以直接复用-->
 
-<!--其实这一块就是1.1、Lane模型中设计原理的双缓存机制，Lane可以分为 当前Lane和挂起Lane。当前 Lane 是正在执行的任务的优先级，而挂起 Lane 则是即将执行的任务的优先级，一个Lane的优先级低于当前Lane时就会被挂起，等待下一次Lane切换时执行-->
+<!--其实这一块就是 1.1、Lane 模型中设计原理的双缓存机制，Lane 可以分为 当前 Lane 和挂起 Lane。当前 Lane 是正在执行的任务的优先级，而挂起 Lane 则是即将执行的任务的优先级，一个 Lane 的优先级低于当前 Lane 时就会被挂起，等待下一次 Lane 切换时执行-->
 
 `ReactFiberLane.js`
 
@@ -134,7 +134,7 @@ const SyncLane = 0b01;
 const SyncBatchedLane = 0b10;
 
 /**
- * 判断subset是不是set的子集
+ * 判断 subset 是不是 set 的子集
  * @param {*} set
  * @param {*} subset
  * @returns
@@ -163,25 +163,25 @@ export default {
 }
 ```
 
-这里创建了4个Lane和两个Lane的操作方法
+这里创建了 4 个 Lane 和两个 Lane 的操作方法
 
 ------
 
 `ReactUpdateQueue.js`
 
-初始化更新队列的方法`initializeUpdateQueue`
+初始化更新队列的方法 `initializeUpdateQueue`
 
 ```js
 import { NoLane, NoLanes, isSubsetOfLanes, mergeLanes } from './ReactFiberLane';
 
 function initializeUpdateQueue(fiber) {
   const queue = {
-    baseState: fiber.memoizedState,//本次更新前该Fiber节点的state,Update基于该state计算更新后的state
-    firstBaseUpdate: null,//本次更新前该Fiber节点已保存的Update链表头
-    lastBaseUpdate: null,//本次更新前该Fiber节点已保存的Update链表尾
+    baseState: fiber.memoizedState,//本次更新前该 Fiber 节点的 state,Update 基于该 state 计算更新后的 state
+    firstBaseUpdate: null,//本次更新前该 Fiber 节点已保存的 Update 链表头
+    lastBaseUpdate: null,//本次更新前该 Fiber 节点已保存的 Update 链表尾
     shared: {
-      //触发更新时，产生的Update会保存在shared.pending中形成单向环状链表
-      //当由Update计算state时这个环会被剪开并连接在lastBaseUpdate后面
+      //触发更新时，产生的 Update 会保存在 shared.pending 中形成单向环状链表
+      //当由 Update 计算 state 时这个环会被剪开并连接在 lastBaseUpdate 后面
       pending: null
     }
   }
@@ -189,7 +189,7 @@ function initializeUpdateQueue(fiber) {
 }
 ```
 
-更新对象入队的方法`enqueueUpdate`
+更新对象入队的方法 `enqueueUpdate`
 
 ```js
 function enqueueUpdate(fiber, update) {
@@ -213,7 +213,7 @@ function enqueueUpdate(fiber, update) {
 
 ------
 
-处理更新队列的方法`processUpdateQueue`
+处理更新队列的方法 `processUpdateQueue`
 
 ```js
 /**
@@ -222,17 +222,17 @@ function enqueueUpdate(fiber, update) {
  * @param {*} renderLanes
  */
 function processUpdateQueue(fiber, renderLanes) {
-  //获取此fiber上的更新队列
+  //获取此 fiber 上的更新队列
   const queue = fiber.updateQueue;
   //获取第一个更新
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
 
-  //判断一下是否在等待生效的的更新，如果有，变成base队列
+  //判断一下是否在等待生效的的更新，如果有，变成 base 队列
   let pendingQueue = queue.shared.pending;
   //合并新老链表为单链表
   if (pendingQueue !== null) {
-    //清空pending
+    //清空 pending
     queue.shared.pending = null;
     //最后一个等待的更新
     const lastPendingUpdate = pendingQueue;
@@ -240,11 +240,11 @@ function processUpdateQueue(fiber, renderLanes) {
     const firstPendingUpdate = lastPendingUpdate.next;
     //把环剪断，最后一个不再指向第一个
     lastPendingUpdate.next = null;
-    //把等待生效的队列添加到base队列中
-    //如果base队列为空
+    //把等待生效的队列添加到 base 队列中
+    //如果 base 队列为空
     if (lastBaseUpdate === null) {
       firstBaseUpdate = firstPendingUpdate;
-    } else {//否则就把当前的更新队列添加到base队列的尾部
+    } else {//否则就把当前的更新队列添加到 base 队列的尾部
       lastBaseUpdate.next = firstPendingUpdate;
     }
     //尾部也接上
@@ -265,7 +265,7 @@ function processUpdateQueue(fiber, renderLanes) {
       //获取更新车道
       const updateLane = update.lane;
       //如果优先级不够，跳过这个更新，如果这是第一个跳过的更新，
-      //上一个状态和更新成为newBaseState和newFirstBaseUpdate
+      //上一个状态和更新成为 newBaseState 和 newFirstBaseUpdate
       if (!isSubsetOfLanes(renderLanes, updateLane)) {
         const clone = {
           id: update.id,
@@ -285,7 +285,7 @@ function processUpdateQueue(fiber, renderLanes) {
         if (newLastBaseUpdate !== null) {
           const clone = {
             id: update.id,
-            //NoLane是所有的优先级的子集，永远不会被跳过
+            //NoLane 是所有的优先级的子集，永远不会被跳过
             lane: NoLane,
             payload: update.payload
           };
@@ -309,7 +309,7 @@ function processUpdateQueue(fiber, renderLanes) {
     queue.lastBaseUpdate = newLastBaseUpdate;
     // 更新队列中的剩下的优先级
     fiber.lanes = newLanes;
-    // fiber上的状态，是由优先级足够的更新对象计算出来的
+    // fiber 上的状态，是由优先级足够的更新对象计算出来的
     fiber.memoizedState = newState;
   }
 }
@@ -321,20 +321,20 @@ function getStateFromUpdate(update, prevState) {
 }
 ```
 
-优先级的处理逻辑就在`processUpdateQueue`中
+优先级的处理逻辑就在 `processUpdateQueue` 中
 
 主要做了以下几件事：
 
-- 合并`pending`队列和`base`队列为新的`base`队列
+- 合并 `pending` 队列和 `base` 队列为新的 `base` 队列
 
-  <!--base队列是用来缓存更新的，pending队列是待生效的更新队列，每次处理更新时都会清空，但是按照优先级处理更新时，有些更新会被挂起，所以就需要一个缓存队列来存放这些被挂起的更新-->
+  <!--base 队列是用来缓存更新的，pending 队列是待生效的更新队列，每次处理更新时都会清空，但是按照优先级处理更新时，有些更新会被挂起，所以就需要一个缓存队列来存放这些被挂起的更新-->
 
   ```js
-  //判断一下是否在等待生效的的更新，如果有，变成base队列
+  //判断一下是否在等待生效的的更新，如果有，变成 base 队列
   let pendingQueue = queue.shared.pending;
   //合并新老链表为单链表
   if (pendingQueue !== null) {
-    //清空pending
+    //清空 pending
     queue.shared.pending = null;
     //最后一个等待的更新
     const lastPendingUpdate = pendingQueue;
@@ -342,11 +342,11 @@ function getStateFromUpdate(update, prevState) {
     const firstPendingUpdate = lastPendingUpdate.next;
     //把环剪断，最后一个不再指向第一个
     lastPendingUpdate.next = null;
-    //把等待生效的队列添加到base队列中
-    //如果base队列为空
+    //把等待生效的队列添加到 base 队列中
+    //如果 base 队列为空
     if (lastBaseUpdate === null) {
       firstBaseUpdate = firstPendingUpdate;
-    } else {//否则就把当前的更新队列添加到base队列的尾部
+    } else {//否则就把当前的更新队列添加到 base 队列的尾部
       lastBaseUpdate.next = firstPendingUpdate;
     }
     //尾部也接上
@@ -354,16 +354,16 @@ function getStateFromUpdate(update, prevState) {
   }
   ```
 
-  这一步就是将`fiber.updateQueue.shared.pending`上的队列，与`base`队列进行合并<!--初次执行时，base队列就是复制了pending队列，后续有了新的pending队列，则将新的队列接到base队列后面，base队列是一个单项链表-->
+  这一步就是将 `fiber.updateQueue.shared.pending` 上的队列，与 `base` 队列进行合并<!--初次执行时，base 队列就是复制了 pending 队列，后续有了新的 pending 队列，则将新的队列接到 base 队列后面，base 队列是一个单项链表-->
 
-- 根据更新对象计算新的`fiber`状态（`fiber.memoizedState`）
+- 根据更新对象计算新的 `fiber` 状态（`fiber.memoizedState`）
 
   ```js
   do {
     //获取更新车道
     const updateLane = update.lane;
     //如果优先级不够，跳过这个更新，如果这是第一个跳过的更新，
-    //上一个状态和更新成为newBaseState和newFirstBaseUpdate
+    //上一个状态和更新成为 newBaseState 和 newFirstBaseUpdate
     if (!isSubsetOfLanes(renderLanes, updateLane)) {
       const clone = {
         id: update.id,
@@ -383,7 +383,7 @@ function getStateFromUpdate(update, prevState) {
       if (newLastBaseUpdate !== null) {
         const clone = {
           id: update.id,
-          //NoLane是所有的优先级的子集，永远不会被跳过
+          //NoLane 是所有的优先级的子集，永远不会被跳过
           lane: NoLane,
           payload: update.payload
         };
@@ -398,15 +398,15 @@ function getStateFromUpdate(update, prevState) {
   } while (true);
   ```
 
-  这里就是**==处理优先级==**的逻辑<!--就是按照优先级来处理更新，优先级不够的会被挂起-->，调用`processUpdateQueue(fiber, renderLanes)`时，会传入一个优先级`renderLanes`，若更新对象的`lane`不是`renderLanes`的子集，则跳过该更新
+  这里就是**==处理优先级==**的逻辑<!--就是按照优先级来处理更新，优先级不够的会被挂起-->，调用 `processUpdateQueue(fiber, renderLanes)` 时，会传入一个优先级 `renderLanes`，若更新对象的 `lane` 不是 `renderLanes` 的子集，则跳过该更新
 
   具体逻辑：
 
-  - **若更新对象的`lane`不是`renderLanes`的子集**
+  - **若更新对象的 `lane` 不是 `renderLanes` 的子集**
 
-    <!--`renderLanes`即是当前Lane，而被跳过的更新的lane就是挂起的Lane-->
+    <!--`renderLanes` 即是当前 Lane，而被跳过的更新的 lane 就是挂起的 Lane-->
 
-    - 复制该更新对象到新的的`base`队列中
+    - 复制该更新对象到新的的 `base` 队列中
 
       ```js
       const clone = {
@@ -422,13 +422,13 @@ function getStateFromUpdate(update, prevState) {
       }
       ```
 
-    - 将被跳过的更新对象的`lane`进行合并，成为`fiber`新的`lane`
+    - 将被跳过的更新对象的 `lane` 进行合并，成为 `fiber` 新的 `lane`
 
       ```js
       newLanes = mergeLanes(newLanes, updateLane);
       ```
 
-  - **若更新对象的`lane`是`renderLanes`的子集**
+  - **若更新对象的 `lane` 是 `renderLanes` 的子集**
 
     - 根据更新对象计算新的状态
 
@@ -436,15 +436,15 @@ function getStateFromUpdate(update, prevState) {
       newState = getStateFromUpdate(update, newState);
       ```
 
-      <!--优先级够了才参与计算，计算出来的状态最终被更新为fiber的memoizedState-->
+      <!--优先级够了才参与计算，计算出来的状态最终被更新为 fiber 的 memoizedState-->
 
-    - 若新的`base`队列已经创建，则仍然复制该更新对象到`base`队列中
+    - 若新的 `base` 队列已经创建，则仍然复制该更新对象到 `base` 队列中
 
       ```js
       if (newLastBaseUpdate !== null) {
         const clone = {
           id: update.id,
-          //NoLane是所有的优先级的子集，永远不会被跳过
+          //NoLane 是所有的优先级的子集，永远不会被跳过
           lane: NoLane,
           payload: update.payload
         };
@@ -452,15 +452,15 @@ function getStateFromUpdate(update, prevState) {
       }
       ```
 
-      ⚠️这里复制没有跳过的更新对象的前提是，**==已经有了新的base队列==**，这么做的原因是保证后面处理低优先级的更新对象时，保证**==状态的连续性==**，毕竟最终目的是获取所有更新对象都参与计算的更新状态，这里跳过低优先级先处理高优先级只是一种**==过渡状态==**，是为了**==优先响应高优更新==**
+      ⚠️这里复制没有跳过的更新对象的前提是，**==已经有了新的 base 队列==**，这么做的原因是保证后面处理低优先级的更新对象时，保证**==状态的连续性==**，毕竟最终目的是获取所有更新对象都参与计算的更新状态，这里跳过低优先级先处理高优先级只是一种**==过渡状态==**，是为了**==优先响应高优更新==**
 
-      <!--这里为了保证后续处理低优先级更新时，被复制的高优先级更新仍能参与计算，复制的时候将其lane修改成了NoLane，NoLane是所有的优先级的子集，永远不会被跳过-->
+      <!--这里为了保证后续处理低优先级更新时，被复制的高优先级更新仍能参与计算，复制的时候将其 lane 修改成了 NoLane，NoLane 是所有的优先级的子集，永远不会被跳过-->
 
     ------
 
 看下实现效果
 
-先实现一个打印方法，用于打印基础状态`baseState`和`base`队列
+先实现一个打印方法，用于打印基础状态 `baseState` 和 `base` 队列
 
 ```js
 function printUpdateQueue(updateQueue) {
@@ -476,7 +476,7 @@ function printUpdateQueue(updateQueue) {
 }
 ```
 
-创建一个`fiber`并初始化更新队列
+创建一个 `fiber` 并初始化更新队列
 
 ```js
 let fiber = { memoizedState: '' };
@@ -484,7 +484,7 @@ initializeUpdateQueue(fiber);
 console.log('fiber', fiber)
 ```
 
-打印`fiber`，看下初始状态的`fiebr`
+打印 `fiber`，看下初始状态的 `fiebr`
 
 ```js
 // fiber {
@@ -500,7 +500,7 @@ console.log('fiber', fiber)
 
 ------
 
-创建更新对象`update`并入队
+创建更新对象 `update` 并入队
 
 ```js
 let updateA = {
@@ -532,11 +532,11 @@ let updateD = {
 enqueueUpdate(fiber, updateD);
 ```
 
-总共创建了四个更新对象，`updateA`和`updateC`的`lane`为`SyncLane`，`updateB`和`updateD`的`lane`为`InputContinuousHydrationLane`
+总共创建了四个更新对象，`updateA` 和 `updateC` 的 `lane` 为 `SyncLane`，`updateB` 和 `updateD` 的 `lane` 为 `InputContinuousHydrationLane`
 
 ------
 
-处理更新队列并打印，指定`renderLane`为`SyncLane`
+处理更新队列并打印，指定 `renderLane` 为 `SyncLane`
 
 ```js
 processUpdateQueue(fiber, SyncLane);
@@ -561,9 +561,9 @@ console.log('updateQueue', printUpdateQueue(fiber.updateQueue));
 // updateQueue A#B=>C=>D=>null
 ```
 
-可以发现`fiber`的`memoizedState`是`updateA`和`updateC`的计算结果，而`updateB`和`updateD`被跳过了
+可以发现 `fiber` 的 `memoizedState` 是 `updateA` 和 `updateC` 的计算结果，而 `updateB` 和 `updateD` 被跳过了
 
-`base`队列中还有`updateB`、`updateC`、`updateD`三个更新对象，此时`updateC`的`lane`被修改成`NoLane`
+`base` 队列中还有 `updateB`、`updateC`、`updateD` 三个更新对象，此时 `updateC` 的 `lane` 被修改成 `NoLane`
 
 ------
 
@@ -598,11 +598,11 @@ console.log(fiber);
 // }
 ```
 
-此时`pending`上的更新对象是`updateE`和`updateF`
+此时 `pending` 上的更新对象是 `updateE` 和 `updateF`
 
 ------
 
-处理更新队列并打印，指定`renderLane`为`InputContinuousHydrationLane`
+处理更新队列并打印，指定 `renderLane` 为 `InputContinuousHydrationLane`
 
 ```js
 processUpdateQueue(fiber, InputContinuousHydrationLane);
@@ -625,11 +625,11 @@ console.log('updateQueue', printUpdateQueue(fiber.updateQueue));
 // updateQueue ABCDEF#null
 ```
 
-可以发现`fiber.memoizedState`已经是最终的状态了，并且`base`队列中没有被跳过的更新了
+可以发现 `fiber.memoizedState` 已经是最终的状态了，并且 `base` 队列中没有被跳过的更新了
 
-### 二、Lane模型下的初次渲染
+### 二、Lane 模型下的初次渲染
 
-在实现Lane模型下的初次渲染之前，可以先看下完整的`scheduleUpdateOnFiber`流程，这个流程中包含了**同步渲染**和**并发渲染**，后面会多次出现这张流程图
+在实现 Lane 模型下的初次渲染之前，可以先看下完整的 `scheduleUpdateOnFiber` 流程，这个流程中包含了**同步渲染**和**并发渲染**，后面会多次出现这张流程图
 
 ![img](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/scheduleUpdateOnFiber1_1667713205987.jpg)
 
@@ -637,9 +637,9 @@ console.log('updateQueue', printUpdateQueue(fiber.updateQueue));
 
 ![image-20230302215730401](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302215730401.png)
 
-下面实现Lane模型下的初次渲染
+下面实现 Lane 模型下的初次渲染
 
-修改`main.jsx`
+修改 `main.jsx`
 
 ```js
 import * as React from 'react';
@@ -653,11 +653,11 @@ root.render(element);
 
 ------
 
-改造`src/react-reconciler/src/ReactFiberReconciler.js`中更新容器的方法`updateContainer`
+改造 `src/react-reconciler/src/ReactFiberReconciler.js` 中更新容器的方法 `updateContainer`
 
 ```diff
  export function updateContainer(element, container) {
-   //获取当前的根fiber HostRootFiber
+   //获取当前的根 fiber HostRootFiber
    const current = container.current;
 +  //请求一个更新车道 初次渲染时是默认事件车道 DefaultLane 16
 +  const lane = requestUpdateLane(current);
@@ -666,25 +666,25 @@ root.render(element);
 -  const update = createUpdate();
 +  const update = createUpdate(lane);
 
-   //给更新对象上添加要更新的虚拟DOM
+   //给更新对象上添加要更新的虚拟 DOM
    update.payload = { element };
 
-   //把此更新对象添加到HostRootFiber的更新队列上，返回根节点
+   //把此更新对象添加到 HostRootFiber 的更新队列上，返回根节点
 -  const root = enqueueUpdate(current, update);
 +  const root = enqueueUpdate(current, update, lane);
 
-   // 在fiber上调度更新
+   // 在 fiber 上调度更新
 -  scheduleUpdateOnFiber(root);
 +  scheduleUpdateOnFiber(root, current, lane);
  }
 
 ```
 
-==从`updateContainer`这里开始添加Lane模型的逻辑==
+==从 `updateContainer` 这里开始添加 Lane 模型的逻辑==
 
 ------
 
-**实现请求一个更新车道的方法`requestUpdateLane`**，==初次渲染时`requestUpdateLane`的返回值是`DefaultLane`(16)==
+**实现请求一个更新车道的方法 `requestUpdateLane`**，==初次渲染时 `requestUpdateLane` 的返回值是 `DefaultLane`(16)==
 
 ```diff
 +  //请求一个更新车道 初次渲染时是默认事件车道 DefaultLane 16
@@ -696,12 +696,12 @@ root.render(element);
 
 /**
  * @description 请求一个更新车道
- * 先获取当前更新优先级，默认值是NoLane 没有车道
- * 若更新优先级为NoLane，则获取当前事件优先级
+ * 先获取当前更新优先级，默认值是 NoLane 没有车道
+ * 若更新优先级为 NoLane，则获取当前事件优先级
  * 若没有事件则，返回默认事件车道 DefaultLane 16
  */
 export function requestUpdateLane() {
-  // 获取当前更新优先级，默认值是NoLane 没有车道
+  // 获取当前更新优先级，默认值是 NoLane 没有车道
   const updateLane = getCurrentUpdatePriority();
   if (updateLane !== NoLanes) {
     return updateLane;
@@ -712,21 +712,21 @@ export function requestUpdateLane() {
 }
 ```
 
-`requestUpdateLane`请求一个更新车道
+`requestUpdateLane` 请求一个更新车道
 
-- 先获取当前更新优先级：`getCurrentUpdatePriority` <!--（默认值是NoLane 没有车道）-->
-- 若更新优先级为NoLane，则获取当前事件优先级：`getCurrentEventPriority` <!--（默认值是DefaultLane 16）-->
+- 先获取当前更新优先级：`getCurrentUpdatePriority` <!--（默认值是 NoLane 没有车道）-->
+- 若更新优先级为 NoLane，则获取当前事件优先级：`getCurrentEventPriority` <!--（默认值是 DefaultLane 16）-->
 - 若没有事件则返回默认事件车道 `DefaultLane` 16
 
-<!--所以初次渲染时，renderlane是`DefaultLane` 16-->
+<!--所以初次渲染时，renderlane 是 `DefaultLane` 16-->
 
 ------
 
-<!--下面是getCurrentUpdatePriority和getCurrentEventPriority的实现，没什么逻辑就是优先级匹配，没啥看的，直接跳过，只需知道初次渲染时，const lane = requestUpdateLane(current)这里拿到的lane是DefaultLane 16-->
+<!--下面是 getCurrentUpdatePriority 和 getCurrentEventPriority 的实现，没什么逻辑就是优先级匹配，没啥看的，直接跳过，只需知道初次渲染时，const lane = requestUpdateLane(current)这里拿到的 lane 是 DefaultLane 16-->
 
-<!-------------------------------略过start---------------------------------->
+<!-------------------------------略过 start---------------------------------->
 
-实现`getCurrentUpdatePriority`
+实现 `getCurrentUpdatePriority`
 
 ```js
 // src/react-reconciler/src/ReactEventPriorities.js
@@ -750,11 +750,11 @@ export const DefaultEventPriority = DefaultLane; //16
 //空闲事件优先级
 export const IdleEventPriority = IdleLane;
 
-// 全局变量 当前更新的优先级 默认值是NoLane 没有车道
+// 全局变量 当前更新的优先级 默认值是 NoLane 没有车道
 let currentUpdatePriority = NoLane;
 
 /**
- * @description 获取当前更新优先级 默认值是NoLane 没有车道
+ * @description 获取当前更新优先级 默认值是 NoLane 没有车道
  */
 export function getCurrentUpdatePriority() {
   return currentUpdatePriority;
@@ -764,7 +764,7 @@ export function getCurrentUpdatePriority() {
 ```js
 // src/react-reconciler/src/ReactFiberLane.js
 export const TotalLanes = 31;
-//没有车道，所有位都为0
+//没有车道，所有位都为 0
 export const NoLanes = 0b0000000000000000000000000000000;
 export const NoLane = 0b0000000000000000000000000000000;
 export const SyncLane = 0b0000000000000000000000000000001;
@@ -780,7 +780,7 @@ export const OffscreenLane = 0b1000000000000000000000000000000;
 const NonIdleLanes = 0b0001111111111111111111111111111;
 ```
 
-实现`getCurrentEventPriority`
+实现 `getCurrentEventPriority`
 
 ```js
 // src/react-dom-bindings/src/client/ReactDOMHostConfig.js
@@ -849,11 +849,11 @@ export const IdleEventPriority = IdleLane;
 
 <!--没啥意思，绕来绕去的，看的头皮发麻，直接略过-->
 
-<!-------------------------------略过end---------------------------------->
+<!-------------------------------略过 end---------------------------------->
 
 ------
 
-改造`src/react-reconciler/src/ReactFiberClassUpdateQueue.js`中的创建更新对象的方法`createUpdate`
+改造 `src/react-reconciler/src/ReactFiberClassUpdateQueue.js` 中的创建更新对象的方法 `createUpdate`
 
 ```diff
    //创建更新对象
@@ -875,16 +875,16 @@ export const IdleEventPriority = IdleLane;
 
 ```
 
-这里就是给更新对象添加`lane`
+这里就是给更新对象添加 `lane`
 
-<!--更新对象的lane就表示了该更新的优先级，优先级高的更新要先处理-->
+<!--更新对象的 lane 就表示了该更新的优先级，优先级高的更新要先处理-->
 
 ------
 
-改造`src/react-reconciler/src/ReactFiberClassUpdateQueue.js`中的**更新入队**方法`enqueueUpdate`
+改造 `src/react-reconciler/src/ReactFiberClassUpdateQueue.js` 中的**更新入队**方法 `enqueueUpdate`
 
 ```diff
-   //把此更新对象添加到HostRootFiber的更新队列上，返回根节点
+   //把此更新对象添加到 HostRootFiber 的更新队列上，返回根节点
 -  const root = enqueueUpdate(current, update);
 +  const root = enqueueUpdate(current, update, lane);
 ```
@@ -892,11 +892,11 @@ export const IdleEventPriority = IdleLane;
 ```js
 /**
  * @description 将更新对象添加到更新队列中的方法
- * @param fiber 初始的fiber对象
+ * @param fiber 初始的 fiber 对象
  * @param update 更新对象
  */
 export function enqueueUpdate(fiber, update, lane) {
-  // 获取初始fiber对象上pending属性
+  // 获取初始 fiber 对象上 pending 属性
   const updateQueue = fiber.updateQueue;
   // 获取共享队列
   const sharedQueue = updateQueue.shared;
@@ -923,16 +923,16 @@ export function enqueueConcurrentClassUpdate(
 }
 ```
 
-这里的`fiber`更新对象入队方法`enqueueConcurrentClassUpdate`和之前`hook`上更新对象方法`enqueueConcurrentHookUpdate`是一样的逻辑，通过调用`enqueueUpdate`将更新内容放到全局变量`concurrentQueues` 上<!--是个数组-->，后续在`ReactFiberWorkLoop.js`中调用`finishQueueingConcurrentUpdates`完成更新队列的创建
+这里的 `fiber` 更新对象入队方法 `enqueueConcurrentClassUpdate` 和之前 `hook` 上更新对象方法 `enqueueConcurrentHookUpdate` 是一样的逻辑，通过调用 `enqueueUpdate` 将更新内容放到全局变量 `concurrentQueues` 上<!--是个数组-->，后续在 `ReactFiberWorkLoop.js` 中调用 `finishQueueingConcurrentUpdates` 完成更新队列的创建
 
 ------
 
-顺便改造下**处理更新队列**的方法`processUpdateQueue`
+顺便改造下**处理更新队列**的方法 `processUpdateQueue`
 
 ```js
 /**
  * @description 根据老状态和更新队列中的更新计算最新的状态
- * @param workInProgress 新fiber 要计算的fiber
+ * @param workInProgress 新 fiber 要计算的 fiber
  */
 export function processUpdateQueue(
   workInProgress,
@@ -941,7 +941,7 @@ export function processUpdateQueue(
 ) {
   // 获取新的更新队列
   const queue = workInProgress.updateQueue;
-  // 第一个跳过的更新
+  // 获取第一个更新
   let firstBaseUpdate = queue.firstBaseUpdate;
   // 最后一个跳过的更新
   let lastBaseUpdate = queue.lastBaseUpdate;
@@ -964,7 +964,7 @@ export function processUpdateQueue(
       // 第一个基本更新就是待生效队列的第一个更新
       firstBaseUpdate = firstPendingUpdate;
     } else {
-      // 否则把待生效更新队列添加到基本更新的尾部
+      // 否则就把待生效更新队列添加到基本更新的尾部
       lastBaseUpdate.next = firstPendingUpdate;
     }
     // 最后一个基本更新肯定就是最后一个待生效的更新
@@ -972,11 +972,11 @@ export function processUpdateQueue(
   }
   /**  合并新旧链表结束  */
 
-  //如果链表不为空firstBaseUpdate=>lastBaseUpdate
+  //如果链表不为空 firstBaseUpdate=>lastBaseUpdate
   if (firstBaseUpdate !== null) {
     //上次跳过的更新前的状态
     let newState = queue.baseState;
-    //尚未执行的更新的lane
+    //尚未执行的更新的 lane
     let newLanes = NoLanes;
     // 新的基本状态
     let newBaseState = null;
@@ -989,7 +989,7 @@ export function processUpdateQueue(
     do {
       //获取此更新车道
       const updateLane = update.lane;
-      //如果说updateLane不是renderLanes的子集的话，说明本次渲染不需要处理过个更新，就是需要跳过此更新
+      //如果说 updateLane 不是 renderLanes 的子集的话，说明本次渲染不需要处理过个更新，就是需要跳过此更新
       if (
         !isSubsetOfLanes(workInProgressRootRenderLanes, updateLane)
       ) {
@@ -999,17 +999,17 @@ export function processUpdateQueue(
           lane: updateLane,
           payload: update.payload
         };
-        //说明新的跳过的base链表为空,说明当前这个更新是第一个跳过的更新
+        //说明新的跳过的 base 链表为空,说明当前这个更新是第一个跳过的更新
         if (newLastBaseUpdate === null) {
           //让新的跳过的链表头和链表尾都指向这个第一次跳过的更新
           newFirstBaseUpdate = newLastBaseUpdate = clone;
-          //计算保存新的baseState为此跳过更新时的state
+          //计算保存新的 baseState 为此跳过更新时的 state
           newBaseState = newState;
         } else {
           newLastBaseUpdate = newLastBaseUpdate.next = clone;
         }
-        //如果有跳过的更新，就把跳过的更新所在的赛道合并到newLanes,
-        //最后会把newLanes赋给fiber.lanes
+        //如果有跳过的更新，就把跳过的更新所在的赛道合并到 newLanes,
+        //最后会把 newLanes 赋给 fiber.lanes
         newLanes = mergeLanes(newLanes, updateLane);
       } else {
         //说明已经有跳过的更新了
@@ -1032,23 +1032,23 @@ export function processUpdateQueue(
     queue.baseState = newBaseState;
     queue.firstBaseUpdate = newFirstBaseUpdate;
     queue.lastBaseUpdate = newLastBaseUpdate;
-    //本次渲染完会判断，此fiber上还有没有不为0的lane,如果有，会再次渲染
+    //本次渲染完会判断，此 fiber 上还有没有不为 0 的 lane,如果有，会再次渲染
     workInProgress.lanes = newLanes;
     workInProgress.memoizedState = newState;
   }
 }
 ```
 
-这里就是前面**1.4、 ReactUpdateQueue**中实现的逻辑，有了这套机制之后，React便可以做到优先处理高优任务
+这里就是前面**1.4、ReactUpdateQueue**中实现的逻辑，有了这套机制之后，React 便可以做到优先处理高优任务
 
 ------
 
-改造调度更新的方法`scheduleUpdateOnFiber`
+改造调度更新的方法 `scheduleUpdateOnFiber`
 
 ‼️**==重点在这👇==**
 
 ```diff
-   // 在fiber上调度更新
+   // 在 fiber 上调度更新
 -  scheduleUpdateOnFiber(root);
 +  scheduleUpdateOnFiber(root, current, lane);
 ```
@@ -1057,11 +1057,11 @@ export function processUpdateQueue(
 
 ![image-20230302215730401](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302215730401-20230302225427911.png)
 
-改造`scheduleUpdateOnFiber`
+改造 `scheduleUpdateOnFiber`
 
 ```diff
 /**
- * @description 在fiber上调度更新 也就是计划更新root
+ * @description 在 fiber 上调度更新 也就是计划更新 root
  * 源码中此处有一个任务的功能，这里后续再实现
  * @param root 根 FiberRootNode
  * @param lane 车道 初次渲染时是默认事件车道 DefaultLane 16
@@ -1069,30 +1069,30 @@ export function processUpdateQueue(
 +export function scheduleUpdateOnFiber(root, fiber, lane) {
 +  // 给当根 root 标记更新的车道
 +  markRootUpdated(root, lane);
-   // 确保调度执行root上的更新
+   // 确保调度执行 root 上的更新
    ensureRootIsScheduled(root);
  }
 
 ```
 
-首先需要给`root`上标记更新的车道：`markRootUpdated(root, lane)`
+首先需要给 `root` 上标记更新的车道：`markRootUpdated(root, lane)`
 
 ```js
 /**
- * @description 给当前根 root标记更新的车道
+ * @description 给当前根 root 标记更新的车道
  */
 export function markRootUpdated(root, updateLane) {
-  //pendingLanes指的此根上等待生效的lane
+  //pendingLanes 指的此根上等待生效的 lane
   root.pendingLanes |= updateLane;
 }
 ```
 
-`root`上的`pendingLanes`默认值为`NoLanes`(0)，这里需要给`root`的`pendingLanes`合并`DefaultLane`(16)
+`root` 上的 `pendingLanes` 默认值为 `NoLanes`(0)，这里需要给 `root` 的 `pendingLanes` 合并 `DefaultLane`(16)
 
 > ```js
 > /**
->  * @description FiberRootNode的构造函数，用于创建fiber根节点
->  * @param containerInfo 容器信息，根root上的就是真实DOM，div#root
+>  * @description FiberRootNode 的构造函数，用于创建 fiber 根节点
+>  * @param containerInfo 容器信息，根 root 上的就是真实 DOM，div#root
 >  */
 > function FiberRootNode(containerInfo) {
 >   this.containerInfo = containerInfo;
@@ -1103,11 +1103,11 @@ export function markRootUpdated(root, updateLane) {
 
 ------
 
-接着改造`ensureRootIsScheduled(root)`
+接着改造 `ensureRootIsScheduled(root)`
 
 ```js
 /**
- * @description 确保执行root上的更新
+ * @description 确保执行 root 上的更新
  */
 function ensureRootIsScheduled(root) {
   //获取当前优先级最高的车道
@@ -1122,7 +1122,7 @@ function ensureRootIsScheduled(root) {
     // 调度的优先级
     let schedulerPriorityLevel;
     switch (
-      lanesToEventPriority(nextLanes) //将lane转成事件优先级
+      lanesToEventPriority(nextLanes) //将 lane 转成事件优先级
     ) {
       //离散事件优先级 click onchange
       case DiscreteEventPriority:
@@ -1160,7 +1160,7 @@ function ensureRootIsScheduled(root) {
 
 改造的内容有两点：
 
-1. **根据`root`上的`lane`判断是走同步更新还是调度更新**
+1. **根据 `root` 上的 `lane` 判断是走同步更新还是调度更新**
 
    ```js
    //获取当前优先级最高的车道
@@ -1179,13 +1179,13 @@ function ensureRootIsScheduled(root) {
 
    <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302231930366.png" alt="image-20230302231930366" style="zoom:50%;" />
 
-   初次渲染时`newCallbackPriority`为`DefaultLane`(16)不是`SyncLane`，所以走调度更新
+   初次渲染时 `newCallbackPriority` 为 `DefaultLane`(16)不是 `SyncLane`，所以走调度更新
 
    <!--同步更新后面再实现-->
 
    ------
 
-   `getNextLanes`和`getHighestPriorityLane`的实现 <!--可以不用看-->
+   `getNextLanes` 和 `getHighestPriorityLane` 的实现 <!--可以不用看-->
 
    ```js
    /**
@@ -1207,7 +1207,7 @@ function ensureRootIsScheduled(root) {
      return getHighestPriorityLane(lanes);
    }
 
-   //找到最右边的1 只能返回一个车道
+   //找到最右边的 1 只能返回一个车道
    export function getHighestPriorityLane(lanes) {
      return lanes & -lanes;
    }
@@ -1215,17 +1215,17 @@ function ensureRootIsScheduled(root) {
 
 2. **增加调度更新的逻辑**
 
-   - 将`lane`转成事件优先级：`schedulerPriorityLevel`，供`Scheduler_scheduleCallback`使用
+   - 将 `lane` 转成事件优先级：`schedulerPriorityLevel`，供 `Scheduler_scheduleCallback` 使用
 
      ```js
      let schedulerPriorityLevel;
-     switch (lanesToEventPriority(nextLanes) //将lane转成事件优先级
+     switch (lanesToEventPriority(nextLanes) //将 lane 转成事件优先级
      ) {
        //...
      }
      ```
 
-   - 使用正确的优先级`schedulerPriorityLevel`，执行`Scheduler_scheduleCallback`
+   - 使用正确的优先级 `schedulerPriorityLevel`，执行 `Scheduler_scheduleCallback`
 
      ```js
      // 调度执行更新任务
@@ -1235,26 +1235,26 @@ function ensureRootIsScheduled(root) {
      );
      ```
 
-     > 之前的`ensureRootIsScheduled`
+     > 之前的 `ensureRootIsScheduled`
      >
      > ```js
      > function ensureRootIsScheduled(root) {
-     >   //告诉浏览器要执行performConcurrentWorkOnRoot
+     >   //告诉浏览器要执行 performConcurrentWorkOnRoot
      >   scheduleCallback(NormalSchedulerPriority, performConcurrentWorkOnRoot.bind(null, root));
      > }
      > ```
      >
-     > `scheduleCallback`的逻辑再**15、实现scheduler**中已经改造完成，接下来继续改造`scheduleCallback(priorityLevel, callback)`中的`callback`逻辑，也就是`performConcurrentWorkOnRoot`
+     > `scheduleCallback` 的逻辑再**15、实现 scheduler**中已经改造完成，接下来继续改造 `scheduleCallback(priorityLevel, callback)` 中的 `callback` 逻辑，也就是 `performConcurrentWorkOnRoot`
 
-     <!--这里需要明确的一点‼️ scheduleCallback会创建一个宏任务来执行调度更新，后面将要实现的同步更新创建的则是一个微任务-->
+     <!--这里需要明确的一点‼️ scheduleCallback 会创建一个宏任务来执行调度更新，后面将要实现的同步更新创建的则是一个微任务-->
 
 ------
 
-改造`performConcurrentWorkOnRoot`
+改造 `performConcurrentWorkOnRoot`
 
 ```diff
 +function performConcurrentWorkOnRoot(root,didTimeout) {
-+//获取root上当前优先级最高的车道， 初次渲染时是默认事件车道 DefaultLane 16
++//获取 root 上当前优先级最高的车道， 初次渲染时是默认事件车道 DefaultLane 16
 + const lanes = getNextLanes(root, NoLanes);
 + if (lanes === NoLanes) {
 +   return null;
@@ -1269,7 +1269,7 @@ function ensureRootIsScheduled(root) {
 + }
   const finishedWork = root.current.alternate;
   root.finishedWork = finishedWork;
-   //开始进入提交阶段，就是执行副作用，修改真实DOM
+   //开始进入提交阶段，就是执行副作用，修改真实 DOM
   commitRoot(root);
 }
 ```
@@ -1282,7 +1282,7 @@ function ensureRootIsScheduled(root) {
   const shouldTimeSlice = !includesBlockingLane(root, lanes) && (!didTimeout);
   ```
 
-  ==如果`root`上**不包含阻塞的车道**，并且**任务没有超时**，就可以并行渲染,就是启用时间分片==
+  ==如果 `root` 上**不包含阻塞的车道**，并且**任务没有超时**，就可以并行渲染,就是启用时间分片==
   - **是否包含阻塞车道：`includesBlockingLane`**
 
   ```js
@@ -1292,24 +1292,24 @@ function ensureRootIsScheduled(root) {
   }
   ```
 
-  由于初次渲染时，`root`上的`lane`是`DefaultLane`，所以`includesBlockingLane`便为`true`
+  由于初次渲染时，`root` 上的 `lane` 是 `DefaultLane`，所以 `includesBlockingLane` 便为 `true`
 
-  <!--所以初次渲染时，shouldTimeSlice为false，走同步渲染的逻辑-->
+  <!--所以初次渲染时，shouldTimeSlice 为 false，走同步渲染的逻辑-->
 
   - **任务是否过期：`didTimeout`**
 
-    `didTimeout`是`scheduleCallback`内部执行`performConcurrentWorkOnRoot`时传入的
+    `didTimeout` 是 `scheduleCallback` 内部执行 `performConcurrentWorkOnRoot` 时传入的
 
     > ```js
     > const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
     > const continuationCallback = callback(didUserCallbackTimeout);
     > ```
     >
-    > `didUserCallbackTimeout`就是`didTimeout`，表示当前任务是否过期
+    > `didUserCallbackTimeout` 就是 `didTimeout`，表示当前任务是否过期
     >
     > 若任务的过期时间小于当前时间，则说明当前任务已过期
 
-- 若`shouldTimeSlice`为`true`，则采用并发渲染：`renderRootConcurrent`
+- 若 `shouldTimeSlice` 为 `true`，则采用并发渲染：`renderRootConcurrent`
 
   ```js
   if (shouldTimeSlice) {
@@ -1319,7 +1319,7 @@ function ensureRootIsScheduled(root) {
 
   <!--并发渲染后面再实现-->
 
-- 若`shouldTimeSlice`为`false`，则采用同步渲染：`renderRootSync`
+- 若 `shouldTimeSlice` 为 `false`，则采用同步渲染：`renderRootSync`
 
   ```js
   } else {
@@ -1331,7 +1331,7 @@ function ensureRootIsScheduled(root) {
 
   <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302234622023.png" alt="image-20230302234622023" style="zoom:50%;" />
 
-<!--performConcurrentWorkOnRoot是Concurrent Mode下的更新API，但不是每次更新都走并发渲染（切片）renderRootConcurrent，而是根据`shouldTimeSlice`判断走并发渲染renderRootConcurrent，还是同步渲染renderRootSync，这是因为一次任务虽然可以分割成若干小任务执行，但是当这个任务过期后，便应当尽快将任务执行完成，这个时候就不能继续切片执行了，而是将剩余部分一次性执行完成（走同步渲染renderRootSync）-->
+<!--performConcurrentWorkOnRoot 是 Concurrent Mode 下的更新 API，但不是每次更新都走并发渲染（切片）renderRootConcurrent，而是根据 `shouldTimeSlice` 判断走并发渲染 renderRootConcurrent，还是同步渲染 renderRootSync，这是因为一次任务虽然可以分割成若干小任务执行，但是当这个任务过期后，便应当尽快将任务执行完成，这个时候就不能继续切片执行了，而是将剩余部分一次性执行完成（走同步渲染 renderRootSync）-->
 
 ------
 
@@ -1343,7 +1343,7 @@ function ensureRootIsScheduled(root) {
 
 ![image-20230302235350790](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230302235350790.png)
 
-整个`Lane`模型下的初渲染，基本上和之前实现的初渲染一致，多了`SyncLane`和`shouldTimeSlice`的判断
+整个 `Lane` 模型下的初渲染，基本上和之前实现的初渲染一致，多了 `SyncLane` 和 `shouldTimeSlice` 的判断
 
 看下实现效果
 
@@ -1362,15 +1362,15 @@ root.render(element);
 
 ### 三、总结
 
-Lane模型是React内部用于表示任务优先级的机制，它通过位运算高效地管理不同优先级的更新。Lane模型的核心特点包括：
+Lane 模型是 React 内部用于表示任务优先级的机制，它通过位运算高效地管理不同优先级的更新。Lane 模型的核心特点包括：
 
-1. **优先级表示**：使用31条车道（Lane）表示不同的优先级，数字越小优先级越高
-2. **双缓存机制**：包含当前Lane（正在执行的任务）和挂起Lane（等待执行的任务）
+1. **优先级表示**：使用 31 条车道（Lane）表示不同的优先级，数字越小优先级越高
+2. **双缓存机制**：包含当前 Lane（正在执行的任务）和挂起 Lane（等待执行的任务）
 3. **批处理能力**：可以同时处理多个相同优先级的更新
 4. **优先级调度**：根据任务优先级动态调整执行顺序，优先响应用户交互
 
-Lane模型与Scheduler调度器紧密配合，共同实现了React的高效更新机制。在初次渲染时，React会根据当前任务的优先级和是否超时来决定是采用同步渲染还是并发渲染。
+Lane 模型与 Scheduler 调度器紧密配合，共同实现了 React 的高效更新机制。在初次渲染时，React 会根据当前任务的优先级和是否超时来决定是采用同步渲染还是并发渲染。
 
-Lane模型的引入使React能够更精细地控制更新过程，提高应用的响应性和用户体验。通过优先处理高优先级任务（如用户交互），React可以在保持应用流畅的同时处理低优先级的后台工作。
+Lane 模型的引入使 React 能够更精细地控制更新过程，提高应用的响应性和用户体验。通过优先处理高优先级任务（如用户交互），React 可以在保持应用流畅的同时处理低优先级的后台工作。
 
-总的来说，Lane模型是React并发渲染能力的核心基础，它让React能够智能地决定什么时候执行什么任务，从而提供更好的用户体验。
+总的来说，Lane 模型是 React 并发渲染能力的核心基础，它让 React 能够智能地决定什么时候执行什么任务，从而提供更好的用户体验。

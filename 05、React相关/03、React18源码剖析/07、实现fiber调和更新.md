@@ -395,11 +395,12 @@ function updateHostRoot(current, workInProgress) {
 
 上面👆这段实现的核心在于：
 
-- `processUpdateQueue(workInProgress)` 根据老状态和「**更新队列**」中的更新，计算「**最新的状态** 」`nextState` <!--其实就是对象合并-->
+- `processUpdateQueue(workInProgress)` ：
+  - 根据「**老状态**」和「**更新队列**」中的更新，计算「**最新的状态** 」`nextState` <!--其实就是对象合并-->
 
 - `reconcileChildren(current, workInProgress, nextChildren)`：
 
-  根据新的 **VirtualDOM**（`nextChildren` 也就是 `workInProgress.memoizedState.element`）生成子 `fiber` 链表，并==将子 `fiber` 链表挂到新的 `fiber` 上==（`workInProgress.child`）
+  - 根据新的 **VirtualDOM**（`nextChildren` 也就是 `workInProgress.memoizedState.element`）生成子 `fiber` 链表，并==将子 `fiber` 链表挂到新的 `fiber` 上==（`workInProgress.child`）
 
 ------
 
@@ -524,7 +525,9 @@ workInProgress.child = ...
 
 所以走的是 **Reconcile（调和）**流程，执行的是 `reconcileChildFibers` 方法
 
-<!--reconcileChildFibers 方法和 mountChildFibers 方法的区别在于是否会进行副作用的标识-->
+- `reconcileChildFibers` 方法和 `mountChildFibers` 方法的区别在于是否会进行「副作用」的标识
+- `mountChildFibers` 会标记 **Placement**（**插入**）的副作用标识
+- `HostRootfiber` 是根 `fiber` 节点，其对应的真实 **DOM** 是 `div#root` ，不需要 **Placement**
 
 ------
 
@@ -645,7 +648,7 @@ export const mountChildFibers = createChildReconciler(false);
        ) {
          // 若是有老的父 fiber 上有子 fiber 则进入 diff 过程
          //...
-  
+    
          /*
            初次挂载时，老fiber节点currentFirstChild肯定是没有的
            所以可以直接根据虚拟DOM创建新的Fiber节点

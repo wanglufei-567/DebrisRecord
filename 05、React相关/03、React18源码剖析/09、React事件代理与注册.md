@@ -8,7 +8,7 @@
 
 ![eventflow](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/eventflow_1665894563837.jpg)
 
-DOM事件流包含三个阶段
+**DOM**事件流包含三个阶段
 
 - 事件捕获阶段
   - 是先由最上一级的节点先接收事件,然后向下传播到具体的节点 `document->body->div->button`
@@ -221,11 +221,11 @@ React 采用合成事件的主要原因有以下几点：
   - 那么由于DOM事件流，在捕获和冒泡阶段，根节点的事件监听回调便会触发
   - 然后再按照顺序收集事件流中的所有元素
   - 最后再正向或者反向遍历从元素上拿到相关事件的监听回调进行执行，从而达到和DOM事件流相同的执行顺序
-  
+
   由于真正注册事件监听的是**==根节点==**，所以如果内部元素通过`addEventListener`添加了监听回调，那么根节点上的回调和内部元素的原生监听事件回调，仍然按照DOM事件流来执行
-  
+
   看下打印结果👇
-  
+
   <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230214221357884.png" alt="image-20230214221357884" style="zoom:50%;" />
 
 ### 二、React中的合成事件
@@ -682,7 +682,7 @@ export function addEventBubbleListener(target, eventType, listener) {
 >       paths.push(currentTarget);
 >       currentTarget = currentTarget.parentNode;
 >     }
-> 
+>
 >     if (isCapture) {
 >       for (let i = paths.length - 1; i >= 0; i--) {
 >         let handler = paths[i].onxxClickCapture;
@@ -752,7 +752,7 @@ export function dispatchEvent(
   const nativeEventTarget = getEventTarget(nativeEvent);
   // 获取该真实DOM对应的fiber
   const targetInst = getClosestInstanceFromNode(nativeEventTarget);
-  
+
   // console.log("dispatchEvent", domEventName, eventSystemFlags, targetContainer, nativeEvent);
 
   // 从事件系统中派发事件
@@ -1153,7 +1153,7 @@ const captureName = reactName + 'Capture';
 const reactEventName = isCapturePhase ? captureName : reactName;
 ```
 
-这里对`reactEventName`的赋值**==区分了捕获和冒泡阶段==**，这个很重要，因为后续`getListener`就是通过这个名字去`fiber`节点上取`React`事件监听方法 
+这里对`reactEventName`的赋值**==区分了捕获和冒泡阶段==**，这个很重要，因为后续`getListener`就是通过这个名字去`fiber`节点上取`React`事件监听方法
 
 在`src/react-dom-bindings/src/events/getListener.js`中实现并导出`getListener`
 
@@ -1332,7 +1332,7 @@ dispatchQueue = [{event1, listeners1}, {event2, listeners2}, ...]
   </h1>
 ```
 
-可以发现当点击’world‘时，所有的事件监听方法都收集到队列中了（这里截图的时捕获阶段的派发队列）
+可以发现当点击'world'时，所有的事件监听方法都收集到队列中了（这里截图的时捕获阶段的派发队列）
 
 那么接下来就要实现事件监听方法的执行了
 
@@ -1518,4 +1518,52 @@ let element = <FunctionComponent />;
 - ==给根节点注册事件，进行事件代理==
 - ==事件触发时，从事件目标对象向上回溯DOM节点完成事件收集==
 - ==根据是否在捕获阶段，进行正向或反向遍历派发队列，将事件取出来进行执行==
+### 三、总结
+
+#### 3.1、React 合成事件的实现原理
+
+**React** 的合成事件系统主要通过以下步骤实现：
+
+1. **事件委托**：**React** 不会直接在 **DOM** 元素上绑定事件，而是在根容器节点（`root`）上进行事件委托，每种事件类型只注册一次（捕获和冒泡各一次）
+
+2. **事件注册**：
+   - 在 `createRoot` 时，调用 `listenToAllSupportedEvents` 方法，为根容器注册所有支持的事件
+   - 通过 `addEventListener` 在根节点上同时注册捕获和冒泡阶段的事件监听器
+
+3. **事件触发与收集**：
+   - 当事件触发时，根节点的事件处理函数 `dispatchEvent` 被调用
+   - 通过 `getEventTarget` 获取事件源 **DOM** 节点
+   - 通过 `getClosestInstanceFromNode` 获取事件源对应的 **fiber** 节点
+   - 通过 `extractEvents` 从事件源开始向上遍历 **fiber** 树，收集路径上所有相关的事件处理函数
+
+4. **事件执行**：
+   - 根据是捕获还是冒泡阶段，决定正向或反向遍历收集到的事件处理函数队列
+   - 通过 `processDispatchQueue` 执行事件处理函数
+   - 支持通过 `stopPropagation` 方法阻止事件继续传播
+
+#### 3.2、合成事件的优势
+
+1. **性能优化**：通过事件委托减少事件监听器的数量，避免为每个元素单独绑定事件处理函数
+
+2. **跨浏览器兼容性**：合成事件对象统一了不同浏览器之间的事件处理差异
+
+3. **事件对象池化**：**React** 可以重用事件对象，减少内存分配和垃圾回收
+
+4. **事件优先级**：可以为不同类型的事件分配不同的优先级，配合 **React** 的调度系统进行优化
+
+5. **统一的 API**：为开发者提供一致的事件处理接口，简化开发
+
+#### 3.3、与 DOM 原生事件的区别
+
+1. **事件注册方式**：**React** 使用 **JSX** 中的属性（如 `onClick`）注册事件，而不是 `addEventListener`
+
+2. **事件处理时机**：**React** 的事件处理发生在原生事件流完成之后
+
+3. **事件对象**：**React** 提供合成事件对象（**SyntheticEvent**），而不是原生事件对象
+
+4. **事件名称**：**React** 使用驼峰命名（如 `onClick`），而不是全小写（如 `onclick`）
+
+5. **事件处理函数中的 this**：在 **React** 类组件中，需要手动绑定 this 或使用箭头函数，而原生事件则根据调用方式决定
+
+通过合成事件系统，**React** 不仅提高了应用性能，还为开发者提供了更加一致和可预测的事件处理体验，同时也为 **React** 内部的调度和优化提供了更大的灵活性。
 

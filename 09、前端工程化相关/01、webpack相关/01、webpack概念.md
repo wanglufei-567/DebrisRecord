@@ -440,6 +440,7 @@ module.exports = {
 
 1. 使用 `webpack` 打包项目，得到输出的文件，==放到输出目录里== <!--output配置的目录-->
 2. 使用`webpack-dev-server`（`webpack serve`）打包的话，**==结果文件并不会写入硬盘，只会写到内存里==**  <!--所以使用开发服务器时，在工程里看不到打包后的文件-->
+3. 若是使用了 `HtmlWebpackPlugin` 来指定 **HTML** 模板，`webpack-dev-server` 会默认使用这个 **HTML**
 
 `webpack-dev-server`会启一个**http服务器**，用来返回打包后的文件
 

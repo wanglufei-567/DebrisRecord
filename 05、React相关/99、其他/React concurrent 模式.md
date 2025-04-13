@@ -286,108 +286,163 @@ function prepareFreshStack(root, lanes) {
 
 这确保了即使在 **concurrent 模式**下，**React** 也能维持状态的一致性，避免**"丢失更新"**的问题
 
-### 四. Concurrent模式的实际应用
+### 四、Concurrent模式的实际应用
 
-#### 4.1 复杂数据处理
+> 在 **React 18** 中，与并发特性（**Concurrent Features**）相对应的非并发模式被称为“**阻塞模式**”（**Blocking Mode**）
+>
+> 在阻塞模式下，**React** 的渲染行为与 **React 17** 及之前的版本类似，即每次状态更新都会立即触发同步渲染
 
-在处理大量数据时，**Concurrent 模式**可以：
-- 保持 **UI** 响应，不阻塞用户输入
-- 优先处理用户交互，再继续数据处理
-- 根据设备性能自动调整工作量
+**React 18** 虽然默认使用的是 **Concurrent 模式**，但默认情况下所有的更新都是同步阻塞的，与**React 17** 及之前的版本类似，若想使用并发特性（时间切片、高优先级打断低优先级）需要使用新 **Hook**
 
-```jsx
-function LargeList({ items }) {
-  const [isPending, startTransition] = useTransition();
-  const [filterText, setFilterText] = useState('');
-  
-  // 处理输入变化
-  const handleChange = (e) => {
-    // 立即更新输入框（高优先级）
-    setFilterText(e.target.value);
-    
-    // 标记为低优先级更新
-    startTransition(() => {
-      // 过滤大量数据（低优先级）
-      setFilteredItems(filterItems(items, e.target.value));
-    });
-  };
-  
-  return (
-    <>
-      <input value={filterText} onChange={handleChange} />
-      {isPending ? <div>Loading...</div> : <ListView items={filteredItems} />}
-    </>
-  );
-}
+#### 4.1、useTransition 与 startTransition
+
+在 **React 18** 中，`useTransition` 和 `startTransition` 都是为了支持 **并发渲染（Concurrent Rendering）** 而设计的，用于处理**==非紧急更新==**，以避免阻塞用户界面，提升交互体验
+
+##### 4.1.1、startTransition
+
+✅ 用法
+
+```tsx
+import { startTransition } from 'react';
+
+startTransition(() => {
+  // 非紧急更新（如：筛选、导航、懒加载等）
+  setState(...);
+});
 ```
 
-#### 4.2、Suspense 与数据获取
+📌 作用
 
-**Suspense** 配合 **Concurrent 模式** 处理数据加载：
+将某些**更新标记为“可中断的低优先级任务”**，避免阻塞如输入框打字、点击等高优先级交互。
 
-```jsx
-function ProfilePage() {
-  return (
-    <Suspense fallback={<Spinner />}>
-      <ProfileDetails />
-      <Suspense fallback={<PostsSkeleton />}>
-        <Posts />
-      </Suspense>
-    </Suspense>
-  );
-}
+🧠 适用场景
 
-// 使用Suspense兼容的数据获取
-function ProfileDetails() {
-  // 这个数据读取会在数据准备好之前"挂起"组件
-  const user = resource.user.read();
-  return <h1>{user.name}</h1>;
-}
+- 点击按钮加载大量数据
+- 切换 Tab 页内容
+- 实时搜索联想时更新列表数据
+
+📝 举例
+
+```tsx
+const handleChange = (e) => {
+  const value = e.target.value;
+  setInputValue(value); // 高优先级：保持输入流畅
+
+  startTransition(() => {
+    filterData(value);  // 低优先级：数据筛选可稍后完成
+  });
+};
 ```
 
-#### 4.3、useTransition 和 useDeferredValue
+##### 4.1.2、useTransition
 
-这两个 **hooks** 是 **Concurrent 模式** 的重要 **API**：
+✅ 用法
 
-```jsx
-// useTransition示例
-function SearchResults({ query }) {
-  const [isPending, startTransition] = useTransition();
-  const [searchQuery, setSearchQuery] = useState(query);
-  
-  function handleChange(e) {
-    const value = e.target.value;
-    // 立即更新输入框
-    setQuery(value);
-    
-    // 标记搜索结果更新为非紧急
-    startTransition(() => {
-      setSearchQuery(value);
-    });
-  }
-  
-  return (
-    <>
-      <input value={query} onChange={handleChange} />
-      {isPending ? <Spinner /> : <Results query={searchQuery} />}
-    </>
-  );
-}
+```tsx
+const [isPending, startTransition] = useTransition();
 
-// useDeferredValue示例
-function SlowList({ text }) {
-  // 创建文本的延迟版本
-  const deferredText = useDeferredValue(text);
-  
-  // 使用延迟版本渲染列表
-  const items = useMemo(() => {
-    // 昂贵的计算
-    return generateItems(deferredText);
-  }, [deferredText]);
-  
-  return <div>{items}</div>;
-}
+startTransition(() => {
+  setState(...);
+});
 ```
+
+📌 作用
+
+除了提供 `startTransition` 的功能之外，还提供了 `isPending` 状态，便于在 UI 上展示“加载中”的指示。
+
+🧠 适用场景
+
+- 有 UI 提示需求的“非紧急更新”，比如：加载 spinner、禁用按钮等。
+
+📝 举例
+
+```tsx
+const [isPending, startTransition] = useTransition();
+
+const handleClick = () => {
+  startTransition(() => {
+    loadLargeComponent();
+  });
+};
+
+return (
+  <>
+    <button onClick={handleClick} disabled={isPending}>
+      切换视图
+    </button>
+    {isPending && <span>加载中...</span>}
+  </>
+);
+```
+
+##### 4.1.3、总结对比
+
+| 特性               | `startTransition`    | `useTransition`                                  |
+| ------------------ | -------------------- | ------------------------------------------------ |
+| 是否是 Hook        | 否                   | 是                                               |
+| 是否可追踪加载状态 | 否                   | 是（`isPending`）                                |
+| 用法               | 全局函数             | `[isPending, startTransition] = useTransition()` |
+| 场景               | 只需标记低优先级更新 | 还需控制加载 UI 或按钮状态                       |
+
+#### 4.2、useDeferredValue
+
+✅ 用法
+
+```tsx
+const deferredValue = useDeferredValue(value);
+```
+
+📌 作用
+
+`useDeferredValue` 会**延迟传入值的更新**，从而让高优先级的更新（如输入）先执行，**降低低优先级计算对主线程的压力**。
+
+React 会“延后”非关键性的值变化，直到浏览器空闲再处理，**不会影响原始值的实时更新**。
+
+🧠 适用场景
+
+- 输入框实时联想搜索，但数据量大、筛选慢
+- 图表、表格等根据用户输入更新但不要求实时反应
+- 输入联动的大型虚拟列表组件
+
+📝 举例
+
+```tsx
+const [query, setQuery] = useState('');
+const deferredQuery = useDeferredValue(query); // 延迟的 query
+const filteredList = useMemo(() => {
+  return bigList.filter(item => item.includes(deferredQuery));
+}, [deferredQuery]);
+
+return (
+  <>
+    <input value={query} onChange={e => setQuery(e.target.value)} />
+    <List data={filteredList} />
+  </>
+);
+```
+
+✨ 效果
+
+- 用户输入 `query` 时，输入框依旧立即响应；
+- `filteredList` 的计算可能稍有延迟，但不会阻塞主线程；
+- 提高感知性能，尤其在慢设备上非常明显。
+
+#### 4.3、总结对比
+
+| 特性               | `useDeferredValue`        | `useTransition` / `startTransition`          |
+| ------------------ | ------------------------- | -------------------------------------------- |
+| 是否 Hook          | ✅ 是                      | `useTransition`: ✅ 是`startTransition`: ❌ 否 |
+| 延迟值本身         | ✅ 是（返回延迟版本）      | ❌ 否（手动包裹异步逻辑）                     |
+| 控制更新优先级     | ✅ 通过延迟值实现          | ✅ 显式标记更新为“低优先级”                   |
+| 是否可感知加载状态 | ❌ 否                      | ✅ `isPending`                                |
+| 典型用途           | 延迟传入值 → 降低计算负担 | 异步更新 / 大量更新 → 提升交互响应           |
+
+**使用场景：**
+
+- ✅ `useDeferredValue`: **需要一个延迟版本的值**（如：大数据筛选、虚拟滚动）
+  - `useDeferredValue` 更像是 “值的 `debounce`” 替代方案，但不是基于时间的 `debounce`，而是基于调度优先级的延迟
+- ✅ `useTransition`: **需要包裹一个更新操作并显示加载中状态**（如：点击按钮切换视图）
+- ✅ `startTransition`: **无需 loading 状态，仅降低更新优先级**（如：输入联动更新）
 
 ### 五. 总结与展望
 

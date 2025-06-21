@@ -4,20 +4,19 @@
 
 - ==根据**Dockerfile**构建一个新的镜像==
   - `docker build -t <image_name> <Dockerfile_path>`
-    - `-t` 选项用于指定镜像的名称和标签（tag）
+    - `-t` 选项用于指定镜像的名称和标签（`tag`）
     - `image-name` 为镜像指定的名称
     - `tag` 为镜像指定的标签，通常用于版本控制
     - `Dockerfile_path` 表示 **Dockerfile** 所在的当前目录 <!--默认找dockerfile这个文件-->
-
 - `docker images`：==**列出所有本地镜像**==
-- `docker commit <container_id> new_image_name`：==**通过已有容器构建一个新的镜像**==
 - `docker pull <image_name>`：从**Docker Hub**或其他仓库中拉取镜像
 - `docker push <image_name>`：将镜像推送到**Docker Hub**或其他仓库
 - `docker rmi <image_id>`：删除本地镜像
+- `docker commit <container_id> new_image_name`：通过已有容器构建一个新的镜像
 
 ### 二、创建和运行容器
 
-- **==创建并运行一个带有标签（tag）的容器==**
+- **==创建并运行一个带有标签（tag）的容器==** <!--重要-->
 
   - `docker run -p 8080:80 --name my_container <image_name>:<tag> -d  `
 
@@ -35,7 +34,7 @@
 
       <!--`-d` 或 `--detach`: 这个选项告诉Docker在后台以守护进程方式运行容器，而不会将容器的标准输入（stdin）、标准输出（stdout）和标准错误（stderr）连接到终端-->
 
-- ==**以交互模式启动容器，并进入容器的Shell**== <!--像ssh连接访问远端服务器-->
+- ==**以交互模式启动容器，并进入容器的Shell**== <!--像ssh连接访问远端服务器--> <!--重要-->
 
   - `docker run -it <image_name> /bin/bash`：
     - `-it`：这两个选项结合在一起，表示以交互模式运行容器

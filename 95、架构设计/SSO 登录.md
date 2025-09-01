@@ -21,45 +21,93 @@
 
 用户直接访问：
 
-```
+```http
 https://app-a.com/home
 ```
 
-系统 A 发现当前请求没有有效的本地会话，于是将用户重定向到 **SSO 服务**的登录页：
-
+```http
+GET /home HTTP/1.1
+Host: appa.com
+Cookie: (无登录态)
 ```
-https://sso.com/login?service=https://app-a.com/callback
+
+应用 A 检查用户未登录 → 返回 302 将用户重定向到 **SSO 服务**的登录页，并附上 `redirect_uri`
+
+```http
+https://sso.com/login?client_id=appA&redirect_uri=https%3A%2F%2FappA.com%2Fsso%2Fcallback&state=xyz
+```
+
+```http
+HTTP/1.1 302 Found
+Location: https://sso.com/login?client_id=appA&redirect_uri=https%3A%2F%2FappA.com%2Fsso%2Fcallback&state=xyz
 ```
 
 > **注意**：
 >
-> - 这里的 `service=https://app-a.com/callback` 参数实际上就是 **redirect 地址**，表示用户在登录成功后，**SSO 服务**要将结果回传到哪个路径
+> - 这里的 `redirect_uri=https%3A%2F%2FappA.com%2Fsso%2Fcallback&state=xyz` 参数实际上就是 **redirect 地址**，表示用户在登录成功后，**SSO 服务**要将结果回传到哪个路径
 >
 > - 如果应用有复杂的前端路由，还可以通过附带 `state` 或 `redirectUrl` 参数来记录用户最初访问的页面，例如：
 >
+>   ```http
+>   https://sso.com/login?redirect_uri=https://app-a.com/callback&state=/home
 >   ```
->   https://sso.com/login?service=https://app-a.com/callback&state=/home
->   ```
+>
+> **重定向：**
+>
+> - 当服务端返回 `3xx` 状态码（例如 `301 Moved Permanently` 或 `302 Found`），会在响应头里带上 `Location`，告诉客户端新的资源地址
+> - 浏览器接收到后，会自动向 `Location` 指定的 **URL** 发送新的请求
+>
+> ```http
+> HTTP/1.1 302 Found
+> Location: https://example.com/login
+> ```
 
 #### 2.2、用户在 SSO 服务登录
+
+ 浏览器自动跳转到 **SSO 登录页**
+
+```http
+GET /login?client_id=appA&redirect_uri=https%3A%2F%2FappA.com%2Fsso%2Fcallback&state=xyz HTTP/1.1
+Host: sso.com
+```
+
+**SSO** 返回登录页面（**HTML 表单**）：
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<html>
+  <form method="POST" action="/login/submit">
+    <input name="username">
+    <input name="password" type="password">
+  </form>
+</html>
+```
 
 用户在 `sso.com` 输入账号密码并通过验证，**SSO 服务**生成一个临时凭证（如 `ticket=xxxx` 或 `code=xxxx`）
 
 #### 2.3、SSO 回跳到应用 A
 
-**SSO 服务**将用户重定向回业务系统的回调地址：
+**SSO** 验证成功，生成一个**授权码（code）**返回 **302 重定向回应用 A**：
 
-```
-https://app-a.com/callback?ticket=xxxx
+```http
+https://app-a.com/callback?code=xxxx
 ```
 
-此时，浏览器请求到达应用 A，但 A 只拿到一个 `ticket`，还无法得知用户身份
+```http
+HTTP/1.1 302 Found
+Location: https://appA.com/sso/callback?code=abcd1234&state=xyz
+Set-Cookie: sso_session=SSO-TOKEN; Path=/; HttpOnly; Secure
+```
+
+此时，浏览器请求到达**应用 A**，但 **A** 只拿到一个 `ticket`，还无法得知用户身份
 
 #### 2.4、应用 A 与 SSO 服务交互
 
-应用 A 后端拿到 `ticket`，再发起服务端请求到 **SSO 服务**进行校验：
+**应用 A** 后端拿到 `code`，再发起服务端请求到 **SSO 服务**进行校验：
 
-```
+```http
 POST https://sso.com/validate
 Body: { ticket: "xxxx", service: "https://app-a.com/callback" }
 ```

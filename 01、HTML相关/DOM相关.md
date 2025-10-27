@@ -61,17 +61,6 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
   const isOverflowingVertically = container.scrollHeight > container.clientHeight;
   ```
 
-- `window.scrollY` 和 `window.scrollX`（**==只读==**）:
-
-  - `window.scrollY` 返回==整个文档==在垂直方向上的滚动距离，以像素为单位
-  - `window.scrollX` 返回==整个文档==在水平方向上的滚动距离，以像素为单位
-
-  ```javascript
-  const verticalScrollPosition = window.scrollY;
-  const horizontalScrollPosition = window.scrollX;
-  ```
-
-
 相关事件：
 
 - `scrollend`：当用户停止滚动时，会触发 `scrollend` 事件
@@ -107,7 +96,7 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
   - 计算公式为
     - `offsetWidth` = `content`宽度 + 左`padding` + 右`padding` + 左`boder` + 右`boder`
     - `offsetHeight` = `content`高度 + 左`padding` + 右`padding` + 左`boder` + 右`boder`
-- `offsetLeft`/`offsetTop`：这两个属性表示当前节点的 **左/上边框外边缘** 到最近的已定位父级（`offsetParent`） **左/上边框内边缘** 的距离
+- `offsetLeft`/`offsetTop`：这两个属性表示当前元素的 **左/上边框外边缘** 到最近的已定位父级元素（`offsetParent`） **左/上边框内边缘** 的距离 <!--比较常用-->
 
 #### 3.2、位置距离方法
 

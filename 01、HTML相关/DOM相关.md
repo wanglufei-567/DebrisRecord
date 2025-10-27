@@ -81,10 +81,6 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
   - 计算公式为
     - `clientWidth` = `content`宽度 + 左`padding` + 右`padding`
     - `clientHeight` = `content`高度 + 左`padding` + 右`padding` 
-- `clientLeft`/`clientTop`: 这两个属性表示元素边框的宽度和高度
-
-  - `clientLeft` 属性（只读）不包括元素的左内边距或左外边距
-  - `clientTop` 属性（只读）不包括元素的上外边距和上内边距
 
 ------
 

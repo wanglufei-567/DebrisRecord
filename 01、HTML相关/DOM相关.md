@@ -134,3 +134,85 @@ window.addEventListener('scroll', function(event) {  console.log('滚动...'); }
   var y = window.pageYOffset + rect.top;
   ```
 
+### 四、DOM intersection 相关
+
+`intersection` （**相交 / 交汇 / 交叉的区域**）表示元素与视口的交集区域，`inter` 含“相互交错、在...之间”之意，浏览器提供一个 `IntersectionObserver` **API** 用于监听目标元素与视口（或指定容器）之间的相交状态变化，无需监听 `scroll`，性能更优
+
+常用于：
+
+- 懒加载图片 / 视频
+- 锚点高亮（ScrollSpy）
+- 无限滚动加载
+- 元素进入视区触发动画
+
+#### 4.1、基本语法
+
+```javascript
+// 创建观察器
+const callback = (entries, observer) => {
+  entries.forEach(entry => {
+    // entry 为 IntersectionObserverEntry 对象
+  });
+};
+
+const options = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.1
+};
+
+const observer = new IntersectionObserver(callback, options);
+
+// 观察目标
+observer.observe(element);
+observer.unobserve(element);   // 停止观察某个元素
+observer.disconnect();        // 停止观察全部元素
+```
+
+- **options**
+  - `root` :  用于判断“相交”的参考容器（即交叉检测的根
+  - `rootMargin`:  对 `root`（通常是视口）边界做扩展或收缩
+    - 用 **CSS margin** 语法写法
+    - 例如 `rootMargin: "200px 0px"` 表示垂直方向提前 200px 就触发回调
+  - `threshold`：触发回调所需的交集比率（`intersectionRatio`）阈值，取值范围 `0.0`~`1.0`，也可为数组（多阈值）
+    - `0`（默认）：一旦元素与 root 有任意交集（哪怕 1px）即触发（进入/离开都会触发）
+    - `1.0`：当元素**完全**进入 root 时才触发。
+    - `[0, 0.25, 0.5, 0.75, 1]`：用于监听多个可视比例变化（常用于动画或精细进度感知）。
+    - `0.1`：当元素至少 10% 可见时触发
+- **entry**
+  - `target` ：当前条目对应的被观察元素（DOM 元素）
+  - `isIntersecting`：布尔值，表示目标是否当前与 `root` 有交集（是否“可见”）
+
+#### 4.2、基本使用
+
+使用 `IntersectionObserver` 实现图片懒加载
+
+```html
+<img data-src="real.jpg" src="placeholder.jpg" />
+```
+
+```javascript
+// 懒加载示例（核心逻辑）
+
+const images = document.querySelectorAll('img[data-src]');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const img = entry.target;
+    img.src = img.dataset.src;
+    observer.unobserve(img);
+  });
+}, {
+  root: null,
+  threshold: 0,
+  rootMargin: '200px'
+});
+
+images.forEach(img => observer.observe(img));
+```
+
+当图片即将进入视口区域（通过 `rootMargin: "200px"` 提前触发）时，将其真实图片地址从 `data-src` 替换至 `src`，从而延迟网络请求
+
+
+

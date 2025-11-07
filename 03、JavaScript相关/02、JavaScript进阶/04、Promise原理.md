@@ -609,7 +609,7 @@ module.exports = MyPromise;
 
   *  **outerPromise** 的 `then` 调用链是追加到 **innerPromise** 的 `then` 调用链之后
   *  当 **innerPromise** 没有配置 `then` 时，**outerPromise** 的 `then` 调用链并不是直接追加到 **innerPromise** 本身
-     *  而是会给 **innerPromise** 添加一个默认的 `then` 方法
+     *  而是会给 **innerPromise** 添加一个默认的 `then` 方法 <!--这个默认的 then 会放到队尾-->
      *  **outerPromise** 的 `then` 调用链是追加到这个默认 `then` 方法上的
 
 
@@ -617,7 +617,7 @@ module.exports = MyPromise;
 
   ```javascript
   const outerPromise = new Promise((resolve) => {
-    //
+    // 内部的 promise
     const innerPromise = new Promise(res => {
       res('promiseInner value')
     }).then(value => {
@@ -643,7 +643,7 @@ module.exports = MyPromise;
     });
   ```
 
-  打印结果：
+  打印结果：<!--相当于给 outerPromise 的 then 调用链前加上了 innerPromise 的调用链-->
 
   ```markdown
 promiseInner.then promiseInner value
@@ -673,15 +673,21 @@ const promiseOuter2 = Promise.resolve()
   })
   .then(() => {
     console.log('promiseOuter2.then.then')
-  });
+  })
+  .then(() => {
+    console.log('promiseOuter2.then.then.then')
+  })
 ```
 
 打印结果：
+
+<!-- 默认的 then 加入微任务队列的时机要晚于普通 then，所以其是在队尾，从而导致该 then 之后的 then 加入微任务任务队列的时机也延迟了 -->
 
 ```markdown
 romiseOuter2.then
 promiseOuter2.then.then
 promiseOuter.then promiseInner value
+promiseOuter2.then.then.then
 ```
 
 ##### 5.1.1、async 函数中的 Promise Resolution Procedure

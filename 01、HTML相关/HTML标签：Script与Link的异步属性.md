@@ -29,7 +29,7 @@
 <link rel="stylesheet" href="styles.css">
 ```
 
-### 三、`<script>`标签的`defer`和`async`属性
+### 三、`<script>`标签的 `defer` 和 `async` 属性
 
 `<script>`标签的`defer`和`async`属性都是==用来控制浏览器如何异步加载外部**JavaScript**文件==
 
@@ -75,6 +75,44 @@
 对于那些可能在当前页面使用到的资源可以利用 `Preload`，而对一些可能在将来的某些页面中被使用的资源可以利用 `Prefetch`
 
 如果从加载优先级上看，`Preload` 会提升请求优先级；而 `Prefetch` 会把资源的优先级放在最低，当浏览器空闲时才去预加载
+
+### 五、页面生命周期事件
+
+ **页面加载与生命周期事件（Page Lifecycle Events）**，也可以称为 **文档（Document）与窗口（Window）的生命周期事件**，它们反映了浏览器从解析、渲染、加载资源到卸载页面的全过程中，不同阶段的状态变化
+
+| 触发顺序 | 事件                                     | 触发对象   | 触发时机说明                                             | 备注                             |
+| -------- | ---------------------------------------- | ---------- | -------------------------------------------------------- | -------------------------------- |
+| 1        | `readystatechange`（`loading` 阶段）     | `document` | HTML 正在解析，DOM 尚未构建完成                          | 很早发生，一般无需监听           |
+| 2        | `readystatechange`（`interactive` 阶段） | `document` | DOM 构建完成，资源可能仍在加载                           | 此阶段与 `DOMContentLoaded` 临近 |
+| 3        | **`DOMContentLoaded`**                   | `document` | **DOM 树构建完成**，但外部资源（图片、CSS 等）未必已加载 | 常用来执行 DOM 操作逻辑          |
+| 4        | `readystatechange`（`complete` 阶段）    | `document` | DOM 和资源均加载完成                                     | 通常与 `load` 同时出现           |
+| 5        | **`load`**                               | `window`   | 页面以及所有资源加载完成                                 | 比 `DOMContentLoaded` 晚         |
+| 6        | `beforeunload`                           | `window`   | 用户刷新、关闭页面或跳转之前                             | 可用于提示用户保存数据           |
+| 7        | `unload`                                 | `window`   | 页面即将卸载，无法阻止                                   | 用于清理、上报统计数据           |
+
+各个阶段流程示意
+
+```javascript
+开始解析 HTML
+     ↓
+document.readyState = "loading"
+     ↓
+DOM 构建完成
+     ↓
+document.readyState = "interactive"
+     ↓
+触发 DOMContentLoaded
+     ↓
+加载外部资源（图片、CSS、iframe 等）
+     ↓
+document.readyState = "complete"
+     ↓
+触发 load
+     ↓
+用户关闭/刷新页面 → 触发 beforeunload
+     ↓
+页面卸载 → 触发 unload
+```
 
 
 

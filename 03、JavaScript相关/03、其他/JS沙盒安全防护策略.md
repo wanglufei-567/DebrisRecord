@@ -2,7 +2,9 @@
 
 ### 一、前言
 
-在现代 **Web** 应用中，允许用户执行自定义 **JavaScript** 代码已成为许多平台的核心功能，如在线代码编辑器、低代码平台、用户脚本系统等。然而，这种灵活性也带来了巨大的安全风险。本文将深入分析一套完整的 JavaScript 沙盒安全防护策略，探讨如何在保证功能性的同时确保系统安全。
+在现代 **Web** 应用中，允许用户执行自定义 **JavaScript** 代码已成为许多平台的核心功能，如在线代码编辑器、低代码平台、用户脚本系统等，然而，这种灵活性也带来了巨大的安全风险
+
+本文将深入分析一套完整的 **JavaScript 沙盒安全防护策略**，探讨如何在保证功能性的同时确保系统安全
 
 ### 二、核心安全威胁分析
 
@@ -531,18 +533,42 @@ runCompleteSecurityTests();
 
 #### 7.1、Content Security Policy (CSP)
 
-```html
-<meta http-equiv="Content-Security-Policy"
-      content="script-src 'self' 'unsafe-eval'; object-src 'none';">
+**Content Security Policy（CSP**）是浏览器的一种安全机制，用于限制网页可以加载和执行哪些资源，从而防止 **XSS（跨站脚本攻击**）、**数据注入**等安全风险
+
+它通过在 **HTTP 响应头**中设置规则来控制资源来源，例如脚本、样式、图片、字体等
+
+核心特点和作用：
+
+1. **指定资源来源**：可以明确允许哪些域名的脚本、样式、图片等可以被加载，例如 `script-src 'self' https://cdn.example.com`。
+2. **阻止内联脚本/样式**：默认可以禁止 `<script>` 标签中的内联 **JavaScript** 或 `<style>` 中的 **CSS**，降低 **XSS** 攻击风险
+
+举个最简化的例子：
+
+```javascript
+Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.example.com; object-src 'none';
 ```
 
+- `default-src 'self'`：默认只允许自身域名资源
+- `script-src`：允许自身和 `cdn.example.com` 的脚本
+- `object-src 'none'`：禁止 `<object>`、`<embed>` 等插件加载
+
 #### 7.2、子资源完整性（SRI）
+
+**SRI（Subresource Integrity）**是一种前端安全机制，用来保证加载的外部资源（如 **JS**、**CSS**）**未被篡改**
+
+**SRI** 主要是针对 **HTML 标签（如 `<script>`、`<link>`）** 的属性配置的，也就是浏览器在加载这些外部资源时用来校验完整性
+
+原理：服务器或开发者给资源加上哈希值，浏览器加载时会比对哈希，如果不匹配就拒绝执行，防止 **CDN** 或第三方被篡改的脚本运行
 
 ```html
 <script src="user-script.js"
         integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC"
         crossorigin="anonymous"></script>
 ```
+
+- `integrity`：资源的哈希值
+
+- `crossorigin`：跨域请求策略
 
 #### 7.3、网络请求限制
 
@@ -559,7 +585,7 @@ window.fetch = function(url, options) {
 
 ### 八、总结与展望
 
-本文介绍的 JavaScript 沙盒安全防护策略通过多层防护机制，有效地解决了用户代码执行中的主要安全威胁：
+本文介绍的 **JavaScript** 沙盒安全防护策略通过多层防护机制，有效地解决了用户代码执行中的主要安全威胁：
 
 #### 8.1、核心防护机制
 1. **API 访问控制** - 通过 Proxy 代理限制危险 API 访问
@@ -580,5 +606,3 @@ window.fetch = function(url, options) {
 4. **AI 辅助检测** - 使用机器学习识别潜在恶意代码模式
 
 通过不断完善和发展这些安全防护策略，我们可以在享受 JavaScript 灵活性的同时，确保 Web 应用的安全性和稳定性。安全永远是一个持续演进的过程，需要开发者保持警惕，及时更新防护措施以应对新的安全威胁。
-
-```

@@ -535,7 +535,7 @@ runCompleteSecurityTests();
 
 **Content Security Policy（CSP**）是浏览器的一种安全机制，用于限制网页可以加载和执行哪些资源，从而防止 **XSS（跨站脚本攻击**）、**数据注入**等安全风险
 
-它通过在 **HTTP 响应头**中设置规则来控制资源来源，例如脚本、样式、图片、字体等
+==它通过在 **HTTP 响应头**中设置规则来控制资源来源==
 
 核心特点和作用：
 
@@ -558,7 +558,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.examp
 
 **SRI** 主要是针对 **HTML 标签（如 `<script>`、`<link>`）** 的属性配置的，也就是浏览器在加载这些外部资源时用来校验完整性
 
-原理：服务器或开发者给资源加上哈希值，浏览器加载时会比对哈希，如果不匹配就拒绝执行，防止 **CDN** 或第三方被篡改的脚本运行
+**原理**：服务器或开发者给资源加上哈希值，浏览器加载时会比对哈希，如果不匹配就拒绝执行，防止 **CDN** 或第三方被篡改的脚本运行
 
 ```html
 <script src="user-script.js"

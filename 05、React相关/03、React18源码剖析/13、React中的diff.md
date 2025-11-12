@@ -19,11 +19,12 @@
 **React** 组件更新过程可以分为两个阶段：
 
 - **==增量更新阶段==**
-  - 在增量更新阶段，React 会通过`diff`找到新旧虚拟 DOM 中差异的部分，并完成新`fiber`树的构建，但并不会对真实 DOM 进行任何修改 <!-- 主要在beginWork的reconcileChildFibers阶段-->
+  - 在增量更新阶段，**React** 会通过 `diff` 找到新旧虚拟 **DOM** 中差异的部分，并完成新`fiber`树的构建，但并不会对真实 **DOM** 进行任何修改 <!-- 主要在beginWork的reconcileChildFibers阶段-->
 - ==**提交阶段**==
-  - 在增量更新阶段结束后，React 会进入提交阶段，将变更应用到真实 DOM 上。在提交阶段中，React 会根据增量更新阶段生成的更新指令（每个`fiber`节点上的副作用标识`flag`、待删除的子`fiber`列表`deletions`）来对真实 DOM 进行修改，完成组件的更新 <!--commit阶段-->
+  - 在增量更新阶段结束后，**React** 会进入提交阶段，将变更应用到真实 **DOM** 上
+  - 在提交阶段中，**React** 会根据增量更新阶段生成的更新指令（每个 `fiber` 节点上的副作用标识 `flag`、待删除的子 `fiber` 列表 `deletions`）来对真实 **DOM** 进行修改，完成组件的更新 <!--commit阶段-->
 
-`React diff` 算法的核心思想是**基于同层比较**。对于两棵不同的 `fiber` 树，`React diff` 会首先比较它们的根节点，如果两棵树的根节点不同，则 **React** 会直接替换整个节点及其子树。如果根节点相同，则 **React** 会依次比较子节点 <!--也是同层比较-->
+`React diff` 算法的核心思想是**基于同层比较**，对于两棵不同的 `fiber` 树，`React diff` 会首先比较它们的根节点，如果两棵树的根节点不同，则 **React** 会直接替换整个节点及其子树，如果根节点相同，则 **React** 会依次比较子节点 <!--也是同层比较-->
 
 按照新的 **VDom** 节点是否只有一个，**React** 中的 `diff` 可以分为**单节点 `diff`** 和**多节点 `diff`**
 
@@ -101,7 +102,7 @@ function getTag(tag) {
 
 ### 二、单节点 diff
 
-若新的节点只有一个的情况，`diff` 的流程如下图所示
+若新的 **VDom** 节点只有一个的情况，`diff` 的流程如下图所示
 
 ![image-20230220223009926](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230220223009926.png)
 
@@ -186,7 +187,7 @@ function reconcileChildFibers(
 }
 ```
 
-当新的子VDom是个单节点时，会走到`reconcileSingleElement`中
+当新的子 **VDom** 是个单节点时，会走到`reconcileSingleElement`中
 
 ```js
 // src/react-reconciler/src/ReactChildFiber.js
@@ -295,7 +296,7 @@ function deleteChild(returnFiber, childToDelete) {
 
 - 记录待删除的老`fiber`
 
-  - 由于是老的子`fiber`，新的父`fiber`只能通过`deletions`属性将其记录下来，待到了`commit`阶段根据`deletions`中的`fiber`将页面上对应的真实DOM节点直接删除 
+  - 由于是老的子`fiber`，新的父`fiber`只能通过`deletions`属性将其记录下来，待到了`commit`阶段根据`deletions`中的`fiber`将页面上对应的真实 **DOM** 节点直接删除
 
     <!--不是真正意义上的删除，只是记录下来，不对老fiber树做任何操作，老fiber树上的这些fiber节点后面会自动被垃圾回收删除-->
 
@@ -323,7 +324,7 @@ function deleteRemainingChildren(returnFiber, currentFirstChild) {
 }
 ```
 
-这段逻辑就是删除从`currentFirstChild`之后所有的`fiber`节点 
+这段逻辑就是删除从`currentFirstChild`之后所有的`fiber`节点
 
 增量更新的部分到这里就完成了，接下来完成提交阶段的逻辑
 
@@ -389,7 +390,7 @@ export function commitMutationEffectsOnFiber(finishedWork, root) {
 }
 ```
 
-在实现`useReducer`时，已经添加了更新真实DOM属性的逻辑
+在实现`useReducer`时，已经添加了更新真实 **DOM** 属性的逻辑
 
 ```js
 //处理DOM更新
@@ -419,7 +420,7 @@ if (flags & Update) {
   }
 ```
 
-那么接下来继续要添加删除真实DOM节点的处理逻辑
+那么接下来继续要添加删除真实 **DOM** 节点的处理逻辑
 
 ------
 
@@ -446,9 +447,9 @@ function recursivelyTraverseMutationEffects(root, parentFiber) {
 }
 ```
 
-增加的部分：就是在处理子节点的逻辑之前先把父`fiber`上该删除的节点对应的真实DOM都删除
+增加的部分：就是在处理子节点的逻辑之前先把父`fiber`上该删除的节点对应的真实 **DOM** 都删除
 
-通过在增量更新阶段记录下的`deletions`，去找到页面上对应的真实DOM节点并删除
+通过在增量更新阶段记录下的`deletions`，去找到页面上对应的真实 **DOM** 节点并删除
 
 ------
 
@@ -483,7 +484,7 @@ function commitDeletionEffects(root, returnFiber, deletedFiber) {
 }
 ```
 
-要想删除真实DOM节点，必须要找到它的父真实DOM节点，找到父节点之后通过全局变量`hostParent`记录下来
+要想删除真实 **DOM** 节点，必须要找到它的父真实 **DOM** 节点，找到父节点之后通过全局变量`hostParent`记录下来
 
 ------
 
@@ -557,7 +558,7 @@ function recursivelyTraverseDeletionEffects(
 }
 ```
 
-这里为什么在删除一个节点时先删除其子节点，这是因为React中每个节点的删除会进行一些其他处理（比如生命周期的逻辑），所以才没有直接一下将该节点直接删除
+这里为什么在删除一个节点时先删除其子节点，这是因为 **React** 中每个节点的删除会进行一些其他处理（比如生命周期的逻辑），所以才没有直接一下将该节点直接删除
 
 ------
 
@@ -573,20 +574,20 @@ function recursivelyTraverseDeletionEffects(
 
 ### 三、多节点diff
 
-React `DOM diff` 有三个规则
+**React** `DOM diff` 有三个规则
 
 - 只对同级元素进行比较，不同层级不对比 <!--同层比较-->
 - 不同的 `type` 对应不同的元素
 - 可以通过 `key` 来标识同一个节点
 
-当新的VDom节点为多个时，新VDom需要遍历三轮与老VDom进行比较
+当新的 **VDom** 节点为多个时，新 **VDom** 需要遍历三轮与老 **VDom** 进行比较
 
 - **第 1 轮遍历**
 
-  新VDom和老VDom按照索引，==一一进行比较== <!--不像Vue做了优化，头尾、尾头遍历-->
+  新 **VDom** 和老 **VDom** 按照索引，==一一进行比较== <!--不像Vue做了优化，头尾、尾头遍历-->
 
   - 如果 `key` 不同则==直接结束本轮循环==  <!--即使只有第一个节点的key不同剩余节点的key都相同-->
-  - 如果`key` 相同而 `type` 不同，则直接==创建新`fibe`r节点==，标记老`fiber`为删除，==继续循环==
+  - 如果`key` 相同而 `type` 不同，则直接==创建新`fiber`节点==，标记老`fiber`为删除，==继续循环==
   - 如果`key` 相同且 `type` 也相同，则直接==复用老节 `fiber` 节点==，==继续循环==
   - 如果`newChildren` 或 `oldFiber` 遍历完，==结束本轮循环==
 
@@ -659,7 +660,7 @@ function reconcileChildFibers(
 ) {
   //新的子虚拟DOM只有一个节点的情况
   //...
-    
+
   /*
     新的子节点有多个的情况
     newChild是个数组 [hello文本节点,span虚拟DOM元素]
@@ -675,7 +676,7 @@ function reconcileChildFibers(
 }
 ```
 
-当新的 VDom 是多个节点时，会走到 `reconcileChildrenArray` 中，所以接下来完善 `reconcileChildrenArray`
+当新的 **VDom** 是多个节点时，会走到 `reconcileChildrenArray` 中，所以接下来完善 `reconcileChildrenArray`
 
 ------
 
@@ -715,9 +716,9 @@ function reconcileChildFibers(
 
 ```
 
-这是初次挂载时的逻辑👆，只是根据新的 VDom 创建 `fiber` <!--老 `fiber` `currentFirstFiber` 没有使用到-->
+这是初次挂载时的逻辑👆，只是根据新的 **VDom** 创建 `fiber` <!--老 `fiber` `currentFirstFiber` 没有使用到-->
 
-那么接下来便增加 diff 的逻辑，首先是第一轮循环
+那么接下来便增加 **diff** 的逻辑，首先是第一轮循环
 
 #### 3.1、第一轮遍历
 
@@ -785,7 +786,7 @@ function reconcileChildFibers(
 
 - `resultingFirstChild` ： 新 `fiber` 第一个子 `fiber`（父 `fiber` 的 `child`） `reconcileChildrenArray` 返回值就是这个
 - `previousNewFiber` ：上一个新子 `fiber`，用于追加 `sibling fiber`
-- `newIdx` ：用来遍历新的虚拟DOM的索引
+- `newIdx` ：用来遍历新的虚拟**DOM**的索引
 - `oldFiber = currentFirstFiber` ：老子 `fiber` ，默认值是第一个老子 `fiber`
 - `nextOldFiber` ：下一个老子 `fiber`，用于提前缓存
 - `lastPlacedIndex`：上一个不需要移动的老节点的索引，用于记录可以直接复用不用移动位置的老 `fiber` 的索引 <!--后面第三轮循环：移动节点 使用-->
@@ -796,7 +797,7 @@ function reconcileChildFibers(
 
 **第 1 轮遍历**
 
-新 VDom 和老 VDom 按照索引，==一一进行比较==
+新 **VDom** 和老 **VDom** 按照索引，==一一进行比较==
 
 - 如果 `key` 不同则==直接结束本轮循环==
 - 如果 `key` 相同而 `type` 不同，则直接==创建新 `fiber` 节点==，标记老 `fiber` 为删除，==继续循环==
@@ -1016,7 +1017,7 @@ if (oldIndex < lastPlacedIndex) {
 
 第三轮遍历就是**移动节点**
 
-接下来看下一段完整的多节点diff的流程示意图
+接下来看下一段完整的多节点 **diff** 的流程示意图
 
 `main.jsx`中的`jsx`
 
@@ -1250,7 +1251,7 @@ if (oldIndex < lastPlacedIndex) {
 - 若老`fiber`的索引小于上一个不需要移动的老节点的索引，则说明这个老`fiber`需要移动，仍然返回`lastPlacedIndex`，保持`lastPlacedIndex`不变
 - 若是老`fiber`的索引大于上一个不需要移动的老节点的索引，则说明这个老`fiber`不需要移动，返回这个老`fiber`的索引，作为新的`lastPlacedIndex`
 
-这里明明是处理`lastPlacedIndex`的逻辑，如何告诉浏览器页面上哪个DOM节点需要动，哪个不需要动？
+这里明明是处理`lastPlacedIndex`的逻辑，如何告诉浏览器页面上哪个 **DOM** 节点需要动，哪个不需要动？
 
 答案是👇
 
@@ -1258,7 +1259,12 @@ if (oldIndex < lastPlacedIndex) {
 newFiber.flags |= Placement;
 ```
 
-若老`fiber`的索引小于上一个不需要移动的老节点的索引是，则给新`fiber`上添加了插入的副作用，这样在`commit`阶段，就会处理这个副作用；由于新`fiber`是复用的老`fiber`，那么真实DOM也复用了（`stateNode`属性），也就是说不会新创建真实DOM节点去插入，而是直接用页面上已有的DOM节点进行插入（展示的效果就是移动）
+若老`fiber`的索引小于上一个不需要移动的老节点的索引是，则给新`fiber`上添加了插入的副作用，这样在`commit`阶段，就会处理这个副作用
+
+- 由于新`fiber`是复用的老`fiber`，那么真实 **DOM** 也复用了（`stateNode`属性），也就是说不会新创建真实 **DOM** 节点去插入，而是直接用页面上已有的 **DOM** 节点进行插入（展示的效果就是移动）
+- 具体的 **DOM** 节点插入流程
+  - 从当前 `fiber` 节点出发，先找离自己最近的有真实 **DOM** 的兄弟 `fiber` 节点作为锚点，将自己的真实 **DOM**插入到锚点的真实 **DOM**之前
+  - 若是没有锚点，就直接追加到父节点的真实 **DOM** 之后
 
 ------
 
@@ -1272,5 +1278,94 @@ newFiber.flags |= Placement;
 
 ![image-20230223162947583](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230223162947583.png)
 
-<!--**React** 的 **DOM** diff 没有 **Vue** 那么复杂，**Vue** 中做了很多优化，所以 **React** 的性能不如 **Vue** 是不是和这个有关-->
+<!-- React 的 DOM diff 没有 Vue 那么复杂，Vue 中做了很多优化，所以 React 的性能不如 Vue 是不是和这个有关-->
 
+### 四、总结
+
+本文详细解析了 **React18** 中的 **diff** 算法实现，从理论到实践，深入剖析了 **React** 如何高效地更新虚拟 **DOM** 树。以下是本文的核心要点总结：
+
+#### 1. diff 算法的三大核心原则
+
+**React** 的 **diff** 算法通过三个核心原则，将复杂度从 **O(n³)** 优化到接近 **O(n)**：
+
+- **同层比较**：只对同一层级的节点进行比较，不跨层级对比，这大大降低了算法复杂度
+- **key 标识**：通过 `key` 属性来标识节点，帮助 **React** 识别哪些节点可以复用
+- **类型判断**：不同 `type` 的元素会产生不同的树结构，相同 `type` 才会继续深入比较
+
+#### 2. 单节点 diff 的核心流程
+
+当新的虚拟 **DOM** 只有一个节点时，**diff** 流程相对简单：
+
+- 遍历所有老 `fiber` 节点，寻找可复用的节点
+- 通过 `key` 和 `type` 双重判断来决定是否复用
+- `key` 相同且 `type` 相同：直接复用老 `fiber`，删除其他兄弟节点
+- `key` 相同但 `type` 不同：删除所有老 `fiber`，创建新 `fiber`
+- `key` 不同：删除当前老 `fiber`，继续遍历
+
+#### 3. 多节点 diff 的三轮遍历策略
+
+多节点 **diff** 是最复杂的场景，**React** 采用了三轮遍历的策略：
+
+**第一轮遍历（同位置比较）**：
+
+- 新老节点按索引一一比较
+- `key` 不同直接结束本轮循环
+- `key` 相同但 `type` 不同，创建新 `fiber`，标记老 `fiber` 删除
+- `key` 和 `type` 都相同，复用老 `fiber`
+- 任一方遍历完成，结束本轮循环
+
+**第二轮遍历（处理剩余节点）**：
+- 新节点遍历完但老节点还有：删除剩余所有老 `fiber`
+- 老节点遍历完但新节点还有：将剩余新节点标记为插入
+- 两者都未遍历完：进入第三轮遍历
+
+**第三轮遍历（节点移动）**：
+- 将剩余老 `fiber` 存入 **Map** 结构（以 `key` 或 `index` 为键）
+- 遍历剩余新节点，从 **Map** 中查找可复用的老 `fiber`
+- 通过 `lastPlacedIndex` 判断节点是否需要移动
+- 若老 `fiber` 的 `index` < `lastPlacedIndex`，标记为移动
+- 若老 `fiber` 的 `index` >= `lastPlacedIndex`，不需要移动，更新 `lastPlacedIndex`
+
+#### 4. key 的重要性
+
+`key` 在 **diff** 算法中起着至关重要的作用：
+
+- **提高复用效率**：通过 `key` 快速定位可复用节点，避免不必要的 **DOM** 操作
+- **保持状态稳定**：确保组件实例在列表更新时能够正确保持状态
+- **优化移动操作**：帮助 **React** 准确判断哪些节点需要移动，哪些可以原地复用
+- **避免使用 index**：使用 `index` 作为 `key` 在列表顺序变化时会导致性能问题和状态错乱
+
+#### 5. 副作用标记与提交
+
+**diff** 算法在增量更新阶段只是标记副作用，并不直接操作 **DOM**：
+
+- `Placement`：标记节点需要插入或移动
+- `Update`：标记节点的属性需要更新
+- `ChildDeletion`：标记父节点有子节点需要删除
+- `deletions` 数组：记录需要删除的老 `fiber` 节点
+
+在提交阶段，**React** 会根据这些副作用标记，统一对真实 **DOM** 进行批量更新操作。
+
+#### 6. 性能优化要点
+
+从 **React** 的 **diff** 实现中，我们可以总结出以下性能优化建议：
+
+- **合理使用 key**：为列表项提供稳定且唯一的 `key`
+- **避免频繁改变节点类型**：类型变化会导致整个子树重建
+- **保持组件结构稳定**：不要在渲染过程中动态改变组件层级结构
+- **利用 React.memo**：对于复杂组件，使用 `memo` 避免不必要的重新渲染
+- **拆分大列表**：对于超长列表，考虑使用虚拟滚动等技术
+
+#### 7. 实现中的关键点
+
+在实现 **diff** 算法时，需要特别注意：
+
+- `lastPlacedIndex` 的维护：这是判断节点是否需要移动的关键
+- `alternate` 属性的使用：通过它可以快速找到对应的老 `fiber`
+- `shouldTrackSideEffects` 标志：区分初次挂载和更新场景
+- 删除操作的处理：需要递归删除所有子节点，确保生命周期正确执行
+- `Map` 数据结构的运用：在第三轮遍历中提高查找效率
+
+#### 8. 与 Vue 的对比思考
+
+文章末尾的注释提到了 **React** 与 **Vue** 的性能差异，**Vue** 的 **diff** 算法确实做了更多优化（如双端比较、最长递增子序列等），但 **React** 的实现更加简洁，易于理解和维护，性能差异往往体现在特定场景下，实际应用中两者都能提供出色的性能表现

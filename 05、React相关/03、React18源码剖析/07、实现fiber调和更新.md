@@ -4,7 +4,8 @@
 
 #### 1.1、调和更新
 
-**React** 的调和更新采用了**双缓冲**的思想，维护了两棵 **fiber** 树：
+**React** 的「调和」更新采用了**双缓冲**的思想，维护了两棵 **fiber** 树：
+
 - 一棵 **fiber** 树用于渲染展示
 - 另一棵 **fiber** 树用于计算更新
 
@@ -648,7 +649,7 @@ export const mountChildFibers = createChildReconciler(false);
        ) {
          // 若是有老的父 fiber 上有子 fiber 则进入 diff 过程
          //...
-    
+      
          /*
            初次挂载时，老fiber节点currentFirstChild肯定是没有的
            所以可以直接根据虚拟DOM创建新的Fiber节点
@@ -1585,7 +1586,7 @@ let element = (
 
      - 建立 **fiber** 节点之间的关系(`child`、`sibling`、`return`)
 
-   - **completeWork** 阶段：创建真实 **DOM**、设置属性、构建 **DOM** 树 🌟
+   - **completeWork** 阶段：创建真实 **DOM**、设置属性、构建 **DOM** 树 🌟 
 
      - 为每个 **fiber** 节点创建对应的真实 **DOM**
 

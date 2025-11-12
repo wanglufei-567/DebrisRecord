@@ -14,11 +14,11 @@ const element = <h1>Hello, world!</h1>;
 
 **为什么使用JSX？**
 
-> React 认为渲染逻辑本质上与其他 UI 逻辑内在耦合，比如，在 UI 中需要绑定处理事件、在某些时刻状态发生变化时需要通知到 UI，以及需要在 UI 中展示准备好的数据。
+> **React** 认为渲染逻辑本质上与其他 **UI** 逻辑内在耦合，比如，在 **UI** 中需要绑定处理事件、在某些时刻状态发生变化时需要通知到 **UI**，以及需要在 **UI** 中展示准备好的数据
 >
-> React 并没有采用将「标记」与「逻辑」分离到不同文件这种人为的分离方式，而是通过将二者共同存放在称之为「组件」的松散耦合单元之中，来实现[*关注点分离*](https://en.wikipedia.org/wiki/Separation_of_concerns)。
+> **React** 并没有采用将「标记」与「逻辑」分离到不同文件这种人为的分离方式，而是通过将二者共同存放在称之为「组件」的松散耦合单元之中，来实现[*关注点分离*](https://en.wikipedia.org/wiki/Separation_of_concerns)
 >
-> React [不强制要求](https://zh-hans.reactjs.org/docs/react-without-jsx.html)使用 JSX，但是大多数人发现，在 JavaScript 代码中将 JSX 和 UI 放在一起时，会在视觉上有辅助作用，它还可以使 React 显示更多有用的错误和警告消息。
+> **React** [不强制要求](https://zh-hans.reactjs.org/docs/react-without-jsx.html)使用 **JSX**，但是大多数人发现，在 **JavaScript** 代码中将 **JSX** 和 **UI** 放在一起时，会在视觉上有辅助作用，它还可以使 **React** 显示更多有用的错误和警告消息
 
 <!--也是屁话，让人费解，其实就是jsx写的时候，DOM结构与UI逻辑写在一起，比较清晰明了-->
 
@@ -314,5 +314,5 @@ console.log('element', element)
 
 ### 三、总结
 
-**JSX** 是一种 **JavaScript** 的语法扩展，其本质上还是 **JavaScript**；**JSX** 在工程打包时会自动编译成一段 ==**JavaScript**函数调用==的代码，并在==**运行时**执行调用==生成虚拟DOM
+**JSX** 是一种 **JavaScript** 的语法扩展，其本质上还是 **JavaScript**；**JSX** 在工程打包时会自动编译成一段 ==**JavaScript**函数调用==的代码，并在==**运行时**执行调用==生成虚拟**DOM**
 

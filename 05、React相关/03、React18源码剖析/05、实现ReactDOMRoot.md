@@ -9,7 +9,7 @@
 
 #### 1.1、什么是 root
 
-> 在 React 中，"root" 是一个指向顶层数据结构的指针，React 用它来跟踪要渲染的树。
+> 在 **React** 中，"root" 是一个指向顶层数据结构的指针，**React** 用它来跟踪要渲染的树。
 
 <!--屁话，看不懂，其实就字面意思 根，也可以理解成根节点-->
 
@@ -49,9 +49,9 @@ root.render(<App tab="profile" />);
 
 **为什么引入 New Root API ？**
 
-> 首先，这修复了 API 在运行更新时的一些人类工程学问题。如上所示，在 Legacy API 中，你需要多次将容器元素传递给 `render`，即使它从未更改过；这也意味着我们不需要将根元素存储在 DOM 节点上，尽管我们今天仍然这样做
+> 首先，这修复了 **API** 在运行更新时的一些人类工程学问题。如上所示，在 **Legacy API** 中，你需要多次将容器元素传递给 `render`，即使它从未更改过；这也意味着我们不需要将根元素存储在 **DOM** 节点上，尽管我们今天仍然这样做
 >
-> 其次，这一变化允许让我们可以移除 `hydrate` 方法并替换为 root 上的一个选项；删除渲染回调，这些回调在部分 hydration 中是没有意义的
+> 其次，这一变化允许让我们可以移除 `hydrate` 方法并替换为 **root** 上的一个选项；删除渲染回调，这些回调在部分 **hydration** 中是没有意义的
 
 <!--也是屁话，其实就是逻辑解耦，扯那么多有的没的-->
 
@@ -318,7 +318,7 @@ export const Update = 0b00000000000000000000000100;
 - **FiberRoot** 对象（也可称其为 **FiberRootNode** 对象）<!--fiber 根节点，fiber 树挂载的地方-->
   - 该对象属于 `react-reconciler` 包，在 `createFiberRoot` 函数中创建，作为 `react-reconciler` 在运行过程中的「**全局上下文**」，保存着 `fiber` 构建过程中所依赖的全局状态
 - **HostRootFiber** 对象 <!--根 fiber，fiber 树的起始 fiber-->
-  - 该对象属于 `react-reconciler` 包，在 `createHostRootFiber` 函数中创建，这是 React 应用中的第一个 `fiber` 对象, 是 `fiber` 树的根节点。
+  - 该对象属于 `react-reconciler` 包，在 `createHostRootFiber` 函数中创建，这是 **React** 应用中的第一个 `fiber` 对象, 是 `fiber` 树的根节点。
 
 下面👇是整个 `ReactDOMRoot` 创建的流程图
 

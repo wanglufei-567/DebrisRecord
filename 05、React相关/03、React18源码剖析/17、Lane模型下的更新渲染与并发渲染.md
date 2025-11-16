@@ -6,11 +6,11 @@
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/scheduleUpdateOnFiber1_1667713205987.jpg" alt="img" style="zoom:50%;" />
 
-这张图中有两个 API 很重要，用于在不同的渲染模式下执行更新操作：
+这张图中有两个 **API** 很重要，用于在不同的渲染模式下执行更新操作：
 
 - **同步更新模式下的 API：`performSyncWorkOnRoot`**
 
-  它会==立即执行所有更新操作，并阻塞 UI 渲染直到更新完成==。这个 API 在以前的版本中是默认使用的，但在 **React 18** 中，它被视为一种备用的更新模式，仅在需要精确控制更新过程时使用
+  它会==立即执行所有更新操作，并阻塞 **UI** 渲染直到更新完成==，这个 **API** 在以前的版本中是默认使用的，但在 **React 18** 中，它被视为一种备用的更新模式，仅在需要精确控制更新过程时使用
 
 - **Concurrent Mode 下的 API：`performConcurrentWorkOnRoot`**
 
@@ -564,7 +564,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
 
        ```js
        // src/scheduler/src/forks/Scheduler.js
-
+       
        function workLoop(startTime) {
          //...
          while (currentTask !== null) {
@@ -575,29 +575,29 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
              currentTask.callback = null;
              //执行工作，如果返回新的函数，则表示当前的工作没有完成
              const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
-
+    
              const continuationCallback = callback(didUserCallbackTimeout);
-
+    
              if (typeof continuationCallback === 'function') {
                currentTask.callback = continuationCallback;
                return true; //还有任务要执行
              }
-
+    
              //...
            }
-
+    
            //...
        }
        ```
-
+    
        其中
-
+    
        ```js
         const continuationCallback = callback(didUserCallbackTimeout);
        ```
-
+    
        `callback`便是`performConcurrentWorkOnRoot`，这里将`callback`的返回值（还是`performConcurrentWorkOnRoot`）继续赋值给`currentTask.callback` ，那么这个任务`currentTask`在下次时间切片中便可以继续执行
-
+    
        至于==**下个切片中是如何接着执行的**==，这取决于**==全局变量`workInProgress`记录下了fiber树构建到哪个节点==**，**==`workInProgress`保证了下个时间切片中可以从正确的fiber节点继续构建==**
 
 ------
@@ -690,7 +690,7 @@ function sleep(duration) {
 }
 ```
 
-通过`sleep(1000)`可以使一个fiber工作单元的执行时间大于5ms，一个时间切片的时间，可以让我们明显的观察到并发渲染
+通过`sleep(1000)`可以使一个 **fiber** 工作单元的执行时间大于5ms，一个时间切片的时间，可以让我们明显的观察到并发渲染
 
 ------
 
@@ -710,7 +710,7 @@ let element = <FunctionComponent />;
 
 ![image-20230306002206899](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20230306002206899.png)
 
-可以看到三个`fiber`节点，每个`fiber`节点构建时都走了一遍`performConcurrentWorkOnRoot`方法，也就是说总共有三次时间切片，这就是**React**的**==并发渲染==**，==将一个任务拆分为若干个小任务，在每一帧中执行（每个时间切片），保证了不会阻塞UI==
+可以看到三个`fiber`节点，每个`fiber`节点构建时都走了一遍`performConcurrentWorkOnRoot`方法，也就是说总共有三次「时间切片」，这就是**React**的**==并发渲染==**，==将一个任务拆分为若干个小任务，在每一帧中执行（每个时间切片），保证了不会阻塞UI==
 
-需要明确的一点，只有fiber树的构建能进行拆分，==最后的commit阶段是不能拆分的，是一气呵成的完成真实DOM的挂载==
+需要明确的一点，只有 **fiber** 树的构建能进行拆分，==最后的 **commit** 阶段是不能拆分的，是一气呵成的完成真实 **DOM** 的挂载==
 

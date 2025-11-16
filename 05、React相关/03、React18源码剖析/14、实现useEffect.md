@@ -2,35 +2,37 @@
 
 ### 一、前言
 
-`useEffect` 和 `useLayoutEffect` 都是 **React** 提供的用于**==处理副作用==**（Side Effect）的 Hook
+`useEffect` 和 `useLayoutEffect` 都是 **React** 提供的用于**==处理「副作用」==**（**Side Effect**）的 **Hook**，**「副作用」**指的是**那些与组件渲染无关的操作**，比如**网络请求**、**DOM 操作**、**定时器设置**等
 
-**==副作用指的是那些与组件渲染无关的操作==**，比如网络请求、DOM 操作、定时器设置等。在类式组件中，通常会将这些操作放在生命周期方法中进行处理，比如 `componentDidMount`、`componentDidUpdate` 和 `componentWillUnmount` 等
+在类式组件中，通常会将这些操作放在生命周期方法中进行处理，比如 `componentDidMount`、`componentDidUpdate` 和 `componentWillUnmount` 等
 
-而在函数式组件中，可以使用 `useEffect` 和 `useLayoutEffect` 来处理副作用。它们的用法类似，都接受两个参数：一个副作用函数和一个依赖数组
+而在函数式组件中，可以使用 `useEffect` 和 `useLayoutEffect` 来处理副作用，它们的用法类似，都接受两个参数：一个**副作用函数**和一个**依赖数组**
 
 虽然 `useEffect` 和 `useLayoutEffect` 都是 **React** 中用于**处理副作用**的钩子函数，它们的**执行时机**和**执行顺序**有所不同
 
-- `useEffect` 的执行时机是在组件渲染完成之后，即 **DOM更新** 之后且**浏览器渲染完成之后**异步执行
-  - 在 `useEffect` 中执行的副作用操作**不会阻塞组件的渲染**，也不会影响用户的交互体验，
+- `useEffect` 的执行时机是在组件渲染完成之后，即 **DOM更新** 之后且**浏览器渲染完成之后**异步执行 <!--离散事件触发的，会同步执行-->
+  - 在 `useEffect` 中执行的副作用操作**不会阻塞组件的渲染**，也不会影响用户的交互体验
   - `useEffect` 常用于数据获取、订阅事件、添加定时器等操作
   - `useEffect` 可以通过第二个参数来指定依赖项数组，当依赖项发生变化时才会执行副作用操作，否则会跳过
 - `useLayoutEffect` 的执行时机是在组件渲染之后，即 **DOM更新** 之后但在**浏览器布局和绘制之前**同步执行
   - 因此，在 `useLayoutEffect` 中执行的副作用操作**会阻塞组件的渲染**，可能会导致页面出现短暂的卡顿
-  - `useLayoutEffect` 常用于进行 **DOM** 操作（例如测量元素尺寸、修改样式等）以及实现一些需要同步更新 **UI** 的功能
+  - `useLayoutEffect` 常用于进行 **DOM** 操作（例如**测量元素尺寸**、**修改样式**等）以及实现一些需要同步更新 **UI** 的功能
   - `useLayoutEffect` 也可以通过第二个参数来指定依赖项数组，当依赖项发生变化时才会执行副作用操作，否则会跳过
 
 由于 `useLayoutEffect` 会在组件渲染完成之后同步执行，因此应该尽量避免在其中进行耗时的操作，以免影响用户体验
 
-另外，由于 `useLayoutEffect` 可能会阻塞组件的渲染，因此在大多数情况下，应该优先考虑使用 `useEffect` 来处理副作用。只有当**必须在浏览器布局和绘制之前执行一些操作时**，才应该使用 `useLayoutEffect`。
+另外，由于 `useLayoutEffect` 可能会阻塞组件的渲染，因此在大多数情况下，应该优先考虑使用 `useEffect` 来处理副作用，只有当**必须在浏览器布局和绘制之前执行一些操作时**，才应该使用 `useLayoutEffect`
 
 下面分别对 `useEffect` 和 `useLayoutEffect` 进行详细介绍：
 
 #### 1.1、useEffect
 
-`useEffect` 可以在函数组件中使用，用于处理副作用。它接受两个参数，第一个参数是一个函数，**==该函数会在组件渲染完成后异步执行==**，用于处理副作用。第二个参数是一个数组，表示该副作用函数所依赖的变量，当这些变量发生变化时，会重新执行副作用函数。
+`useEffect` 可以在函数组件中使用，用于处理副作用，它接受两个参数：
+
+1. 第一个参数是一个函数，**该函数会在组件渲染完成后异步执行**，用于处理副作用
+2. 第二个参数是一个数组，表示该副作用函数所依赖的变量，当这些变量发生变化时，会重新执行副作用函数
 
 ```jsx
-jsxCopy code
 import { useEffect } from 'react';
 
 function MyComponent(props) {
@@ -47,13 +49,13 @@ function MyComponent(props) {
 }
 ```
 
-在上面的例子中，`useEffect` 会在 `props.dependency` 发生变化时重新执行副作用函数。当组件卸载时，还会执行清理函数。
+在上面的例子中，`useEffect` 会在 `props.dependency` 发生变化时重新执行副作用函数，当组件卸载时，还会执行清理函数
 
-需要注意的是，由于 `useEffect` 的执行是异步的，因此如果副作用函数中有需要在渲染后立即执行的操作，可能会出现闪烁或视觉上的不一致。这种情况下，可以考虑使用 `useLayoutEffect`。
+需要注意的是，由于 `useEffect` 的执行是异步的，因此如果副作用函数中有需要在渲染后立即执行的操作，可能会出现闪烁或视觉上的不一致，这种情况下，可以考虑使用 `useLayoutEffect`
 
 #### 1.2、useLayoutEffect
 
-`useLayoutEffect` 的用法与 `useEffect` 类似，不同之处在于它会**==在组件渲染完成后同步执行副作用函数==**。因此，`useLayoutEffect` ==**更适合处理那些需要在渲染后立即执行的操作**==，比如 DOM 操作。
+`useLayoutEffect` 的用法与 `useEffect` 类似，不同之处在于它会**在组件渲染完成后同步执行副作用函数**，因此，`useLayoutEffect` **更适合处理那些需要在渲染后立即执行的操作**，比如 **DOM 操作**
 
 ```jsx
 jsxCopy code
@@ -73,7 +75,11 @@ function MyComponent() {
 
 #### 1.3、eventLoop
 
-下面👇这是一张事件循环的模型图，`useEffect`的副作用函数之所以会是在组件渲染完成后**==异步执行==**，这是因为`useEffect`的副作用函数被放进宏任务队列中了 <!--作为回调入的队-->，等一帧结束之后才能执行；而 `useLayoutEffect`的副作用函数之所以会是在组件渲染完成后同步执行，这是因为`useLayoutEffect`的副作用函数是在React commit阶段之后，立即执行的
+下面👇这是一张事件循环的模型图
+
+`useEffect`的副作用函数之所以会是在组件渲染完成后**==异步执行==**，这是因为`useEffect`的副作用函数被放进宏任务队列中了 <!--作为回调入的队--> 等一帧结束之后才能执行
+
+而 `useLayoutEffect`的副作用函数之所以会是在组件渲染完成后同步执行，这是因为`useLayoutEffect`的副作用函数是在**React commit**阶段之后，立即执行的
 
 <img src="https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/useLayoutEffect.jpg" alt="img" style="zoom:50%;" />
 
@@ -223,7 +229,7 @@ function mountEffectImpl(fiberFlags, hookFlags, create, deps) {
 <!--useEffect 就是 PassiveEffect 消极的副作用，因为是在渲染之后异步完成-->
 
 - 每个 `useEffect hook` 对象上的 `memoizedState` 都指向一个属于自己的 `effect` 对象
-- 每个 `effect` 对象有组成了一个循环链表
+- 每个 `effect` 对象又组成了一个循环链表
 - 函数组件 `fiber` 的 `updateQueue` 的 `lastEffect` 属性，指向 `effect` 链表的最后一项 <!--为何这么设计？可能是因为方便查找出 useEffect-->
 
 ------
@@ -388,7 +394,9 @@ if (rootDoesHavePassiveEffect) {
 scheduleCallback(flushPassiveEffect);
 ```
 
-会开启一个**宏任务**，而 `useEffect` 的副作用函数将则入队到这个宏任务中，接着就会继续执行 `commitRoot` 的逻辑，完成提交阶段；而开启的宏任务则会在页面渲染完成后，再进入主执行栈完成执行，从而实现了 `useEffect` 的副作用函数的异步执行
+会开启一个**宏任务**，而 `useEffect` 的副作用函数将则入队到这个宏任务中，接着就会继续执行 `commitRoot` 的逻辑，完成提交阶段
+
+而开启的宏任务则会在页面渲染完成后，再进入主执行栈完成执行，从而实现了 `useEffect` 的副作用函数的异步执行
 
 ------
 
@@ -720,7 +728,7 @@ function areHookInputsEqual(nextDeps, prevDeps) {
 
   - **若一致**，则构建新的`effect`对象，挂到新`hook`对象的`memoizedState`上
 
-    ⚠️注意新旧`deps`一致时:
+    ⚠️注意，新旧`deps`一致时:
 
     - `effect`的`tag`不包含`HookHasEffect`
     - 没有给`fiber` 添加`PassiveEffect flags`
@@ -741,7 +749,7 @@ function areHookInputsEqual(nextDeps, prevDeps) {
 
 `useEffect`的实现到这里就完成了，看下实现效果👇
 
-JSX
+**JSX**
 
 ```jsx
 function FunctionComponent() {
@@ -883,11 +891,11 @@ function updateLayoutEffect(create, deps) {
 }
 ```
 
-这里的实现复用了 useEffect 的，只是 fiber 的 flag 标识和 effect 的 tag 标识不一样
+这里的实现复用了 `useEffect` 的，只是 `fiber` 的 `flag` 标识和 `effect` 的 `tag` 标识不一样
 
 ------
 
-在 src/react-reconciler/src/ReactFiberWorkLoop.js 中实现 useLayoutEffect 的副作用提交方法
+在 `src/react-reconciler/src/ReactFiberWorkLoop.js` 中实现 `useLayoutEffect` 的副作用提交方法
 
 ```js
 function commitRoot(root) {
@@ -986,7 +994,7 @@ function commitHookLayoutEffects(finishedWork, hookFlags) {
 
 到这里 `useLayoutEffect` 的实现就完成了，看下实现效果👇
 
-JSX
+**JSX**
 
 ```jsx
 function FunctionComponent() {

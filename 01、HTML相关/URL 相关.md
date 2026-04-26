@@ -42,11 +42,9 @@ let url2 = new URL("/path?query=123#section", "https://example.com");
 console.log(url2.href); // 输出: "https://example.com/path?query=123#section"
 ```
 
-------
-
 ### 三、URL 对象的属性
 
-创建 URL 对象后，可以通过其内置属性来访问和操作各部分信息：
+创建 **URL** 对象后，可以通过其内置属性来访问和操作各部分信息：
 
 1. **href**
    - **描述**：整个 URL 的完整字符串表示。
@@ -102,5 +100,49 @@ console.log(url.origin);       // "https://example.com"
 // 操作查询参数
 url.searchParams.set("query", "456");
 console.log(url.href);         // URL 中的查询字符串更新为 "?query=456"
+```
+
+### 四、常见用法
+
+#### 4.1、解析当前网页的 URL
+
+> ```javascript
+> window.location
+> 
+> // 会返回一个对象，包含 URL 的各个部分：
+> {
+>   href: "完整URL",
+>   protocol: "https:",
+>   host: "example.com",
+>   hostname: "example.com",
+>   port: "",
+>   pathname: "/path",
+>   search: "?query=1",
+>   hash: "#hash"
+> }
+> ```
+
+通过 **window** 对象上的 `location.href`  属性可以获取到当前网页的 URL 信息，但 `location.href`  是一个纯字符串，解析很不方便
+
+例如：
+
+```javascript
+window.location.href
+// 返回 https://example.com/path?query=1#hash
+```
+
+若想获取参数，通常会写：
+
+```javascript
+// ❌ 手动解析（容易出错）
+const query = href.split('?')[1]
+```
+
+但使用浏览器内置的 **URL API**，可以自动帮你解析 **URL** 并提供结构化字段和标准方法操作参数
+
+```javascript
+const url = new URL(location.href)
+
+const query = url.searchParams.get('id')
 ```
 

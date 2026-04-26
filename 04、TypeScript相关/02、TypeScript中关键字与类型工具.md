@@ -489,17 +489,19 @@ interface ArrayConstructor {
 
 > 没用过，记录笔记顺便记上的，后面有机会使用的话可以直接来这看
 
-`infer` 最早出现在此 [PR](https://github.com/Microsoft/TypeScript/pull/21496) 中，表示在 `extends` 条件语句中待推断的类型变量。
+`infer` 最早出现在此 [PR](https://github.com/Microsoft/TypeScript/pull/21496) 中，表示在 `extends` 条件语句中待推断的类型变量
 
 简单示例如下：
+
+**==提取函数的参数类型==**
 
 ```ts
 type ParamType<T> = T extends (...args: infer P) => any ? P : T;
 ```
 
-在这个条件语句 `T extends (...args: infer P) => any ? P : T` 中，`infer P` 表示待推断的函数参数。
+在这个条件语句 `T extends (...args: infer P) => any ? P : T` 中，`infer P` 表示待推断的函数参数
 
-整句表示为：如果 `T` 能赋值给 `(...args: infer P) => any`，则结果是 `(...args: infer P) => any` 类型中的参数 `P`，否则返回为 `T`。
+整句表示为：如果 `T` 能赋值给 `(...args: infer P) => any`，则结果是 `(...args: infer P) => any` 类型中的参数 `P`，否则返回为 `T`
 
 ```ts
 interface User {

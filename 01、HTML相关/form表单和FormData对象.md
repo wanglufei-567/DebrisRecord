@@ -14,6 +14,7 @@
     - 适用于普通字符内容提交，提交的数据为纯字符
   - `multipart/form-data`：二进制数据格式
     - 适用于提交的数据为非纯字符，如图片，视频等
+    - ==上传文件时，需要手动指定为`multipart/form-data`，使用默认值`application/x-www-form-urlencoded`会出问题==
   - `text/plain` ： 纯文本提交
 
 `form`标签使用时的注意事项：

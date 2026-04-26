@@ -8,7 +8,7 @@
 
 什么是 **Promise**?
 
-**Promise** 是 JS 中进行异步编程的新的解决方案<!--别的地方看的，记不住-->
+**Promise** 是 **JS** 中进行异步编程的新的解决方案<!--别的地方看的，记不住-->
 
 具体点的说 <!--也是屁话-->
 
@@ -78,8 +78,9 @@ promise.then(result => {
   - 在执行器中直接调用 `resolve()`/`reject()`
   - 延迟更长时间才调用 `then()`
 - **什么时候才能得到数据?** ‼️<!--这个对于实现Promise很重要-->
-- ==如果先指定的回调, 那当状态发生改变时, 回调函数就会调用, 得到数据==
-- ==如果先改变的状态, 那当指定回调时, 回调函数就会调用, 得到数据==
+  - ==如果先指定的回调, 那当状态发生改变时, 回调函数就会调用, 得到数据==
+  - ==如果先改变的状态, 那当指定回调时, 回调函数就会调用, 得到数据==
+
 
 **4、promise.then() 返回的新 promise 的结果状态由什么决定?** ‼️ <!--这个对于链式调用很重要-->
 
@@ -598,7 +599,7 @@ module.exports = MyPromise;
 1. **如果当前 Promise （称为 outerPromise）`resolve` 的值是一个 Promise （称为 innerPromise ）**：
    - 需要等待 **innerPromise** 完成，这个过程会产生额外的微任务（**microtask**），因为 **Promise** 的解析是异步的
    - 解析后的 **innerPromise** 的状态和值会被采用（**adopted**）为 **outerPromise** 的状态和值
-     - 如果被解析的 **Promise** 没有配置 `then` 方法，当前 **Promise** 的 `then` 调用链会被追加到一个默认的 `then` 上
+     - ==如果被解析的 **Promise** 没有配置 `then` 方法，当前 **Promise** 的 `then` 调用链会被追加到一个**默认的 `then`** 上==
 2. **如果 `resolve` 的值不是一个 Promise**：
    - **outerPromise** 的 `then` 调用链会**立即进入微任务队列**
    - 这意味着 **outerPromise** 会被标记为已完成（`fulfilled`），并且 `resolve` 的值会被传递给后续的 `then` 调用
@@ -609,11 +610,10 @@ module.exports = MyPromise;
 
   *  **outerPromise** 的 `then` 调用链是追加到 **innerPromise** 的 `then` 调用链之后
   *  当 **innerPromise** 没有配置 `then` 时，**outerPromise** 的 `then` 调用链并不是直接追加到 **innerPromise** 本身
-     *  而是会给 **innerPromise** 添加一个默认的 `then` 方法 <!--这个默认的 then 会放到队尾-->
-     *  **outerPromise** 的 `then` 调用链是追加到这个默认 `then` 方法上的
+     *  而是会给 **innerPromise** 添加一个 **默认的 `then` 方法** ，==这个**默认的 `then`** 会放到队尾，导致追加在其后的**outerPromise** 的 `then` 调用链加入到微任务队列的时机也都延迟了==
+     *  **outerPromise** 的 `then` 调用链是追加到这个 **默认 `then` 方法** 上的
 
-
-  **innerPromise** 有 `then` 调用链
+==**情况一：**  **innerPromise** 有 `then` 调用链==
 
   ```javascript
   const outerPromise = new Promise((resolve) => {
@@ -653,7 +653,7 @@ promiseOuter2.then.then
 promiseOuter.then promiseInner value3
   ```
 
-  **innerPromise** 没有 `then` 调用链
+==**情况二：**  **innerPromise** 没有 `then` 调用链==
 
 ```javascript
 const promiseOuter = new Promise((resolve) => {
@@ -681,7 +681,7 @@ const promiseOuter2 = Promise.resolve()
 
 打印结果：
 
-<!-- 默认的 then 加入微任务队列的时机要晚于普通 then，所以其是在队尾，从而导致该 then 之后的 then 加入微任务任务队列的时机也延迟了 -->
+==**默认的 `then`** 加入 **微任务队列** 的时机要晚于普通 `then`，所以其是在队尾，从而导致该 `then` 之后的 `then` 加入微任务任务队列的时机也延迟了==
 
 ```markdown
 romiseOuter2.then

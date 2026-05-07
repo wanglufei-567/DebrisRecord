@@ -180,7 +180,7 @@ reader.readAsArrayBuffer(file);
 
 **FileList 接口** 主要用于表示用户从 `<input type="file">` 元素选择的文件，或者通过拖拽操作上传的文件列表
 
-**FileList 实例对象**是一个**只读的类数组对象**（Array-like object），其中存储了若干个 **File** 对象，无法通过 `new FileList()` 手动实例化它，**FileList 实例对象**完全由浏览器在用户触发文件选择或拖拽行为时自动创建并填充
+**FileList 实例对象**是一个**只读的类数组对象**，其中存储了若干个 **File** 对象，无法通过 `new FileList()` 手动实例化它，**FileList 实例对象**完全由浏览器在用户触发文件选择或拖拽行为时自动创建并填充
 
 **使用示例：**
 

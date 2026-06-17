@@ -2,15 +2,12 @@
 
 ### 一、Harness Engineering 是什么
 
-**Harness Engineering** 是围绕 **LLM Agent** 设计的外部工程系统，让模型在**可观测**、**可验证**、**可回滚**、**可持续改进**的边界内行动
+==**Harness Engineering** 是围绕 **LLM Agent** 设计的**外部工程系统**，让模型在**可观测**、**可验证**、**可回滚**、**可持续改进**的边界内行动==
 
 它解决的不是“如何写好一句 **Prompt**”，而是：
 
-- **Agent** 能看到什么上下文
-- **Agent** 能调用什么工具
-- **Agent** 能访问哪些数据、修改哪些文件
-- **Agent** 如何记录任务状态
-- **Agent** 如何验证结果
+- **Agent** 能看到什么上下文、能调用什么工具、能访问哪些数据、能修改哪些文件
+- **Agent** 如何记录任务状态、如何验证结果
 - 失败后如何重试、恢复、回滚
 - 哪些动作必须经过人工批准
 - 哪些规则由测试、类型、权限、沙箱强制执行
@@ -19,9 +16,9 @@
 
 > ==**Agent = Model + Harness**==
 >
-> ==**Model** 提供推理、生成和规划能力==
+> - ==**Model** 提供推理、生成和规划能力==
 >
-> ==**Harness** 提供工具、上下文、状态、权限、验证、反馈和执行边界==
+> - ==**Harness** 提供工具、上下文、状态、权限、验证、反馈和执行边界==
 
 **Harness Engineering** 的核心不是训练一个更听话的模型，而是设计一个让模型难以越界、容易纠错、可以持续产出的工程系统
 
@@ -72,7 +69,7 @@ Prompt Engineering  ⊂  Context Engineering  ⊂  Harness Engineering
 
 这三个环节不是 **Harness** 的全部组件，但构成了最小可用闭环
 
-#### 1. 上下文管理
+#### 3.1、上下文管理
 
 目标：让 **Agent** 在行动前看到正确、足够、不过载的信息
 
@@ -86,7 +83,7 @@ Prompt Engineering  ⊂  Context Engineering  ⊂  Harness Engineering
 
 判断标准：**Agent** 不需要反复猜项目结构，也不会因为上下文过多而忽略关键约束
 
-#### 2. 验证与反馈
+#### 3.2、 验证与反馈
 
 目标：把 **Agent** 的输出转化为可判定、可追踪、可修复的反馈信号
 
@@ -100,9 +97,9 @@ Prompt Engineering  ⊂  Context Engineering  ⊂  Harness Engineering
 
 判断标准：**Agent** 不能只说“完成了”，必须用测试、日志、截图、指标或审查结果证明完成
 
-#### 3. 技术债清理
+#### 3.3、 技术债清理
 
-目标：把验证阶段暴露的问题沉淀为结构改进，而不是只修一次表面错误
+目标：==把验证阶段暴露的问题沉淀为结构改进，而不是只修一次表面错误==
 
 典型做法：
 
@@ -112,7 +109,7 @@ Prompt Engineering  ⊂  Context Engineering  ⊂  Harness Engineering
 - 复盘失败样本，更新 **Prompt**、上下文组织、工具描述和评估集
 - 定期安排后台 **Agent** 或人工任务处理技术债
 
-判断标准：同类错误下一次更难发生，系统不会因为 **Agent** 的高产出而快速积累混乱
+判断标准：==同类错误下一次更难发生，系统不会因为 **Agent** 的高产出而快速积累混乱==
 
 技术债清理尤其要关注“依赖方向”，例如编码 **Agent** 场景中常见的分层：
 
@@ -120,29 +117,25 @@ Prompt Engineering  ⊂  Context Engineering  ⊂  Harness Engineering
 UI → Runtime → Service → Repo → Config → Types
 ```
 
-合理方向是上层依赖下层，不能让下层反向感知上层
+合理方向是上层依赖下层，不能让下层反向感知上层，例如：
 
-- 例如 **UI** 可以调用 **Runtime** 或 **Service**，**Service** 可以调用 **Repo**，但 **Repo** 不应该感知页面交互，**Types** 不应该依赖业务实现
+-  **UI** 可以调用 **Runtime** 或 **Service**，**Service** 可以调用 **Repo**，但 **Repo** 不应该感知页面交互，**Types** 不应该依赖业务实现
 
 因此，**Harness** 需要把架构边界变成可验证规则：
 
 - 用架构测试或 **Lint** 禁止反向依赖
 - 用模块边界规则限制跨层 **import**
 - 用类型契约固定层间输入输出
-- 在 **CI** 和 **Review** 中检查 UI 修复是否污染 **Service**、**Repo**、**Types**
+- 在 **CI** 和 **Review** 中检查 **UI** 修复是否污染 **Service**、**Repo**、**Types**
 - 把常见违规模式写进 `AGENTS.md` 或仓库规则
+
+#### 3.4、小结
 
 这套闭环的关键是：
 
-- **上下文管理** 决定 **Agent** 做事前知道什么
-- **验证与反馈** 决定 **Agent** 做事后如何知道对错
-- **技术债清理** 决定系统能否把一次错误转化为长期改进
-
-如果只做上下文管理，**Agent** 仍可能自信地做错
-
-如果只做验证，团队会反复修同类问题
-
-如果只做技术债清理，但没有上下文管理，**Agent** 仍会在错误信息结构里工作
+- **上下文管理**： 决定 **Agent** 做事前知道什么
+- **验证与反馈**：决定 **Agent** 做事后如何知道对错
+- **技术债清理**：决定系统能否把一次错误转化为长期改进
 
 ### 四、OpenAI 的实战：Agent-first 软件工程
 
@@ -201,7 +194,7 @@ UI → Runtime → Service → Repo → Config → Types
 
 第一步让 **Agent** 能“接着做”，第二步让 **Agent** 能“按正确标准做”
 
-#### 1. 跨会话交接：Initializer + Coding Agent
+#### 5.1、跨会话交接：Initializer + Coding Agent
 
 [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) 讨论的是长任务的基础问题：上下文窗口有限，每个新会话都可能像“失忆的新工程师”一样重新开始
 
@@ -235,7 +228,7 @@ UI → Runtime → Service → Repo → Config → Types
 
 这套设计的本质是：把上下文窗口里的隐性状态，转成下一轮 **Agent** 可读取的显式事实
 
-#### 2. 分阶段控制：Planner + Generator + Evaluator
+#### 5.2、 分阶段控制：Planner + Generator + Evaluator
 
 [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) 是在第一步基础上的升级：有了进度文件、功能清单和端到端验证后，仍然会出现需求理解偏差、自我评估偏宽、实现质量不稳定
 
@@ -265,13 +258,13 @@ UI → Runtime → Service → Repo → Config → Types
 
 这能降低长任务 **Agent** 的常见风险：模型投入大量上下文和行动成本后，容易倾向于认为“差不多完成了”
 
-所以，Anthropic 的演进不是“多设计几个 Agent 角色”，而是从“解决上下文断裂”推进到“解决质量判断断裂”
+所以，**Anthropic** 的演进不是“多设计几个 **Agent** 角色”，而是从“解决上下文断裂”推进到“解决质量判断断裂”
 
 - 第一篇的核心是 **状态连续性**
 - 第二篇的核心是 **评估独立性**
-- 两者共同目标是让长任务 Agent 从“能继续做”走向“能可靠做完”
+- 两者共同目标是让长任务 **Agent** 从“能继续做”走向“能可靠做完”
 
-#### 3. 运行时边界：Session / Harness / Sandbox
+#### 5.3、运行时边界：Session / Harness / Sandbox
 
 **Anthropic** 的 **Managed Agents** 实践进一步把系统拆成三个接口：
 
@@ -335,17 +328,16 @@ UI → Runtime → Service → Repo → Config → Types
 
 模型能力越弱，**Harness** 越厚：
 
-- 需要更详细的 **Prompt**
-- 需要更多结构化上下文
-- 需要更细的任务拆解
-- 需要更多检查点、评估器和人工审批
-- 需要更严格的沙箱和权限边界
+- 更详细的 **Prompt**
+
+- 更细的任务拆解
+- 更多检查点、评估器和人工审批
+- 更严格的沙箱和权限边界
 
 模型能力越强，**Harness** 会变薄：
 
 - 一些显式流程会被模型内化
 - 一些固定规则会变成模型默认能力
-- 一些中间 **Agent** 角色会合并
 - 一些低风险任务可以减少人工审批
 - 上下文压缩、计划维护、错误恢复会更自动化
 

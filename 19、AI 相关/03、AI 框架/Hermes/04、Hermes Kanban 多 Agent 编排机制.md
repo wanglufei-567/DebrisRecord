@@ -1,4 +1,4 @@
-## **Hermes Kanban**：从 **Chat** 到后台多 **Agent** 任务流
+## Hermes Kanban 多 Agent 编排机制
 
 ### 一、前言
 

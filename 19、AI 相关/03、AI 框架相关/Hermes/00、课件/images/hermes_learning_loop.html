@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hermes Learning Loop：执行经验怎样改变未来行为</title>
+  <link rel="stylesheet" href="./hermes_diagram_theme.css">
+  <style>
+    html, body, .artboard { width: 1000px; height: 670px; }
+
+    .zone {
+      position: absolute;
+      left: 40px;
+      top: 112px;
+      width: 920px;
+      height: 360px;
+      border: 1.5px solid var(--purple-soft);
+      border-radius: 17px;
+      background: rgba(245, 243, 255, 0.46);
+    }
+
+    .zone-label {
+      position: absolute;
+      left: 18px;
+      top: 14px;
+      color: #6d28d9;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .connections {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    .loop-node {
+      position: absolute;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 94px;
+      padding: 13px;
+      border: 1.6px solid var(--color);
+      border-radius: 11px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .loop-node h2 {
+      margin: 0 0 5px;
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.2;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .loop-node p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .evidence { left: 64px; top: 168px; width: 185px; --color: var(--blue); }
+    .select { left: 279px; top: 168px; width: 186px; --color: var(--orange); }
+    .deposit { left: 495px; top: 168px; width: 170px; --color: var(--purple); }
+    .maintain { left: 695px; top: 168px; width: 240px; --color: var(--purple); }
+    .consume { left: 719px; top: 356px; width: 200px; --color: var(--green); }
+    .execute { left: 499px; top: 356px; width: 170px; --color: var(--green); }
+    .correct { left: 265px; top: 356px; width: 184px; --color: var(--orange); }
+
+    .curator-limit {
+      position: absolute;
+      z-index: 2;
+      left: 710px;
+      top: 280px;
+      width: 210px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #7c2d12;
+      font-size: 13.5px;
+      font-weight: 650;
+    }
+
+    .inputs-title {
+      position: absolute;
+      left: 40px;
+      top: 498px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .input-card {
+      position: absolute;
+      z-index: 2;
+      top: 532px;
+      height: 90px;
+      padding: 14px 17px;
+      border: 1.5px solid var(--color);
+      border-radius: 11px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .input-card h3 {
+      margin: 0 0 5px;
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .input-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .reviewer { left: 210px; width: 294px; --color: var(--blue); }
+    .ground-truth { left: 522px; width: 270px; --color: var(--green); }
+
+    .input-tag {
+      position: absolute;
+      right: 15px;
+      top: 13px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--wash);
+      color: var(--color);
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    .reviewer { --wash: var(--blue-wash); }
+    .ground-truth { --wash: var(--green-wash); }
+
+    .risk-contrast {
+      position: absolute;
+      z-index: 2;
+      left: 64px;
+      top: 292px;
+      width: 230px;
+      color: var(--text);
+      font-size: 13.5px;
+      line-height: 1.4;
+      display: grid;
+      gap: 6px;
+    }
+
+    .risk-row {
+      display: grid;
+      grid-template-columns: 58px 18px 1fr;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .risk-kind { color: var(--muted); }
+    .risk-arrow { color: var(--orange); font-weight: 750; text-align: center; }
+    .risk-row strong { color: #334155; font-weight: 700; }
+    .risk-row:last-child strong { color: #7c2d12; }
+  </style>
+</head>
+<body>
+  <main class="artboard" aria-label="Hermes Learning Loop">
+    <h1 class="diagram-title">Learning Loop：执行经验怎样改变未来行为</h1>
+    <p class="diagram-subtitle">自进化不是自动多一个文件，而是证据经过选择、治理、再消费与修正后改变未来行动</p>
+
+    <section class="zone">
+      <div class="zone-label">知识与行为策略层的可审计循环</div>
+    </section>
+
+    <svg class="connections" width="1000" height="670" aria-hidden="true">
+      <defs>
+        <marker id="arrow" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+        </marker>
+        <marker id="feedback-arrow" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+        </marker>
+      </defs>
+      <path d="M249 215 H279" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <path d="M465 215 H495" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <path d="M665 215 H695" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <path d="M935 215 H950 V403 H919" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <path d="M719 403 H669" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <path d="M499 403 H449" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#feedback-arrow)"/>
+      <path d="M357 356 V290 H580 V272" fill="none" stroke="#059669" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M573 272 L580 262 L587 272 Z" fill="#059669"/>
+      <path d="M815 262 V276" fill="none" stroke="#fb923c" stroke-width="1.8"/>
+      <circle cx="815" cy="276" r="3.5" fill="#fb923c"/>
+      <path d="M357 532 V450" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#feedback-arrow)"/>
+      <path d="M657 532 V486 H402 V450" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#feedback-arrow)"/>
+    </svg>
+
+    <section class="loop-node evidence">
+      <h2>Session 执行证据</h2>
+      <p>结果、失败与用户纠正</p>
+    </section>
+    <section class="loop-node select">
+      <h2>Agent 选择</h2>
+      <p>区分临时状态与稳定内容</p>
+    </section>
+    <section class="loop-node deposit">
+      <h2>Memory / Skill</h2>
+      <p>事实进入 Memory<br>方法进入 Skill</p>
+    </section>
+    <section class="loop-node maintain">
+      <h2>skill_manage / Curator</h2>
+      <p>修补、合并、归档与生命周期治理</p>
+    </section>
+    <section class="loop-node consume">
+      <h2>新 Session 再消费</h2>
+      <p>沉淀重新进入 Context</p>
+    </section>
+    <section class="loop-node execute">
+      <h2>真实执行</h2>
+      <p>新结果继续暴露问题</p>
+    </section>
+    <section class="loop-node correct">
+      <h2>修正与归因</h2>
+      <p>把新证据关联到具体沉淀</p>
+    </section>
+
+    <div class="curator-limit">治理活跃度 ≠ 校验正确性</div>
+    <div class="risk-contrast">
+      <div class="risk-row"><span class="risk-kind">执行错误</span><span class="risk-arrow">→</span><strong>影响当次结果</strong></div>
+      <div class="risk-row"><span class="risk-kind">错误沉淀</span><span class="risk-arrow">→</span><strong>反复误导后续判断</strong></div>
+    </div>
+
+    <div class="inputs-title">修正能够成立，需要两种独立性</div>
+    <section class="input-card reviewer">
+      <span class="input-tag">评审独立性</span>
+      <h3>独立评审主体</h3>
+      <p>降低写入者偏见，发现重复、过时与漂移</p>
+    </section>
+    <section class="input-card ground-truth">
+      <span class="input-tag">证据独立性</span>
+      <h3>真实失败 / 用户纠正</h3>
+      <p>提供模型自产知识之外的地面真值</p>
+    </section>
+  </main>
+</body>
+</html>

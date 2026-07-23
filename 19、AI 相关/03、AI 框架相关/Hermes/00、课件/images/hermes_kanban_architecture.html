@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hermes Kanban：控制面、状态面与执行面</title>
+  <link rel="stylesheet" href="./hermes_diagram_theme.css">
+  <style>
+    html, body, .artboard { width: 1000px; height: 680px; }
+
+    .lane {
+      position: absolute;
+      left: 40px;
+      width: 920px;
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      background: var(--wash);
+    }
+
+    .control-lane { top: 106px; height: 116px; --border: #bfdbfe; --wash: rgba(239, 246, 255, 0.72); }
+    .state-lane { top: 240px; height: 198px; --border: #a7f3d0; --wash: rgba(236, 253, 245, 0.72); }
+    .execution-lane { top: 456px; height: 168px; --border: #ddd6fe; --wash: rgba(245, 243, 255, 0.7); }
+
+    .lane-label {
+      position: absolute;
+      left: 18px;
+      top: 14px;
+      color: var(--lane-color);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .control-lane { --lane-color: #1d4ed8; }
+    .state-lane { --lane-color: #047857; }
+    .execution-lane { --lane-color: #6d28d9; }
+
+    .lane-note {
+      position: absolute;
+      left: 94px;
+      top: 16px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .state-lane .lane-note { left: 76px; }
+    .execution-lane .lane-note { left: 150px; top: 10px; }
+
+    .control-nodes {
+      position: absolute;
+      left: 185px;
+      top: 40px;
+      display: grid;
+      grid-template-columns: repeat(4, 155px);
+      gap: 28px;
+    }
+
+    .control-node,
+    .worker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.4px solid var(--blue);
+      border-radius: 10px;
+      background: #fff;
+      color: #334155;
+      font-size: 14px;
+      font-weight: 650;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.05);
+    }
+
+    .control-node { height: 52px; }
+
+    .board {
+      position: absolute;
+      left: 80px;
+      top: 52px;
+      width: 330px;
+      height: 112px;
+      padding: 17px 20px;
+      border: 2px solid var(--green);
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .board h2,
+    .dispatcher h2 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .board p,
+    .dispatcher p {
+      margin: 0;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .truth-tag {
+      position: absolute;
+      right: 16px;
+      top: 15px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--green-wash);
+      color: #047857;
+      font-size: 12.5px;
+      font-weight: 750;
+    }
+
+    .dispatcher {
+      position: absolute;
+      left: 535px;
+      top: 62px;
+      width: 300px;
+      height: 92px;
+      padding: 15px 18px;
+      border: 1.7px solid #14b8a6;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .workers {
+      position: absolute;
+      left: 180px;
+      top: 58px;
+      display: grid;
+      grid-template-columns: repeat(3, 190px);
+      gap: 52px;
+    }
+
+    .worker {
+      height: 62px;
+      border-color: var(--purple);
+      line-height: 1.35;
+    }
+
+    .execution-note {
+      position: absolute;
+      left: auto;
+      right: 18px;
+      top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .connections {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .anchor {
+      position: absolute;
+      left: 205px;
+      right: 205px;
+      bottom: 22px;
+      color: #334155;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .anchor strong { color: #047857; }
+
+    .flow-label {
+      position: absolute;
+      z-index: 4;
+      padding: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .label-claim { left: 455px; top: 326px; color: #475569; }
+    .label-spawn { left: 623px; top: 413px; color: #6d28d9; }
+    .label-writeback { left: 442px; top: 598px; color: #047857; }
+  </style>
+</head>
+<body>
+  <main class="artboard" aria-label="Hermes Kanban 三层架构">
+    <h1 class="diagram-title">Kanban：控制面、状态面与执行面</h1>
+    <p class="diagram-subtitle">持久 Board 保存唯一任务真值，Dispatcher 据此调度，Profile Worker 完成一次真实执行</p>
+
+    <section class="lane control-lane">
+      <div class="lane-label">控制面</div>
+      <div class="lane-note">创建、查看和干预任务</div>
+      <div class="control-nodes">
+        <div class="control-node">CLI</div>
+        <div class="control-node">Gateway</div>
+        <div class="control-node">Dashboard</div>
+        <div class="control-node">Model Tool</div>
+      </div>
+    </section>
+
+    <section class="lane state-lane">
+      <div class="lane-label">状态面</div>
+      <div class="lane-note">持久任务真值与调度语义</div>
+      <div class="board">
+        <span class="truth-tag">唯一任务真值</span>
+        <h2>Kanban Board</h2>
+        <p>Task · Link · Run · Comment · Artifact</p>
+        <p>SQLite kanban.db · 原子状态更新</p>
+      </div>
+      <div class="dispatcher">
+        <h2>Dispatcher</h2>
+        <p>依赖推进 · 原子 claim · 超时回收</p>
+        <p>按 assignee 启动对应 Profile Worker</p>
+      </div>
+    </section>
+
+    <section class="lane execution-lane">
+      <div class="lane-label">执行面</div>
+      <div class="lane-note">读取任务、调用工具并产出交接结果</div>
+      <div class="workers">
+        <div class="worker">Profile Worker A<br>一次 Process</div>
+        <div class="worker">Profile Worker B<br>一次 Process</div>
+        <div class="worker">Profile Worker C<br>一次 Process</div>
+      </div>
+      <div class="execution-note">Profile = 身份模板 · Process = 一次执行</div>
+    </section>
+
+    <svg class="connections" width="1000" height="680" aria-hidden="true">
+      <defs>
+        <marker id="arrow-dark" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+        </marker>
+        <marker id="arrow-green" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+        </marker>
+        <marker id="arrow-purple" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/>
+        </marker>
+      </defs>
+      <path d="M303 200 V214 M486 200 V214 M669 200 V214 M852 200 V214 M303 214 H852" fill="none" stroke="#334155" stroke-width="1.7"/>
+      <path d="M303 214 H285 V292" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow-dark)"/>
+      <path d="M450 348 H575" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow-dark)"/>
+      <path d="M725 394 V446 H557 V500 M315 500 H799" fill="none" stroke="#7c3aed" stroke-width="1.9"/>
+      <path d="M315 500 V514" fill="none" stroke="#7c3aed" stroke-width="1.9" marker-end="url(#arrow-purple)"/>
+      <path d="M557 500 V514" fill="none" stroke="#7c3aed" stroke-width="1.9" marker-end="url(#arrow-purple)"/>
+      <path d="M799 500 V514" fill="none" stroke="#7c3aed" stroke-width="1.9" marker-end="url(#arrow-purple)"/>
+      <path d="M315 576 V594" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+      <path d="M557 576 V594" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+      <path d="M799 576 V594" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+      <path d="M315 594 H799 M315 594 H165 V404" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+    </svg>
+
+    <div class="flow-label label-claim">读取真值 / 原子更新</div>
+    <div class="flow-label label-spawn">spawn</div>
+    <div class="flow-label label-writeback">Run / Comment / Artifact 回写 Board</div>
+
+    <div class="anchor">协作通过 <strong>Board</strong> 流转，不依赖 Worker 之间直接通信</div>
+  </main>
+</body>
+</html>

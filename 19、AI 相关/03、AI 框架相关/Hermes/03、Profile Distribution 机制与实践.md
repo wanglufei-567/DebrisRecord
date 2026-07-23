@@ -351,7 +351,14 @@ agent 可见 MCP tools
 
 ### 八、**L4** 本机数据机制
 
-**Profile Source** 是 **L3**，用户机器上产生的数据是 **L4**
+本文中的 **L3 / L4** 是用于说明部署和隐私边界的项目级解释模型，不是 **Hermes** 官方定义的固定等级
+
+- **L3** 表示由 **Profile Source** 管理、可版本化并随 **Profile Distribution** 交付的能力与知识资产
+- **L4** 表示由用户或 **Runtime** 拥有、不应被 **Install / Update** 流程覆盖的本机状态
+
+资产属于 **L3** 还是 **L4**，应根据所有权、复用范围和发布生命周期判断，不能根据它最初在哪台机器上创建判断
+
+本示例中的 `local/profile-demo/` 保存用户与运行时数据，因此属于 **L4**
 
 ```text
 ~/.hermes/profiles/hermes-profile-demo/local/profile-demo/

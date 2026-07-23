@@ -31,6 +31,34 @@ hermes dashboard --status
 hermes dashboard --stop
 ```
 
+### Gateway 日常管理
+
+```bash
+# 首次配置 Telegram、Discord、Slack 等消息平台
+hermes gateway setup
+
+# 在前台运行 Gateway，适合本地调试或查看实时日志
+hermes gateway run
+
+# 将 Gateway 安装为当前用户的后台服务，通常只需执行一次
+hermes gateway install
+
+# 启动已安装的后台服务
+hermes gateway start
+
+# 查看运行状态
+hermes gateway status
+
+# 配置变更后重启服务
+hermes gateway restart
+
+# 停止后台服务
+hermes gateway stop
+
+# 查看所有 Profile 的 Gateway 状态
+hermes gateway list
+```
+
 ### 配置、模型与认证
 
 ```bash
@@ -76,6 +104,43 @@ hermes profile update <profile_name> -y
 
 # 更新 Profile 时连 config.yaml 也覆盖，只有确定要丢弃本地配置覆盖时再用
 hermes profile update <profile_name> --force-config -y
+```
+
+### Kanban 任务板
+
+**Kanban** 适合需要持久保存、跨 **Profile** 协作或支持失败后恢复的任务，后台分发依赖正在运行的 **Gateway**
+
+```bash
+# 初始化默认任务板，命令可重复执行
+hermes kanban init
+
+# 查看当前任务板和所有任务板
+hermes kanban boards current
+hermes kanban boards list
+
+# 创建任务并指定执行该任务的 Profile
+hermes kanban create "检查认证模块的高风险问题" --assignee <profile_name>
+
+# 查看任务列表和单个任务详情
+hermes kanban list
+hermes kanban show <task_id>
+
+# 将任务改派给另一个 Profile
+hermes kanban assign <task_id> <profile_name>
+
+# 追加任务备注
+hermes kanban comment <task_id> "已补充验收条件"
+
+# 标记完成，并保存结果摘要
+hermes kanban complete <task_id> --result "已完成检查并输出风险清单"
+
+# 任务需要人工输入时先阻塞，条件满足后再解除
+hermes kanban block <task_id> "需要确认生产环境配置" --kind needs_input
+hermes kanban unblock <task_id>
+
+# 实时查看任务事件，或查看状态统计
+hermes kanban watch
+hermes kanban stats
 ```
 
 ### Skill、Tool 与 MCP

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 620" width="980" height="620" font-family="-apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif">
+  <defs>
+    <marker id="a2" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#4A6A85"/>
+    </marker>
+    <marker id="a2r" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#9C4A3C"/>
+    </marker>
+  </defs>
+
+  <text x="40" y="46" font-size="21" font-weight="600" fill="#1F2933">Memory Engine 的五问，以及其中两问为什么悬空</text>
+  <text x="40" y="72" font-size="14" fill="#6B7A88">纠错与归属所需的输入天然不在 Engine 里，这是控制权必须上移的理由</text>
+
+  <!-- Memory OS band -->
+  <rect x="560" y="112" width="380" height="96" rx="10" fill="#D6E4F0" stroke="#2C5F8A" stroke-width="1.8"/>
+  <text x="582" y="142" font-size="16" font-weight="600" fill="#1F2933">Memory OS</text>
+  <text x="582" y="166" font-size="12.5" fill="#3E4C59">Manager　持续执行写入、召回与生命周期策略</text>
+  <text x="582" y="188" font-size="12.5" fill="#3E4C59">Interface　送入目标、Scope 与运行结果</text>
+
+  <!-- external evidence -->
+  <rect x="40" y="112" width="380" height="96" rx="10" fill="#F2EDE6" stroke="#A07B54" stroke-width="1.5"/>
+  <text x="62" y="142" font-size="16" font-weight="600" fill="#1F2933">系统外的独立证据</text>
+  <text x="62" y="166" font-size="12.5" fill="#3E4C59">确定性校验　真实执行失败　用户纠正</text>
+  <text x="62" y="188" font-size="12.5" fill="#9C4A3C">模型复核不算独立证据，与被检对象同源</text>
+
+  <!-- Engine container (covers only first three) -->
+  <rect x="40" y="286" width="530" height="182" rx="12" fill="#E9F0F6" stroke="#4A7EA6" stroke-width="1.8"/>
+  <text x="62" y="312" font-size="15" font-weight="600" fill="#2C5F8A">Memory Engine 内部可以闭合</text>
+
+  <!-- three closed questions -->
+  <rect x="62" y="330" width="152" height="116" rx="8" fill="#FFFFFF" stroke="#4A7EA6" stroke-width="1.3"/>
+  <text x="138" y="358" font-size="16" font-weight="600" fill="#1F2933" text-anchor="middle">选择</text>
+  <text x="138" y="384" font-size="11.5" fill="#6B7A88" text-anchor="middle">什么进入记忆</text>
+  <text x="138" y="410" font-size="11" fill="#9C4A3C" text-anchor="middle">漏写不产生</text>
+  <text x="138" y="428" font-size="11" fill="#9C4A3C" text-anchor="middle">任何信号</text>
+
+  <rect x="230" y="330" width="152" height="116" rx="8" fill="#FFFFFF" stroke="#4A7EA6" stroke-width="1.3"/>
+  <text x="306" y="358" font-size="16" font-weight="600" fill="#1F2933" text-anchor="middle">时效</text>
+  <text x="306" y="384" font-size="11.5" fill="#6B7A88" text-anchor="middle">什么现在还成立</text>
+  <text x="306" y="410" font-size="11" fill="#9C4A3C" text-anchor="middle">矛盾要结构化</text>
+  <text x="306" y="428" font-size="11" fill="#9C4A3C" text-anchor="middle">才检测得到</text>
+
+  <rect x="398" y="330" width="152" height="116" rx="8" fill="#FFFFFF" stroke="#4A7EA6" stroke-width="1.3"/>
+  <text x="474" y="358" font-size="16" font-weight="600" fill="#1F2933" text-anchor="middle">召回</text>
+  <text x="474" y="384" font-size="11.5" fill="#6B7A88" text-anchor="middle">这次该取回什么</text>
+  <text x="474" y="410" font-size="11" fill="#9C4A3C" text-anchor="middle">相关 ≠ 有效</text>
+  <text x="474" y="428" font-size="11" fill="#9C4A3C" text-anchor="middle">≠ 可信</text>
+
+  <!-- two suspended questions, outside the container -->
+  <rect x="606" y="330" width="152" height="116" rx="8" fill="#FBF4F2" stroke="#9C4A3C" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="682" y="358" font-size="16" font-weight="600" fill="#1F2933" text-anchor="middle">纠错</text>
+  <text x="682" y="384" font-size="11.5" fill="#6B7A88" text-anchor="middle">错了怎么办</text>
+  <text x="682" y="412" font-size="11" fill="#9C4A3C" text-anchor="middle">需要外部证据</text>
+  <text x="682" y="430" font-size="11" fill="#9C4A3C" text-anchor="middle">Engine 产不出</text>
+
+  <rect x="776" y="330" width="152" height="116" rx="8" fill="#FBF4F2" stroke="#9C4A3C" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="852" y="358" font-size="16" font-weight="600" fill="#1F2933" text-anchor="middle">归属</text>
+  <text x="852" y="384" font-size="11.5" fill="#6B7A88" text-anchor="middle">这条在哪儿成立</text>
+  <text x="852" y="412" font-size="11" fill="#9C4A3C" text-anchor="middle">目标与边界由</text>
+  <text x="852" y="430" font-size="11" fill="#9C4A3C" text-anchor="middle">调用方决定</text>
+
+  <text x="767" y="312" font-size="15" font-weight="600" fill="#9C4A3C" text-anchor="middle">Engine 闭合不了</text>
+
+  <!-- arrows: evidence -> 纠错 -->
+  <path d="M230 208 L230 250 Q230 264 246 264 L666 264 Q682 264 682 278 L682 322" fill="none" stroke="#9C4A3C" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#a2r)"/>
+  <!-- arrows: OS -> 归属 -->
+  <path d="M812 208 L812 250 Q812 264 828 264 L836 264 Q852 264 852 278 L852 322" fill="none" stroke="#4A6A85" stroke-width="1.8" marker-end="url(#a2)"/>
+
+  <!-- bottom conclusion -->
+  <rect x="40" y="506" width="900" height="70" rx="8" fill="#F5F7F9" stroke="#C6D0D9" stroke-width="1.2"/>
+  <text x="62" y="534" font-size="13.5" fill="#3E4C59">Engine 做得再好，纠错与归属都悬空　它们悬空不是因为实现不够强，是因为所需的输入天然不在 Engine 里</text>
+  <text x="62" y="560" font-size="13.5" font-weight="600" fill="#2C5F8A">于是压力从「记忆怎样处理」变成「谁来持续决定」——这就是 Engine → OS 这一跳的理由</text>
+</svg>

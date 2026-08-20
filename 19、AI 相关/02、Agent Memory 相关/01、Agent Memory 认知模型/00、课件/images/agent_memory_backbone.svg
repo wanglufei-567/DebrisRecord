@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 660" width="980" height="660" font-family="-apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif">
+  <defs>
+    <marker id="arw" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#4A6A85"/>
+    </marker>
+    <marker id="arwGhost" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#9AA7B1"/>
+    </marker>
+  </defs>
+
+  <text x="40" y="46" font-size="21" font-weight="600" fill="#1F2933">Agent Memory 责任升级的三跳</text>
+  <text x="40" y="72" font-size="14" fill="#6B7A88">后一级的责任集包含前一级，但每一跳的性质各不相同</text>
+
+  <!-- Memory Store -->
+  <rect x="50" y="452" width="300" height="150" rx="10" fill="#EDF1F5" stroke="#7C8B99" stroke-width="1.5"/>
+  <text x="70" y="482" font-size="17" font-weight="600" fill="#1F2933">Memory Store</text>
+  <text x="70" y="508" font-size="13" fill="#3E4C59">承担　让信息跨进程、跨会话留下</text>
+  <text x="70" y="530" font-size="13" fill="#8A5A3B">承担不了　存量增加，正确性不随之增加</text>
+  <line x1="70" y1="546" x2="330" y2="546" stroke="#C6D0D9" stroke-width="1"/>
+  <text x="70" y="568" font-size="12" fill="#6B7A88">代价　近乎为零</text>
+  <text x="70" y="588" font-size="12" fill="#6B7A88">所以任何系统至少都到这一级</text>
+
+  <!-- Memory Engine -->
+  <rect x="340" y="268" width="300" height="150" rx="10" fill="#E2EBF3" stroke="#4A7EA6" stroke-width="1.5"/>
+  <text x="360" y="298" font-size="17" font-weight="600" fill="#1F2933">Memory Engine</text>
+  <text x="360" y="324" font-size="13" fill="#3E4C59">承担　选择、时效、召回、纠错、归属</text>
+  <text x="360" y="346" font-size="13" fill="#8A5A3B">承担不了　它是被调用的，决策不在它手里</text>
+  <line x1="360" y1="362" x2="620" y2="362" stroke="#B9CBDB" stroke-width="1"/>
+  <text x="360" y="384" font-size="12" fill="#6B7A88">代价　引入一个会自己出错的组件</text>
+  <text x="360" y="404" font-size="12" fill="#6B7A88">且它的错误比 Store 的更难发现</text>
+
+  <!-- Memory OS -->
+  <rect x="630" y="84" width="300" height="150" rx="10" fill="#D6E4F0" stroke="#2C5F8A" stroke-width="1.8"/>
+  <text x="650" y="114" font-size="17" font-weight="600" fill="#1F2933">Memory OS</text>
+  <text x="650" y="140" font-size="13" fill="#3E4C59">承担　接管跨时间连续性</text>
+  <text x="650" y="162" font-size="13" fill="#8A5A3B">承担不了　多种记忆形态之间的调度</text>
+  <line x1="650" y1="178" x2="910" y2="178" stroke="#A8C0D6" stroke-width="1"/>
+  <text x="650" y="200" font-size="12" fill="#6B7A88">代价　Agent 让渡连续性控制权</text>
+  <text x="650" y="220" font-size="12" fill="#9C4A3C" font-weight="600">判断错时没有旁路</text>
+
+  <!-- jump 1 -->
+  <path d="M350 470 L340 470 Q325 470 325 452 L325 360 Q325 342 340 342 L336 342" fill="none" stroke="#4A6A85" stroke-width="2" marker-end="url(#arw)"/>
+  <rect x="120" y="392" width="196" height="52" rx="6" fill="#FFFFFF" stroke="#4A6A85" stroke-width="1.2"/>
+  <text x="218" y="414" font-size="15" font-weight="600" fill="#2C5F8A" text-anchor="middle">增能力</text>
+  <text x="218" y="434" font-size="11.5" fill="#6B7A88" text-anchor="middle">可增量交付，做一半也能用</text>
+
+  <!-- jump 2 -->
+  <path d="M640 286 L630 286 Q615 286 615 268 L615 176 Q615 158 630 158 L626 158" fill="none" stroke="#4A6A85" stroke-width="2" marker-end="url(#arw)"/>
+  <rect x="404" y="208" width="200" height="52" rx="6" fill="#FFFFFF" stroke="#4A6A85" stroke-width="1.2"/>
+  <text x="504" y="230" font-size="15" font-weight="600" fill="#2C5F8A" text-anchor="middle">转控制</text>
+  <text x="504" y="250" font-size="11.5" fill="#6B7A88" text-anchor="middle">收得不全，等于没收</text>
+
+  <!-- enhanced OS ghost -->
+  <rect x="630" y="-2" width="300" height="0" fill="none"/>
+  <path d="M780 84 L780 66" fill="none" stroke="#9AA7B1" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arwGhost)"/>
+  <text x="795" y="60" font-size="12" fill="#9AA7B1">扩对象 → 增强型 Memory OS</text>
+
+  <!-- bottom key line -->
+  <rect x="50" y="622" width="880" height="0" fill="none"/>
+  <text x="50" y="640" font-size="13.5" font-weight="600" fill="#2C5F8A">增能力 → 转控制 → 扩对象　　这是任何东西被基础设施化的一般路径，不是记忆域独有</text>
+</svg>

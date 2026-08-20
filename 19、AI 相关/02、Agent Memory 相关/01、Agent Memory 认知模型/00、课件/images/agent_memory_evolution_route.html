@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Memory 技术路线：问题推动责任上移</title>
+  <link rel="stylesheet" href="./agent_memory_diagram_theme.css">
+  <style>
+    html, body, .artboard { width: 1000px; height: 650px; }
+
+    .route-note {
+      position: absolute;
+      left: 40px;
+      right: 40px;
+      top: 100px;
+      padding: 11px 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,.86);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .route-note strong { color: var(--ink); }
+
+    .route {
+      position: absolute;
+      left: 40px;
+      right: 40px;
+      top: 153px;
+      height: 260px;
+      display: grid;
+      grid-template-columns: 170px 220px 290px 170px;
+      gap: 23px;
+    }
+
+    .stage {
+      position: relative;
+      padding: 16px;
+      border: 1.7px solid var(--color);
+      border-radius: 12px;
+      background: rgba(255,255,255,.98);
+      box-shadow: var(--shadow);
+    }
+
+    .stage:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: -19px;
+      top: 128px;
+      width: 14px;
+      height: 2px;
+      background: #64748b;
+    }
+
+    .stage:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      right: -23px;
+      top: 124px;
+      border-left: 6px solid #64748b;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+
+    .stage-kicker {
+      color: var(--color);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .8px;
+    }
+
+    .stage h2 {
+      margin: 5px 0 13px;
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .tech {
+      margin-top: 9px;
+      padding: 9px 10px;
+      border: 1px solid var(--line-soft);
+      border-radius: 9px;
+      background: var(--wash);
+    }
+
+    .tech strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .tech span {
+      display: block;
+      color: var(--text);
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+
+    .stage-1 { --color: var(--blue); --wash: var(--blue-wash); }
+    .stage-2 { --color: var(--green); --wash: var(--green-wash); }
+    .stage-3 { --color: var(--purple); --wash: var(--purple-wash); }
+    .stage-4 { --color: var(--orange); --wash: var(--orange-wash); }
+
+    .parallel {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .progress {
+      position: absolute;
+      left: 40px;
+      right: 40px;
+      top: 438px;
+      height: 76px;
+      padding: 14px 22px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .progress-title {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .progress-items {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 9px;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .progress-items span { position: relative; }
+    .progress-items span:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -6px;
+      color: #94a3b8;
+    }
+
+    .unresolved {
+      position: absolute;
+      left: 40px;
+      right: 40px;
+      top: 530px;
+      display: grid;
+      grid-template-columns: 165px 1fr 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .unresolved-label {
+      display: flex;
+      align-items: center;
+      color: #9f3f2d;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .gap-card {
+      padding: 10px 14px;
+      border: 1.5px dashed #c45b48;
+      border-radius: 10px;
+      background: #fff8f6;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .gap-card strong { color: #9f3f2d; }
+
+    .closing {
+      position: absolute;
+      left: 40px;
+      right: 40px;
+      bottom: 19px;
+      padding-top: 13px;
+      border-top: 1px solid var(--line-soft);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="artboard">
+    <h1 class="diagram-title">Agent Memory 技术路线：问题推动责任上移</h1>
+    <p class="diagram-subtitle">按问题层级排列，不把并行技术伪造成项目继承谱系</p>
+
+    <div class="route-note"><strong>共同起点：</strong>当前 Context 装不下过去，完整历史又无法直接参与未来判断</div>
+
+    <section class="route">
+      <article class="stage stage-1">
+        <div class="stage-kicker">对象化</div>
+        <h2>过去成为对象</h2>
+        <div class="tech"><strong>会话 Memory</strong><span>Buffer、Summary、Entity</span></div>
+        <div class="parallel">意义不在压缩效果，而在让过去能够被单独处理</div>
+      </article>
+
+      <article class="stage stage-2">
+        <div class="stage-kicker">窗口外管理</div>
+        <h2>两条并行取向</h2>
+        <div class="tech"><strong>RAG</strong><span>自动、规模化、按需召回</span></div>
+        <div class="tech"><strong>LLM Wiki</strong><span>可读、可审、可版本化</span></div>
+        <div class="parallel">二者是取舍关系，不是先进与落后</div>
+      </article>
+
+      <article class="stage stage-3">
+        <div class="stage-kicker">能力分化</div>
+        <h2>结构、演化与管理</h2>
+        <div class="tech"><strong>GraphRAG</strong><span>补关系与整体性</span></div>
+        <div class="tech"><strong>Mem0 / Graphiti</strong><span>让更新、取代与失效成为一等操作</span></div>
+        <div class="tech"><strong>MemGPT</strong><span>第一次追问谁来决定存取</span></div>
+      </article>
+
+      <article class="stage stage-4">
+        <div class="stage-kicker">控制权</div>
+        <h2>策略归系统</h2>
+        <div class="tech"><strong>Memory OS</strong><span>从“模型临场管”走向“系统持续管”</span></div>
+        <div class="parallel">术语与范围尚未统一，路线仍在形成</div>
+      </article>
+    </section>
+
+    <section class="progress">
+      <div class="progress-title">技术路线依次点亮的系统问题</div>
+      <div class="progress-items"><span>召回</span><span>表示</span><span>时效与演化</span><span>控制权</span></div>
+    </section>
+
+    <section class="unresolved">
+      <div class="unresolved-label">仍留在暗处</div>
+      <div class="gap-card"><strong>纠错：</strong>怎样由现实证据纠正，而非由另一个模型确认</div>
+      <div class="gap-card"><strong>归属：</strong>记忆在哪个目标与 Scope 中成立</div>
+    </section>
+
+    <div class="closing">技术节点会更替，问题顺序不会消失：对象化 → 可召回 → 可演化 → 可治理</div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# Ignore files directly under the repository root
+/*
+
+# Keep root directories and repository metadata files trackable
+!/*/
+!/.gitignore
+!/README
+!/README.*

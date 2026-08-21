@@ -49,7 +49,7 @@ Loop Engineering：想清楚下一次由什么触发、带着什么状态，又�
 
 > 记忆主线是：**启动 → 推进 → 完成 → 变好**
 
-<img src="./10、Loop Engineering 相关/00、课件/images/harness-loop-boundary.png" alt="文档 Agent 从一次调用走向生产运行时，由四类失败压力依次推动行动权、结束权、启动权和演进权分离" />
+![image-20260821112219849](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20260821112219849.png)
 
 #### 1.4、Loop Engineering 的本质
 
@@ -80,7 +80,7 @@ Event → Task Run → Agent 执行 → Verification → Outcome
 多次 Trace + Outcome → 归因 → 候选修改 → Eval / Review / Gray → Harness vN+1
 ```
 
-<img src="./10、Loop Engineering 相关/00、课件/images/loop-timescales.png" alt="Loop Engineering 的完整运行链：Event 创建任务，Verification 包裹 Agent 执行，任务证据进入受控改进并形成下一版 Harness" />
+![image-20260821112311954](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20260821112311954.png)
 
 第一条生命周期处理一次真实任务，通常持续数秒到数小时；第二条生命周期处理多次任务暴露的系统性问题，通常跨越数天或一个版本周期
 
@@ -217,7 +217,7 @@ Model 读取目标与当前状态
 
 #### 4.2、可信改进必须闭合到下一版 Harness
 
-<img src="./10、Loop Engineering 相关/00、课件/images/controlled-improvement-loop.png" alt="生产证据经过归因、候选修改、离线评估、审批和灰度后形成下一版 Harness，并只影响未来任务" />
+![image-20260821112338925](https://raw.githubusercontent.com/wanglufei561/picture_repo/master/assets/image-20260821112338925.png)
 
 系统从多次运行中收集 **Trace**、**Outcome**、成本与人工反馈，形成问题假设，再修改 **Context**、**Prompt**、**Tool**、策略、验证器或模型版本
 

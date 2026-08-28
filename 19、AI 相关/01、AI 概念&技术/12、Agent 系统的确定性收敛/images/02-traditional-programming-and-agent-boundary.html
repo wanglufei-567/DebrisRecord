@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>程序问题模型与 Agent 运行时判断边界</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --paper: #fffefa;
+      --ink: #17243a;
+      --muted: #68778e;
+      --border: #d8e0eb;
+      --soft: #f5f8fc;
+      --blue: #2869e8;
+      --blue-deep: #2059c9;
+      --blue-soft: #e8f1ff;
+      --green: #0eae99;
+      --green-deep: #087f72;
+      --green-soft: #d9f8f1;
+      --orange: #bb4e00;
+      --shadow: 0 16px 40px rgba(30, 47, 76, 0.07);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 1440px;
+      height: 900px;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .canvas {
+      width: 1440px;
+      height: 900px;
+      padding: 42px 56px 34px;
+      background: var(--bg);
+    }
+
+    .eyebrow {
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 9px 0 7px;
+      font-size: 38px;
+      line-height: 1.16;
+      letter-spacing: -1.2px;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .question-row {
+      display: grid;
+      grid-template-columns: 260px 40px 1fr;
+      gap: 14px;
+      align-items: center;
+      margin-top: 24px;
+    }
+
+    .task-card,
+    .question-card {
+      height: 72px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255, 254, 250, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .task-card {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 0 18px;
+    }
+
+    .task-dot {
+      width: 24px;
+      height: 24px;
+      border: 7px solid #fff0bd;
+      border-radius: 50%;
+      background: #ffac11;
+      flex: 0 0 auto;
+    }
+
+    .task-title {
+      font-size: 19px;
+      font-weight: 750;
+    }
+
+    .task-desc {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .arrow {
+      color: #9aabbd;
+      font-size: 28px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .question-card {
+      display: grid;
+      grid-template-columns: 100px 1fr 130px;
+      align-items: center;
+      padding: 0 26px;
+    }
+
+    .question-label {
+      color: #8a9aaf;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .question-text {
+      text-align: center;
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .question-note {
+      color: var(--orange);
+      font-size: 14px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .boundary-card {
+      position: relative;
+      margin-top: 20px;
+      height: 445px;
+      padding: 26px 28px 22px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .boundary-card::before,
+    .boundary-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 6px;
+    }
+
+    .boundary-card::before {
+      left: 0;
+      background: var(--blue);
+    }
+
+    .boundary-card::after {
+      right: 0;
+      background: var(--green);
+    }
+
+    .boundary-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .boundary-kicker {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .boundary-title {
+      margin-top: 2px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .boundary-note {
+      color: var(--blue-deep);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 13px;
+      border: 1px solid #c9daf5;
+      border-radius: 999px;
+      background: #f2f7ff;
+    }
+
+    .model-grid {
+      counter-reset: model-step;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.12fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .model-item {
+      counter-increment: model-step;
+      position: relative;
+      height: 74px;
+      padding: 13px 16px 12px 58px;
+      border: 1px solid #d3deed;
+      border-radius: 11px;
+      background: var(--soft);
+    }
+
+    .model-item::before {
+      content: "0" counter(model-step);
+      position: absolute;
+      left: 15px;
+      top: 20px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      color: var(--blue-deep);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .model-item strong {
+      display: block;
+      font-size: 17px;
+      font-weight: 750;
+    }
+
+    .model-item span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 600;
+    }
+
+    .agent-zone {
+      margin-top: 18px;
+      padding: 16px 16px 17px;
+      border: 0;
+      border-radius: 14px;
+      background: #e9faf6;
+      box-shadow: inset 0 0 0 1px #a6e4d9;
+    }
+
+    .agent-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .agent-title {
+      color: var(--green-deep);
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .agent-desc {
+      color: #5d807a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .judgment-flow {
+      display: grid;
+      grid-template-columns: repeat(9, auto);
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 13px;
+    }
+
+    .judgment {
+      min-width: 154px;
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 10px;
+      background: rgba(255, 254, 250, 0.95);
+      box-shadow: 0 4px 12px rgba(13, 99, 86, 0.05), inset 0 0 0 1px #b3e5dc;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.15;
+      font-weight: 750;
+    }
+
+    .flow-arrow {
+      color: var(--green);
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .runtime-row {
+      display: grid;
+      grid-template-columns: 1fr 265px;
+      gap: 28px;
+      margin-top: 18px;
+    }
+
+    .program-bar,
+    .feedback-card {
+      height: 78px;
+      border-radius: 13px;
+    }
+
+    .program-bar {
+      position: relative;
+      display: grid;
+      grid-template-columns: 145px 1fr;
+      align-items: center;
+      padding: 0 18px;
+      border: 0;
+      background: var(--blue-soft);
+      box-shadow: inset 0 0 0 1px #c6d8f3;
+    }
+
+    .program-bar::after {
+      content: "→";
+      position: absolute;
+      right: -23px;
+      top: 25px;
+      color: #7890b0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .program-title {
+      color: var(--blue-deep);
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .program-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      color: #445875;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .program-flow .flow-arrow { color: #7890b0; }
+
+    .feedback-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 0;
+      background: var(--green-soft);
+      box-shadow: inset 0 0 0 1px #9fdfd3;
+      color: var(--green-deep);
+    }
+
+    .feedback-card::before {
+      content: "↑";
+      position: absolute;
+      top: -21px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--green);
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .feedback-symbol {
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .feedback-title {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .feedback-desc {
+      margin-top: 4px;
+      color: #5a857d;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .collaboration {
+      width: 1130px;
+      height: 50px;
+      margin: 24px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--paper);
+      color: #43536b;
+      box-shadow: var(--shadow);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .collaboration strong {
+      color: var(--orange);
+      font-weight: 850;
+    }
+
+    .memory-anchor {
+      height: 60px;
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      align-items: center;
+      padding: 0 20px;
+      border: 1.5px solid #38d0a9;
+      border-radius: 16px;
+      background: #e7faf3;
+    }
+
+    .anchor-label {
+      color: var(--green-deep);
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    .anchor-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.1px;
+    }
+
+    .anchor-text em {
+      color: var(--green-deep);
+      font-style: normal;
+    }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <div class="eyebrow">PROBLEM MODEL · RUNTIME JUDGMENT</div>
+    <h1>程序建立问题模型，Agent 扩展运行时判断</h1>
+    <div class="subtitle">具体路径可以动态形成，关键差异在于哪些判断能够在运行前被充分建模</div>
+
+    <section class="question-row" aria-label="分工问题">
+      <div class="task-card">
+        <div class="task-dot"></div>
+        <div>
+          <div class="task-title">同一个真实任务</div>
+          <div class="task-desc">可同时包含确定部分与开放判断</div>
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="question-card">
+        <div class="question-label">分工问题</div>
+        <div class="question-text">哪些要素预先建模，哪些判断留到运行时？</div>
+        <div class="question-note">不是二选一</div>
+      </div>
+    </section>
+
+    <section class="boundary-card" aria-label="问题模型与行动边界">
+      <div class="boundary-head">
+        <div>
+          <div class="boundary-kicker">运行前建立</div>
+          <div class="boundary-title">问题模型与行动边界</div>
+        </div>
+        <div class="boundary-note">具体路径仍可在运行时动态形成</div>
+      </div>
+
+      <div class="model-grid">
+        <div class="model-item"><strong>目标与状态</strong><span>任务目标 · 可识别的输入与状态</span></div>
+        <div class="model-item"><strong>工具与行动空间</strong><span>状态接口 · 可执行动作</span></div>
+        <div class="model-item"><strong>约束与验证</strong><span>规则权限 · 验收条件 · 停止边界</span></div>
+      </div>
+
+      <div class="agent-zone">
+        <div class="agent-head">
+          <div class="agent-title">Agent 运行时开放判断</div>
+          <div class="agent-desc">只处理难以提前穷举的理解与选择</div>
+        </div>
+        <div class="judgment-flow">
+          <div class="judgment">语境理解</div><div class="flow-arrow">→</div>
+          <div class="judgment">关系发现</div><div class="flow-arrow">→</div>
+          <div class="judgment">约束权衡</div><div class="flow-arrow">→</div>
+          <div class="judgment">路径选择</div><div class="flow-arrow">→</div>
+          <div class="judgment">反馈调整</div>
+        </div>
+      </div>
+
+      <div class="runtime-row">
+        <div class="program-bar">
+          <div class="program-title">程序化承载</div>
+          <div class="program-flow">
+            <span>执行动作</span><span class="flow-arrow">→</span>
+            <span>更新状态</span><span class="flow-arrow">→</span>
+            <span>验证结果</span>
+          </div>
+        </div>
+        <div class="feedback-card">
+          <div class="feedback-symbol">↺</div>
+          <div>
+            <div class="feedback-title">环境反馈</div>
+            <div class="feedback-desc">结果返回 Agent，继续调整</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="collaboration">
+      <strong>同一任务内协作：</strong>
+      <span>开放判断发生在系统预先提供的问题模型与行动边界内</span>
+    </div>
+
+    <div class="memory-anchor">
+      <div class="anchor-label">一条记忆主线</div>
+      <div class="anchor-text">程序定义可行动的边界，<em>Agent 在边界内处理未充分建模的判断</em></div>
+    </div>
+  </main>
+</body>
+</html>

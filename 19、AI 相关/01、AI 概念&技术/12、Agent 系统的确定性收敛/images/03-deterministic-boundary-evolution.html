@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>确定性边界的形成过程</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --paper: #fffefa;
+      --ink: #17243a;
+      --muted: #68778e;
+      --border: #d8e0eb;
+      --blue: #2869e8;
+      --blue-deep: #2059c9;
+      --blue-soft: #e8f1ff;
+      --green: #0eae99;
+      --green-deep: #087f72;
+      --green-soft: #d9f8f1;
+      --orange: #bb4e00;
+      --orange-soft: #fff3e8;
+      --shadow: 0 7px 14px rgba(30, 47, 76, 0.07);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 1440px;
+      height: 900px;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    body {
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .canvas {
+      width: 1440px;
+      height: 900px;
+      padding: 42px 56px 34px;
+      background: var(--bg);
+    }
+
+    .eyebrow {
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      margin: 9px 0 7px;
+      font-size: 38px;
+      line-height: 1.16;
+      letter-spacing: -1.2px;
+      font-weight: 800;
+    }
+
+    .subtitle { color: var(--muted); font-size: 15px; font-weight: 600; }
+
+    .question-row {
+      display: grid;
+      grid-template-columns: 260px 40px 1fr;
+      gap: 14px;
+      align-items: center;
+      margin-top: 24px;
+    }
+
+    .task-card,
+    .question-card {
+      height: 72px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255, 254, 250, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .task-card {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 0 18px;
+    }
+
+    .task-dot {
+      width: 24px;
+      height: 24px;
+      border: 7px solid #fff0bd;
+      border-radius: 50%;
+      background: #ffac11;
+      flex: 0 0 auto;
+    }
+
+    .task-title { font-size: 19px; font-weight: 750; }
+    .task-desc { margin-top: 2px; color: var(--muted); font-size: 13px; font-weight: 650; }
+    .arrow { color: #9aabbd; font-size: 28px; text-align: center; }
+
+    .question-card {
+      display: grid;
+      grid-template-columns: 100px 1fr 140px;
+      align-items: center;
+      padding: 0 26px;
+    }
+
+    .question-label { color: #8a9aaf; font-size: 14px; font-weight: 750; }
+    .question-text { text-align: center; font-size: 21px; font-weight: 800; }
+    .question-note { color: var(--orange); font-size: 14px; font-weight: 800; text-align: right; }
+
+    .evolution-card {
+      position: relative;
+      height: 445px;
+      margin-top: 20px;
+      padding: 26px 28px 22px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .evolution-card::before,
+    .evolution-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 6px;
+    }
+
+    .evolution-card::before { left: 0; background: var(--green); }
+    .evolution-card::after { right: 0; background: var(--blue); }
+
+    .card-head { display: flex; align-items: center; justify-content: space-between; }
+    .card-kicker { color: var(--green-deep); font-size: 13px; font-weight: 800; }
+    .card-title { margin-top: 2px; font-size: 24px; font-weight: 800; }
+
+    .card-note {
+      padding: 8px 13px;
+      border: 1px solid #c9daf5;
+      border-radius: 999px;
+      background: #f2f7ff;
+      color: var(--blue-deep);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stages {
+      display: grid;
+      grid-template-columns: 1fr 44px 1fr 44px 1fr;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .stage {
+      height: 178px;
+      padding: 13px;
+      border-radius: 15px;
+    }
+
+    .stage.signal {
+      background: #e9faf6;
+      box-shadow: inset 0 0 0 1px #a6e4d9;
+    }
+
+    .stage.evidence {
+      background: #fffdf9;
+      box-shadow: inset 0 0 0 1px #d7e1ee;
+    }
+
+    .stage.mechanism {
+      background: #eef4ff;
+      box-shadow: inset 0 0 0 1px #c6d8f3;
+    }
+
+    .stage-head { display: flex; align-items: center; gap: 10px; }
+
+    .stage-number {
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .signal .stage-number { background: var(--green-soft); color: var(--green-deep); }
+    .evidence .stage-number { background: #eef1f5; color: #56667e; }
+    .mechanism .stage-number { background: var(--blue-soft); color: var(--blue-deep); }
+
+    .stage-title { font-size: 20px; font-weight: 800; }
+    .stage-subtitle { margin-top: 4px; color: var(--muted); font-size: 12.5px; font-weight: 650; }
+
+    .stage-items {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stage-item {
+      height: 42px;
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 10px;
+      background: rgba(255, 254, 250, 0.96);
+      box-shadow: inset 0 0 0 1px rgba(171, 187, 207, 0.55);
+    }
+
+    .stage-item strong { font-size: 14.5px; line-height: 1.2; font-weight: 800; }
+    .stage-item span { color: var(--muted); font-size: 11.5px; line-height: 1.25; font-weight: 600; }
+    .signal .stage-subtitle,
+    .signal .stage-item span { color: #4e746d; }
+    .evidence .stage-subtitle,
+    .evidence .stage-item span { color: #5f6d80; }
+    .mechanism .stage-subtitle,
+    .mechanism .stage-item span { color: #586d8d; }
+
+    .stage-arrow { color: #8799b1; font-size: 25px; font-weight: 800; text-align: center; }
+
+    .branches {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin-top: 17px;
+    }
+
+    .branch {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 0 17px;
+      border-radius: 12px;
+    }
+
+    .branch.revise {
+      background: var(--orange-soft);
+      box-shadow: inset 0 0 0 1px #f2d4b9;
+    }
+
+    .branch.converge {
+      background: var(--green-soft);
+      box-shadow: inset 0 0 0 1px #a7e1d5;
+    }
+
+    .branch-badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 254, 250, 0.88);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .revise .branch-badge { color: var(--orange); }
+    .converge .branch-badge { color: var(--green-deep); }
+    .branch-text { font-size: 14px; font-weight: 750; }
+
+    .feedback-loop {
+      height: 55px;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fffdf9;
+      color: #43536b;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .feedback-symbol { color: var(--green); font-size: 25px; font-weight: 800; }
+    .feedback-loop strong { color: var(--green-deep); font-weight: 850; }
+
+    .collaboration {
+      width: 1130px;
+      height: 50px;
+      margin: 24px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      color: #43536b;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .collaboration strong { color: var(--orange); font-weight: 850; }
+
+    .memory-anchor {
+      height: 60px;
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      align-items: center;
+      padding: 0 20px;
+      border: 1.5px solid #38d0a9;
+      border-radius: 16px;
+      background: #e7faf3;
+    }
+
+    .anchor-label { color: var(--green-deep); font-size: 14px; font-weight: 850; }
+    .anchor-text { font-size: 20px; font-weight: 800; }
+    .anchor-text em { color: var(--green-deep); font-style: normal; }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <div class="eyebrow">OBSERVATION · EVIDENCE · RESPONSIBILITY</div>
+    <h1>边界形成于被验证的实践</h1>
+    <div class="subtitle">重复现象只是信号，独立证据才能把失败解释推进为责任机制</div>
+
+    <section class="question-row" aria-label="认识问题">
+      <div class="task-card">
+        <div class="task-dot"></div>
+        <div>
+          <div class="task-title">一次重复失败</div>
+          <div class="task-desc">相同现象可能来自不同原因</div>
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="question-card">
+        <div class="question-label">认识问题</div>
+        <div class="question-text">什么责任真的不能继续漂移？</div>
+        <div class="question-note">先验证，再收敛</div>
+      </div>
+    </section>
+
+    <section class="evolution-card" aria-label="确定性边界形成过程">
+      <div class="card-head">
+        <div>
+          <div class="card-kicker">从运行现象走向责任机制</div>
+          <div class="card-title">边界不是自然成熟，而是被证据逐步校准</div>
+        </div>
+        <div class="card-note">没有固定的载体升级路线</div>
+      </div>
+
+      <div class="stages">
+        <div class="stage signal">
+          <div class="stage-head"><div class="stage-number">01</div><div><div class="stage-title">发现信号</div><div class="stage-subtitle">重复不等于原因已经成立</div></div></div>
+          <div class="stage-items">
+            <div class="stage-item"><strong>观察现象</strong><span>确认重复出现，而不是孤立偶发</span></div>
+            <div class="stage-item"><strong>提出假设</strong><span>区分事实、上下文、工具与规则来源</span></div>
+          </div>
+        </div>
+        <div class="stage-arrow">→</div>
+
+        <div class="stage evidence">
+          <div class="stage-head"><div class="stage-number">02</div><div><div class="stage-title">验证责任</div><div class="stage-subtitle">用独立证据缩小解释空间</div></div></div>
+          <div class="stage-items">
+            <div class="stage-item"><strong>验证原因</strong><span>确认适用范围与真实错误后果</span></div>
+            <div class="stage-item"><strong>识别责任</strong><span>找出其中不能继续漂移的部分</span></div>
+          </div>
+        </div>
+        <div class="stage-arrow">→</div>
+
+        <div class="stage mechanism">
+          <div class="stage-head"><div class="stage-number">03</div><div><div class="stage-title">落实并校准</div><div class="stage-subtitle">载体服务于责任，而不是代表成熟</div></div></div>
+          <div class="stage-items">
+            <div class="stage-item"><strong>选择机制</strong><span>代码、配置、权限、验证或人工判断</span></div>
+            <div class="stage-item"><strong>继续观察</strong><span>检查问题是否减少、是否引入新限制</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="branches">
+        <div class="branch revise"><div class="branch-badge">证据不足</div><div class="branch-text">修正原因假设、验证条件，或者继续保持开放</div></div>
+        <div class="branch converge"><div class="branch-badge">证据成立</div><div class="branch-text">明确不能漂移的责任，并选择合适机制承担</div></div>
+      </div>
+
+      <div class="feedback-loop"><span class="feedback-symbol">↺</span><strong>实施结果返回观察阶段</strong><span>继续检查边界是否正确、是否需要调整</span></div>
+    </section>
+
+    <div class="collaboration">
+      <strong>载体可以不同：</strong>
+      <span>Prompt、Skill、配置、代码、权限系统、验证机制或人工判断</span>
+    </div>
+
+    <div class="memory-anchor">
+      <div class="anchor-label">一条记忆主线</div>
+      <div class="anchor-text">证据验证原因，责任界定边界，<em>反馈继续校准</em></div>
+    </div>
+  </main>
+</body>
+</html>

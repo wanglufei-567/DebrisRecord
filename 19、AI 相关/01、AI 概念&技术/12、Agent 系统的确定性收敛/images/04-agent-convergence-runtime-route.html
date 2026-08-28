@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent 确定性收敛完整路线</title>
+  <style>
+    :root {
+      --bg: #06080d;
+      --panel: #0b0f17;
+      --panel-2: #101622;
+      --line: #283246;
+      --text: #f4f7ff;
+      --muted: #9ba8bc;
+      --purple: #a99cff;
+      --purple-bg: #17172a;
+      --cyan: #55d8d0;
+      --cyan-bg: #0d2327;
+      --gold: #efc64d;
+      --gold-dim: #7a652b;
+      --green: #4ed6a7;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 1800px;
+      height: 900px;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    body {
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .canvas {
+      width: 1800px;
+      height: 900px;
+      padding: 48px 64px 34px;
+      background: var(--bg);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .title-group h1 {
+      margin: 0;
+      font-size: 46px;
+      line-height: 1.12;
+      letter-spacing: -1.4px;
+      font-weight: 850;
+      text-wrap: balance;
+    }
+
+    .title-group p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .summary-tags {
+      display: flex;
+      gap: 9px;
+      padding-bottom: 5px;
+    }
+
+    .tag {
+      padding: 8px 13px;
+      border: 1px solid #285d50;
+      border-radius: 999px;
+      color: var(--green);
+      background: #0d1d1a;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .frame {
+      height: 555px;
+      margin-top: 30px;
+      padding: 24px 26px 22px;
+      border: 1px solid #202838;
+      border-radius: 14px;
+      background: var(--panel);
+    }
+
+    .flow {
+      height: 335px;
+      display: grid;
+      grid-template-columns: 154px 28px 490px 28px 220px 28px 490px 28px 154px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .endpoint,
+    .stage {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #0d121b;
+    }
+
+    .endpoint {
+      height: 128px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      color: #dce3ef;
+      font-size: 20px;
+      line-height: 1.35;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .group {
+      height: 310px;
+      padding: 13px;
+      border: 1px solid #242c3d;
+      border-radius: 13px;
+      background: #090d14;
+    }
+
+    .group-head {
+      height: 57px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-radius: 9px;
+      background: #111620;
+    }
+
+    .group-head strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .group-head span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .front .group-head { color: var(--purple); box-shadow: inset 0 0 0 1px #4b476d; }
+    .middle .group-head { color: #c5cedb; box-shadow: inset 0 0 0 1px #3c4658; }
+    .back .group-head { color: var(--cyan); box-shadow: inset 0 0 0 1px #27585e; }
+
+    .stages {
+      height: 213px;
+      display: grid;
+      gap: 13px;
+      margin-top: 12px;
+    }
+
+    .stages.two { grid-template-columns: repeat(2, 1fr); }
+
+    .stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .front .stage { color: #ddd8ff; background: var(--purple-bg); border-color: #514c75; }
+    .middle .stage { color: #d7deea; background: #111722; border-color: #465166; }
+    .back .stage { color: #bff9f5; background: var(--cyan-bg); border-color: #2f6f73; }
+
+    .stage strong {
+      font-size: 21px;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    .stage span {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .marker {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      background: #07100e;
+      color: #d9fff2;
+      font-size: 14px;
+      font-weight: 900;
+      transform: translateX(-50%);
+    }
+
+    .arrow {
+      color: #66748a;
+      font-size: 25px;
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .budgets {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .budget {
+      height: 34px;
+      display: grid;
+      grid-template-columns: 78px 1fr 245px;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .budget strong {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .budget-line {
+      height: 6px;
+      border: 1px solid var(--gold-dim);
+      border-radius: 999px;
+      background: #1a170d;
+    }
+
+    .budget span {
+      color: #b4a98a;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .thesis {
+      height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 24px;
+      padding: 0 54px;
+      border: 1px solid var(--gold-dim);
+      border-radius: 13px;
+      background: #121006;
+      color: #f6f7fb;
+      font-size: 24px;
+      line-height: 1.55;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .thesis em { color: var(--cyan); font-style: normal; }
+    .thesis b { color: var(--purple); font-weight: 850; }
+
+    .source {
+      margin-top: 13px;
+      color: #657086;
+      font-size: 11px;
+      text-align: right;
+      font-weight: 600;
+    }
+
+    /* 将三条细轨道收敛为一条跨链运行预算带 */
+    .frame {
+      height: 492px;
+      padding: 20px 26px 18px;
+    }
+
+    .budgets {
+      display: grid;
+      grid-template-columns: 155px repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #2a3243;
+      border-radius: 11px;
+      background: #090d14;
+    }
+
+    .budget-intro {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 12px;
+      border-right: 1px solid #2a3243;
+    }
+
+    .budget-intro span {
+      color: #8f9bb0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .budget-intro strong {
+      margin-top: 4px;
+      color: var(--gold);
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    .budget {
+      height: 58px;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      border: 1px solid #2a3243;
+      border-radius: 8px;
+      background: #0d121b;
+    }
+
+    .budget strong {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 28px;
+      border-radius: 6px;
+      background: #1b170b;
+    }
+
+    .budget-line {
+      display: none;
+    }
+
+    .budget span {
+      color: #aeb8c8;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .thesis {
+      height: 102px;
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <header class="title-row">
+      <div class="title-group">
+        <h1>开放判断进入现实系统的完整路线</h1>
+        <p>一条从概率性理解走向确定性执行的连续链路</p>
+      </div>
+      <div class="summary-tags" aria-label="五道责任边界">
+        <span class="tag">语义</span><span class="tag">执行</span><span class="tag">权限</span><span class="tag">验证</span><span class="tag">成本</span>
+      </div>
+    </header>
+
+    <section class="frame" aria-label="Agent 确定性收敛的完整运行路线">
+      <div class="flow">
+        <div class="endpoint">用户问题</div>
+        <div class="arrow">→</div>
+
+        <section class="group front">
+          <div class="group-head"><strong>前端 · 概率区</strong><span>理解与规划</span></div>
+          <div class="stages two">
+            <div class="stage"><strong>Agent 理解<br />与路由</strong><span>识别意图与候选路径</span></div>
+            <div class="stage"><div class="marker">1</div><strong>语义与<br />上下文层</strong><span>接入稳定口径与允许使用的事实</span></div>
+          </div>
+        </section>
+
+        <div class="arrow">→</div>
+
+        <section class="group middle">
+          <div class="group-head"><strong>中间 · 编排层</strong><span>控制面</span></div>
+          <div class="stages">
+            <div class="stage"><div class="marker">2</div><strong>受控编排</strong><span>可观察 · 可阻断 · 可回退</span></div>
+          </div>
+        </section>
+
+        <div class="arrow">→</div>
+
+        <section class="group back">
+          <div class="group-head"><strong>后端 · 确定区</strong><span>计算 · 业务规则 · 权限控制</span></div>
+          <div class="stages two">
+            <div class="stage"><div class="marker">3</div><strong>确定性执行</strong><span>依据规则、契约与权限改变状态</span></div>
+            <div class="stage"><div class="marker">4</div><strong>校验与审计</strong><span>独立接受结果并保留证据</span></div>
+          </div>
+        </section>
+
+        <div class="arrow">→</div>
+        <div class="endpoint">答案 /<br />业务动作</div>
+      </div>
+
+      <div class="budgets" aria-label="三条端到端预算">
+        <div class="budget-intro"><span>贯穿入口到出口</span><strong>端到端预算</strong></div>
+        <div class="budget"><strong>权限</strong><div class="budget-line"></div><span>身份与授权范围贯穿全链路</span></div>
+        <div class="budget"><strong>成本</strong><div class="budget-line"></div><span>核算成功任务的完整成本</span></div>
+        <div class="budget"><strong>时延</strong><div class="budget-line"></div><span>超时、停止与降级条件持续成立</span></div>
+      </div>
+    </section>
+
+    <div class="thesis"><b>概率性的理解与规划放在前端</b>，<em>确定性的计算、业务规则与权限控制放在后端</em>，中间由可观察、可回退的编排连接两者</div>
+    <div class="source">根据唐国梁 Tommy 公开内容中的工程抽象整理重绘</div>
+  </main>
+</body>
+</html>

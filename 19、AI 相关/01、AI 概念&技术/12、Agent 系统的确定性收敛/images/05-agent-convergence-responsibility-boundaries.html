@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent 确定性收敛的五道责任边界</title>
+  <style>
+    :root {
+      --bg: #06080d;
+      --panel: #0b0f17;
+      --panel-2: #101622;
+      --line: #283246;
+      --text: #f4f7ff;
+      --muted: #98a5b9;
+      --purple: #a99cff;
+      --purple-bg: #17172a;
+      --cyan: #55d8d0;
+      --cyan-bg: #0d2327;
+      --gold: #efc64d;
+      --gold-dim: #79642a;
+      --green: #4ed6a7;
+      --red: #e78383;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 1800px;
+      height: 900px;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    body {
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .canvas {
+      width: 1800px;
+      height: 900px;
+      padding: 42px 54px 28px;
+      background: var(--bg);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.12;
+      letter-spacing: -1.2px;
+      font-weight: 850;
+    }
+
+    .subtitle {
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .print-note {
+      padding: 11px 16px;
+      border: 1px solid var(--gold-dim);
+      border-radius: 999px;
+      color: var(--gold);
+      background: #171307;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .route-panel {
+      height: 260px;
+      margin-top: 24px;
+      padding: 20px 22px 17px;
+      border: 1px solid #202838;
+      border-radius: 13px;
+      background: var(--panel);
+    }
+
+    .route {
+      display: grid;
+      grid-template-columns: 145px 25px 190px 25px 205px 25px 190px 25px 190px 25px 190px 25px 145px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stage {
+      position: relative;
+      height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: #dce3ef;
+      background: #0d121b;
+      font-size: 17px;
+      line-height: 1.35;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .stage.open { color: #ded9ff; background: var(--purple-bg); border-color: #4f4a72; }
+    .stage.control { color: #d6deeb; background: #111722; border-color: #465166; }
+    .stage.stable { color: #bff9f5; background: var(--cyan-bg); border-color: #2d6c71; }
+    .arrow { color: #647187; font-size: 20px; text-align: center; font-weight: 900; }
+
+    .marker {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      background: #161205;
+      color: #fff3c6;
+      font-size: 14px;
+      font-weight: 900;
+      transform: translateX(-50%);
+    }
+
+    .budget-rails {
+      display: grid;
+      gap: 7px;
+      margin-top: 24px;
+    }
+
+    .rail {
+      height: 18px;
+      display: grid;
+      grid-template-columns: 68px 1fr 82px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rail strong {
+      color: #b9aa77;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .rail-line {
+      height: 5px;
+      border: 1px solid #5f5227;
+      border-radius: 999px;
+      background: #18150c;
+    }
+
+    .rail.cost strong,
+    .rail.cost span { color: var(--gold); }
+    .rail.cost .rail-line { border-color: var(--gold-dim); background: #3b3111; }
+
+    .cost-marker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .cost-marker b {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      font-size: 11px;
+    }
+
+    .questions {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .question {
+      height: 348px;
+      padding: 17px 17px 16px;
+      border: 1px solid var(--gold-dim);
+      border-radius: 12px;
+      background: #0c1018;
+    }
+
+    .question-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .question-number {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--gold);
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .question-number b {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      font-size: 12px;
+    }
+
+    .question-label {
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: #ceb865;
+      background: #1c180b;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .question-text {
+      height: 105px;
+      margin-top: 20px;
+      font-size: 20px;
+      line-height: 1.45;
+      font-weight: 850;
+      text-wrap: pretty;
+    }
+
+    .answer-list {
+      display: grid;
+      gap: 10px;
+      padding-top: 14px;
+      border-top: 1px solid #2e3544;
+    }
+
+    .answer {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 8px;
+      align-items: start;
+      color: #cbd4e2;
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .answer i {
+      width: 21px;
+      height: 21px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 900;
+    }
+
+    .answer.good i { color: #d8fff1; background: #174d3d; }
+    .answer.bad { color: #9f7d7d; text-decoration: line-through; }
+    .answer.bad i { color: #ffd6d6; background: #4d2424; text-decoration: none; }
+
+    .verify-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-top: 2px;
+    }
+
+    .verify-action {
+      height: 62px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #22545a;
+      border-radius: 9px;
+      color: var(--cyan);
+      background: #0b1e22;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .verify-action b { font-size: 18px; line-height: 1; }
+    .verify-action span { margin-top: 5px; }
+
+    .footer-band {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 18px;
+      border: 1px solid var(--gold-dim);
+      border-radius: 12px;
+      background: #151106;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .footer-band strong { color: var(--gold); font-size: 24px; }
+    .footer-band span { color: #a99d7b; }
+
+    .source {
+      margin-top: 11px;
+      color: #657086;
+      font-size: 11px;
+      text-align: right;
+      font-weight: 600;
+    }
+
+    /* 用一条全链约束带替代重复的三条细轨道 */
+    .route-panel {
+      height: 224px;
+    }
+
+    .budget-rails {
+      display: grid;
+      grid-template-columns: 145px repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 13px;
+      padding: 8px 10px;
+      border: 1px solid #2a3243;
+      border-radius: 9px;
+      background: #090d14;
+    }
+
+    .rails-title {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border-right: 1px solid #2a3243;
+      color: #9aa7ba;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .rail {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border: 1px solid #2a3243;
+      border-radius: 7px;
+      background: #0d121b;
+    }
+
+    .rail strong {
+      flex: 0 0 auto;
+      color: var(--gold);
+    }
+
+    .rail span {
+      overflow: hidden;
+      color: #9ba8bc;
+      font-size: 11px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rail-line {
+      display: none;
+    }
+
+    .cost-marker {
+      margin-left: auto;
+      padding-left: 10px;
+      border-left: 1px solid #403719;
+    }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <header class="title-row">
+      <div>
+        <h1>五道边界，放回同一条运行路线</h1>
+        <div class="subtitle">用五个问题检查：开放判断进入现实系统以后，责任是否仍然明确</div>
+      </div>
+      <div class="print-note">可直接用于系统评审</div>
+    </header>
+
+    <section class="route-panel" aria-label="五道责任边界在运行路线中的位置">
+      <div class="route">
+        <div class="stage">用户问题</div><div class="arrow">→</div>
+        <div class="stage open">Agent<br />理解与路由</div><div class="arrow">→</div>
+        <div class="stage open"><div class="marker">1</div>语义与<br />上下文层</div><div class="arrow">→</div>
+        <div class="stage control"><div class="marker">2</div>受控编排</div><div class="arrow">→</div>
+        <div class="stage stable"><div class="marker">3</div>确定性执行</div><div class="arrow">→</div>
+        <div class="stage stable"><div class="marker">4</div>校验与审计</div><div class="arrow">→</div>
+        <div class="stage">答案 /<br />业务动作</div>
+      </div>
+
+      <div class="budget-rails">
+        <div class="rails-title">贯穿全链路的运行预算</div>
+        <div class="rail"><strong>权限</strong><span>身份与授权范围</span></div>
+        <div class="rail cost"><strong>成本</strong><span>成功任务完整成本</span><div class="cost-marker"><b>5</b></div></div>
+        <div class="rail"><strong>时延</strong><span>超时、停止与降级</span></div>
+      </div>
+    </section>
+
+    <section class="questions" aria-label="五问评审提纲">
+      <article class="question">
+        <div class="question-head"><div class="question-number"><b>1</b>语义</div><div class="question-label">第一问</div></div>
+        <div class="question-text">它使用的业务语义，从哪里来？</div>
+        <div class="answer-list">
+          <div class="answer good"><i>✓</i><span>来自受治理的语义层与元数据</span></div>
+          <div class="answer good"><i>✓</i><span>关键口径能够追溯到权威事实</span></div>
+          <div class="answer bad"><i>×</i><span>临时硬编码在 Prompt 中</span></div>
+        </div>
+      </article>
+
+      <article class="question">
+        <div class="question-head"><div class="question-number"><b>2</b>执行</div><div class="question-label">第二问</div></div>
+        <div class="question-text">哪些步骤允许模型自由推理，哪些必须固化？</div>
+        <div class="answer-list">
+          <div class="answer good"><i>✓</i><span>自由推理区：模型形成候选判断</span></div>
+          <div class="answer good"><i>✓</i><span>固化区：工作流或 SOP 承担稳定步骤</span></div>
+          <div class="answer bad"><i>×</i><span>所有步骤都交给模型临场决定</span></div>
+        </div>
+      </article>
+
+      <article class="question">
+        <div class="question-head"><div class="question-number"><b>3</b>权限</div><div class="question-label">第三问</div></div>
+        <div class="question-text">工具执行继承的是谁的身份？</div>
+        <div class="answer-list">
+          <div class="answer good"><i>✓</i><span>继承最终用户或明确服务主体的身份</span></div>
+          <div class="answer good"><i>✓</i><span>权限范围与真实责任主体一致</span></div>
+          <div class="answer bad"><i>×</i><span>共享一个高权限账号</span></div>
+        </div>
+      </article>
+
+      <article class="question">
+        <div class="question-head"><div class="question-number"><b>4</b>验证</div><div class="question-label">第四问</div></div>
+        <div class="question-text">错误如何被验证、阻断与回退？</div>
+        <div class="verify-actions">
+          <div class="verify-action"><b>⌕</b><span>被发现</span></div>
+          <div class="verify-action"><b>⊣</b><span>被阻断</span></div>
+          <div class="verify-action"><b>↶</b><span>被回退</span></div>
+        </div>
+        <div class="answer-list" style="margin-top: 12px; padding-top: 12px;">
+          <div class="answer bad"><i>×</i><span>让模型证明自己的结果正确</span></div>
+        </div>
+      </article>
+
+      <article class="question">
+        <div class="question-head"><div class="question-number"><b>5</b>成本</div><div class="question-label">第五问</div></div>
+        <div class="question-text">是否统计每个成功任务的完整成本？</div>
+        <div class="answer-list">
+          <div class="answer good"><i>✓</i><span>模型、工具、查询、重试与人工共同计入</span></div>
+          <div class="answer good"><i>✓</i><span>按照成功任务核算端到端成本</span></div>
+          <div class="answer bad"><i>×</i><span>只比较模型调用单价</span></div>
+        </div>
+      </article>
+    </section>
+
+    <div class="footer-band"><span>五问评审提纲</span><strong>五道边界 = 一张可以打印的检查表</strong></div>
+    <div class="source">根据唐国梁 Tommy 公开内容中的工程抽象整理重绘</div>
+  </main>
+</body>
+</html>

@@ -1,10 +1,5 @@
 ## 从 Chat AI 到 Agent：围绕记忆、工具与控制循环的工程化演进
 
-> 草稿版本：v0.4
-> 精炼时间：2026-06-16
-> 写作定位：面向工程师的 **Agent** 技术认知骨架，用演进线讲清 **Agent** 从何而来，用三条主干讲清 **Agent** 如何工作，用边界和护栏讲清 **Agent** 为什么难以工程化
-> 阅读目标：读者能用 **Memory / Context**、**Tools**、**Control Loop** 复述 **Agent**，并能区分 **LLM**、**Agent**、**Tool**、**Runtime**、**Sandbox**、**Process**
-
 ### 一、问题起点：Chat AI 为什么还不是 Agent
 
 **Chat AI** 的核心形态是用户输入一段话，模型返回一段话
